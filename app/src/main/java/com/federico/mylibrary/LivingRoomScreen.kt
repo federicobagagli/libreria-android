@@ -17,10 +17,6 @@ fun LivingRoomScreen(navController: NavController) {
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.salotto_title),
-            style = MaterialTheme.typography.titleLarge
-        )
 
         Button(onClick = { navController.navigate("view_library") }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.library))

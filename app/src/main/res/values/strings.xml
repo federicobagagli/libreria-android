@@ -14,6 +14,7 @@
     <string name="view_library_title">Library View</string>
     <string name="view_all_books">View All Books</string>
     <string name="back">Back</string>
+    <string name="view_by_criteria">View by Criteria</string>
 
     <!-- Navigation -->
     <string name="screen_books">Library</string>
@@ -28,6 +29,7 @@
     <string name="book_publish_date_label">📅 %1$s</string>
 
     <!-- Add Book -->
+    <string name="add_book">Add Book</string>
     <string name="title">Title</string>
     <string name="author">Author</string>
     <string name="genre">Genre</string>

@@ -4,6 +4,7 @@ package com.federico.mylibrary
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
@@ -48,6 +50,7 @@ fun LibreriaApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
 
     Scaffold(
         topBar = {
@@ -80,6 +83,17 @@ fun LibreriaApp() {
             composable("books") { BooksScreen() }
             composable("add") { AddBookScreen() }
             composable("settings") { SettingsScreen() }
+            composable(
+                route = "books_filter/{title}/{author}/{genre}/{publishDate}",
+                arguments = listOf(
+                    navArgument("title") { defaultValue = "_" },
+                    navArgument("author") { defaultValue = "_" },
+                    navArgument("genre") { defaultValue = "_" },
+                    navArgument("publishDate") { defaultValue = "_" }
+                )
+            ) { backStackEntry ->
+                BooksScreenFiltered(navController = navController, backStackEntry = backStackEntry)
+            }
         }
     }
 }
@@ -90,8 +104,8 @@ fun BottomNavigationBar(navController: NavHostController, currentDestination: an
         val items = listOf(
             NavItem("living_room", Icons.Default.Home, stringResource(R.string.salotto_title)),
             NavItem("books", Icons.Default.Book, stringResource(R.string.screen_books)),
-            NavItem("add", Icons.Default.Add, stringResource(R.string.screen_add)),
-            NavItem("settings", Icons.Default.Settings, stringResource(R.string.screen_settings))
+            NavItem("settings", Icons.Default.Settings, stringResource(R.string.screen_settings)),
+            NavItem("back", Icons.Default.ArrowBack, stringResource(R.string.back))
         )
 
         items.forEach { item ->
@@ -99,10 +113,27 @@ fun BottomNavigationBar(navController: NavHostController, currentDestination: an
                 icon = { Icon(item.icon, contentDescription = item.label) },
                 label = { Text(item.label) },
                 selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
-                onClick = { navController.navigate(item.route) }
+                onClick = {
+                    if (item.route == "back") {
+                        Log.d("BottomNav", "Back button clicked")
+                        val popped = navController.popBackStack()
+                        if (!popped) {
+                            Log.d("BottomNav", "Nothing to pop, navigating to living_room")
+                            navController.navigate("living_room") {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        } else {
+                            Log.d("BottomNav", "Navigated back successfully")
+                        }
+                    } else {
+                        navController.navigate(item.route)
+                    }
+                }
             )
         }
     }
 }
+
+
 
 data class NavItem(val route: String, val icon: ImageVector, val label: String)
