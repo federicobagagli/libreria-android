@@ -27,6 +27,11 @@
     <string name="book_author_label">✍️ %1$s</string>
     <string name="book_genre_label">📚 %1$s</string>
     <string name="book_publish_date_label">📅 %1$s</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_deletion">Are you sure you want to delete this book?</string>
+    <string name="book_updated">Book updated successfully!</string>
+
 
     <!-- Add Book -->
     <string name="add_book">Add Book</string>

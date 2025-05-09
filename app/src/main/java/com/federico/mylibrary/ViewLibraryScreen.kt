@@ -52,7 +52,9 @@ fun ViewLibraryScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Button(onClick = { navController.navigate("books") }, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = {
+            navController.navigate("books/_/_/_/_")
+        }, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.view_all_books))
         }
 
@@ -62,12 +64,13 @@ fun ViewLibraryScreen(navController: NavController) {
                 val encodedAuthor = author.ifBlank { "_" }
                 val encodedGenre = genre.ifBlank { "_" }
                 val encodedDate = publishDate.ifBlank { "_" }
-                navController.navigate("books_filter/$encodedTitle/$encodedAuthor/$encodedGenre/$encodedDate")
+                navController.navigate("books/$encodedTitle/$encodedAuthor/$encodedGenre/$encodedDate")
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_by_criteria))
         }
+
         Button(
             onClick = { navController.navigate("add") },
             modifier = Modifier.fillMaxWidth()

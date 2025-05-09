@@ -78,13 +78,15 @@ fun LibreriaApp() {
             startDestination = "living_room",
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable("edit_book/{bookId}") { backStackEntry ->
+                EditBookScreen(navController, backStackEntry)
+            }
             composable("living_room") { LivingRoomScreen(navController) }
             composable("view_library") { ViewLibraryScreen(navController) }
-            composable("books") { BooksScreen() }
             composable("add") { AddBookScreen() }
             composable("settings") { SettingsScreen() }
             composable(
-                route = "books_filter/{title}/{author}/{genre}/{publishDate}",
+                route = "books/{title}/{author}/{genre}/{publishDate}",
                 arguments = listOf(
                     navArgument("title") { defaultValue = "_" },
                     navArgument("author") { defaultValue = "_" },
@@ -92,8 +94,16 @@ fun LibreriaApp() {
                     navArgument("publishDate") { defaultValue = "_" }
                 )
             ) { backStackEntry ->
-                BooksScreenFiltered(navController = navController, backStackEntry = backStackEntry)
+                val args = backStackEntry.arguments!!
+                BooksScreen(
+                    navController = navController,
+                    title = args.getString("title")?.takeIf { it != "_" },
+                    author = args.getString("author")?.takeIf { it != "_" },
+                    genre = args.getString("genre")?.takeIf { it != "_" },
+                    publishDate = args.getString("publishDate")?.takeIf { it != "_" }
+                )
             }
+
         }
     }
 }
