@@ -34,16 +34,17 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 @Serializable
-data class OpenLibraryBook(
+data class BookInfo(
     val title: String = "",
-    val authors: List<OpenLibraryAuthor> = emptyList()
+    val authors: List<AuthorInfo> = emptyList(),
+    val genre: String = "",
+    val publishDate: String = ""
 )
 
 @Serializable
-data class OpenLibraryAuthor(val name: String)
+data class AuthorInfo(val name: String)
 
-suspend fun fetchBookInfoByIsbn(isbn: String): OpenLibraryBook? {
-
+suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo? {
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json { ignoreUnknownKeys = true })
@@ -51,21 +52,32 @@ suspend fun fetchBookInfoByIsbn(isbn: String): OpenLibraryBook? {
     }
 
     return try {
-        val response: JsonObject = client.get("https://openlibrary.org/api/books") {
+        val response: JsonObject = client.get("https://www.googleapis.com/books/v1/volumes") {
             url {
-                parameters.append("bibkeys", "ISBN:$isbn")
-                parameters.append("format", "json")
-                parameters.append("jscmd", "data")
+                parameters.append("q", "isbn:$isbn")
+                parameters.append("key", apiKey)
             }
         }.body()
 
-        val bookData = response["ISBN:$isbn"]?.jsonObject ?: return null
+        val items = response["items"]?.jsonArray ?: return null
+        val volumeInfo = items[0].jsonObject["volumeInfo"]?.jsonObject ?: return null
 
-        val title = bookData["title"]?.jsonPrimitive?.content ?: ""
-        val authorName = bookData["authors"]?.jsonArray
-            ?.firstOrNull()?.jsonObject?.get("name")?.jsonPrimitive?.content ?: ""
+        val title = volumeInfo["title"]?.jsonPrimitive?.content ?: ""
+        val authorsArray = volumeInfo["authors"]?.jsonArray?.mapNotNull {
+            it.jsonPrimitive.contentOrNull
+        } ?: emptyList()
 
-        OpenLibraryBook(title, listOf(OpenLibraryAuthor(authorName)))
+        val genre = volumeInfo["categories"]?.jsonArray
+            ?.firstOrNull()?.jsonPrimitive?.content ?: ""
+
+        val publishDate = volumeInfo["publishedDate"]?.jsonPrimitive?.content ?: ""
+
+        BookInfo(
+            title = title,
+            authors = authorsArray.map { AuthorInfo(it) },
+            genre = genre,
+            publishDate = publishDate
+        )
     } catch (e: Exception) {
         null
     } finally {
@@ -140,13 +152,6 @@ fun AddBookScreen() {
                 .addOnSuccessListener { barcodes ->
                     Log.d("ScanISBN", "Barcode trovati: ${barcodes.size}")
 
-                    if (barcodes.isNotEmpty()) {
-                        val allValues = barcodes.joinToString("\n") { "Valore: ${it.rawValue}, formato: ${it.format}" }
-                        Toast.makeText(context, allValues, Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(context, "Nessun barcode rilevato", Toast.LENGTH_SHORT).show()
-                    }
-
                     val isbnBarcode = barcodes.firstOrNull {
                         Toast.makeText(context, "Rilevato: ${it.rawValue}", Toast.LENGTH_SHORT).show()
                         it.rawValue?.length == 13 && it.format == Barcode.FORMAT_EAN_13
@@ -163,6 +168,8 @@ fun AddBookScreen() {
                             if (book != null) {
                                 title = book.title
                                 author = book.authors.joinToString(", ") { it.name }
+                                genre = book.genre
+                                publishDate = book.publishDate
                                 Toast.makeText(context, context.getString(R.string.text_recognized), Toast.LENGTH_SHORT).show()
                                 Log.d("ScanISBN", "Libro trovato: ${book.title} - ${book.authors.joinToString(", ") { it.name }}")
                             } else {
@@ -184,7 +191,6 @@ fun AddBookScreen() {
             Log.d("ScanISBN", "Bitmap nullo ricevuto dal TakePicturePreview.")
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -250,35 +256,3 @@ fun AddBookScreen() {
         }
     }
 }
-
-suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): OpenLibraryBook? {
-    val client = HttpClient(OkHttp) {
-        install(ContentNegotiation) {
-            json(Json { ignoreUnknownKeys = true })
-        }
-    }
-
-    return try {
-        val response: JsonObject = client.get("https://www.googleapis.com/books/v1/volumes") {
-            url {
-                parameters.append("q", "isbn:$isbn")
-                parameters.append("key", apiKey)
-            }
-        }.body()
-
-        val items = response["items"]?.jsonArray ?: return null
-        val volumeInfo = items[0].jsonObject["volumeInfo"]?.jsonObject ?: return null
-
-        val title = volumeInfo["title"]?.jsonPrimitive?.content ?: ""
-        val authorsArray = volumeInfo["authors"]?.jsonArray?.mapNotNull {
-            it.jsonPrimitive.contentOrNull
-        } ?: emptyList()
-
-        OpenLibraryBook(title, authorsArray.map { OpenLibraryAuthor(it) })
-    } catch (e: Exception) {
-        null
-    } finally {
-        client.close()
-    }
-}
-
