@@ -1,0 +1,40 @@
+<resources>
+    <string name="app_name">LibraryApp</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_or_register">Login / Registrati</string>
+    <string name="login_success">Login effettuato!</string>
+    <string name="registration_success">Registrazione completata!</string>
+    <string name="error_prefix">Errore:</string><string name="salotto_title">Living Room</string>
+    <string name="library">Libreria</string>
+    <string name="record_library">Discoteca</string>
+    <string name="movie_library">Cineteca</string>
+    <string name="playroom">Ludoteca</string>
+    <string name="view_library_title">Libreria</string>
+    <string name="view_all_books">Visualizza tutti i libri</string>
+    <string name="back">Indietro</string>
+
+    <!-- Navigation -->
+    <string name="screen_books">Libreria</string>
+    <string name="screen_add">Aggiungi Libro</string>
+    <string name="screen_settings">Configurazione</string>
+
+    <!-- Books -->
+    <string name="no_books_found">Nessun libro trovato.</string>
+    <string name="book_title_label">📖 %1$s</string>
+    <string name="book_author_label">✍️ %1$s</string>
+    <string name="book_genre_label">📚 %1$s</string>
+    <string name="book_publish_date_label">📅 %1$s</string>
+
+    <!-- Add Book -->
+    <string name="title">Titolo</string>
+    <string name="author">Autore</string>
+    <string name="genre">Genere</string>
+    <string name="publish_date">Data pubblicazione (AAAA-MM-GG)</string>
+    <string name="save_book">Salva libro</string>
+    <string name="book_added">Libro aggiunto!</string>
+    <string name="missing_title">Aggiungere il titolo prima di salvare</string>
+
+    <!-- Settings -->
+    <string name="settings_title">⚙️ Configurazione</string>
+</resources>

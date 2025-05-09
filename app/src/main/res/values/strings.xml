@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">LibraryApp</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_or_register">Login / Register</string>
+    <string name="login_success">Login successful!</string>
+    <string name="registration_success">Registration completed!</string>
+    <string name="error_prefix">Error:</string>
+    <string name="salotto_title">Living Room</string>
+    <string name="library">Library</string>
+    <string name="record_library">Record Library</string>
+    <string name="movie_library">Movie Library</string>
+    <string name="playroom">Playroom</string>
+    <string name="view_library_title">Library View</string>
+    <string name="view_all_books">View All Books</string>
+    <string name="back">Back</string>
+
+    <!-- Navigation -->
+    <string name="screen_books">Library</string>
+    <string name="screen_add">Add Book</string>
+    <string name="screen_settings">Settings</string>
+
+    <!-- Books -->
+    <string name="no_books_found">No books found.</string>
+    <string name="book_title_label">📖 %1$s</string>
+    <string name="book_author_label">✍️ %1$s</string>
+    <string name="book_genre_label">📚 %1$s</string>
+    <string name="book_publish_date_label">📅 %1$s</string>
+
+    <!-- Add Book -->
+    <string name="title">Title</string>
+    <string name="author">Author</string>
+    <string name="genre">Genre</string>
+    <string name="publish_date">Publish Date (YYYY-MM-DD)</string>
+    <string name="save_book">Save Book</string>
+    <string name="book_added">Book added!</string>
+    <string name="missing_title">Please enter a title before saving the book.</string>
+
+    <!-- Settings -->
+    <string name="settings_title">⚙️ Settings</string>
 </resources>
