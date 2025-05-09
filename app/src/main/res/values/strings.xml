@@ -42,6 +42,15 @@
     <string name="save_book">Save Book</string>
     <string name="book_added">Book added!</string>
     <string name="missing_title">Please enter a title before saving the book.</string>
+    <string name="add_with_camera">Add with Camera</string>
+    <string name="photo_taken">Photo taken successfully!</string>
+    <string name="text_recognized">Text recognized successfully!</string>
+    <string name="scan_isbn">Scan ISBN</string>
+    <string name="scan_isbn_started">Starting ISBN scan...</string>
+    <string name="no_isbn_found">No ISBN detected. Try again.</string>
+
+
+
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Settings</string>

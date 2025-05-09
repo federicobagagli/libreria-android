@@ -41,6 +41,12 @@
     <string name="save_book">Salva libro</string>
     <string name="book_added">Libro aggiunto!</string>
     <string name="missing_title">Aggiungere il titolo prima di salvare</string>
+    <string name="add_with_camera">Aggiungi con fotocamera</string>
+    <string name="photo_taken">Foto acquisita con successo!</string>
+    <string name="text_recognized">Testo riconosciuto con successo!</string>
+    <string name="scan_isbn">Scansiona ISBN</string>
+    <string name="scan_isbn_started">Avvio scansione ISBN...</string>
+    <string name="no_isbn_found">Nessun ISBN rilevato. Riprova.</string>
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>

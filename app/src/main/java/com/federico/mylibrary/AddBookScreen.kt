@@ -11,6 +11,19 @@ import androidx.compose.ui.unit.dp
 import com.federico.mylibrary.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
+import androidx.compose.ui.graphics.Color
+import com.google.mlkit.vision.text.Text
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
+
+
 
 @Composable
 fun AddBookScreen() {
@@ -27,6 +40,45 @@ fun AddBookScreen() {
     val bookAdded = stringResource(R.string.book_added)
     val errorPrefix = stringResource(R.string.error_prefix)
     val missingTitle = stringResource(R.string.missing_title)
+
+    var cameraPermissionGranted by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        cameraPermissionGranted = granted
+        if (!granted) {
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            val options = TextRecognizerOptions.Builder().build()
+            val recognizer = TextRecognition.getClient(options)
+            val image = InputImage.fromBitmap(bitmap, 0)
+
+            recognizer.process(image)
+                .addOnSuccessListener { visionText: Text ->
+                    val allText = visionText.text.lowercase()
+
+                    // Semplice logica di estrazione (puoi migliorare con regex o IA)
+                    title = visionText.textBlocks.firstOrNull()?.text?.take(50) ?: title
+                    author = visionText.textBlocks.getOrNull(1)?.text?.take(50) ?: author
+
+                    Toast.makeText(context, context.getString(R.string.text_recognized), Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(context, context.getString(R.string.error_prefix) + " ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+
+
+
 
     Column(
         modifier = Modifier
@@ -58,6 +110,62 @@ fun AddBookScreen() {
             label = { Text(stringResource(R.string.publish_date)) },
             modifier = Modifier.fillMaxWidth()
         )
+
+        Button(
+            onClick = {
+                if (cameraPermissionGranted) {
+                    cameraLauncher.launch()
+                } else {
+                    permissionLauncher.launch(android.Manifest.permission.CAMERA)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6))
+        ) {
+            Text(stringResource(R.string.add_with_camera), color = Color.White)
+        }
+
+        val barcodeScannerLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicturePreview()
+        ) { bitmap ->
+            if (bitmap != null) {
+                val scanner = com.google.mlkit.vision.barcode.BarcodeScanning.getClient()
+                val image = InputImage.fromBitmap(bitmap, 0)
+
+                scanner.process(image)
+                    .addOnSuccessListener { barcodes ->
+                        val isbnBarcode = barcodes.firstOrNull { it.rawValue?.length == 13 && it.format == com.google.mlkit.vision.barcode.common.Barcode.FORMAT_EAN_13 }
+                        val isbn = isbnBarcode?.rawValue
+
+                        if (isbn != null) {
+                            Toast.makeText(context, "ISBN: $isbn", Toast.LENGTH_SHORT).show()
+
+                            // TODO: chiamata a OpenLibrary o Google Books API con ISBN
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.no_isbn_found), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, "${context.getString(R.string.error_prefix)} ${it.message}", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+
+        Button(
+            onClick = {
+                if (cameraPermissionGranted) {
+                    barcodeScannerLauncher.launch()
+                } else {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784))
+        ) {
+            Text(stringResource(R.string.scan_isbn), color = Color.White)
+        }
+
+
 
         Button(
             onClick = {
