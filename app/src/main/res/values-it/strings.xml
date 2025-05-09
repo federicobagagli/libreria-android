@@ -47,6 +47,7 @@
     <string name="scan_isbn">Scansiona ISBN</string>
     <string name="scan_isbn_started">Avvio scansione ISBN...</string>
     <string name="no_isbn_found">Nessun ISBN rilevato. Riprova.</string>
+    <string name="no_book_found">Nessun libro trovato.</string>
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>

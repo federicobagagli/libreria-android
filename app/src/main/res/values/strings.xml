@@ -48,6 +48,7 @@
     <string name="scan_isbn">Scan ISBN</string>
     <string name="scan_isbn_started">Starting ISBN scan...</string>
     <string name="no_isbn_found">No ISBN detected. Try again.</string>
+    <string name="no_book_found">No book found.</string>
 
 
 
