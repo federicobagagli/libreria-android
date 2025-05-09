@@ -10,6 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import com.federico.mylibrary.R
 import com.federico.mylibrary.model.Book
 import com.google.firebase.auth.FirebaseAuth
@@ -51,15 +53,22 @@ fun BooksScreen(
         isLoading = false
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        when {
-            isLoading -> CircularProgressIndicator()
-            books.isEmpty() -> Text(stringResource(R.string.no_books_found))
-            else -> books.forEach { (id, book) ->
+    if (isLoading) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            CircularProgressIndicator()
+        }
+    } else if (books.isEmpty()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(stringResource(R.string.no_books_found))
+        }
+    } else {
+        LazyColumn(
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(books) { (id, book) ->
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(stringResource(R.string.book_title_label, book.title), style = MaterialTheme.typography.titleMedium)
@@ -67,7 +76,10 @@ fun BooksScreen(
                         Text(stringResource(R.string.book_genre_label, book.genre))
                         Text(stringResource(R.string.book_publish_date_label, book.publishDate))
 
-                        Row(modifier = Modifier.padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Row(
+                            modifier = Modifier.padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             IconButton(onClick = {
                                 navController.navigate("edit_book/$id")
                             }) {
