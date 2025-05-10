@@ -32,6 +32,8 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import com.federico.mylibrary.BuildConfig
+
 
 @Serializable
 data class BookInfo(
@@ -164,7 +166,7 @@ fun AddBookScreen() {
                         Log.d("ScanISBN", "ISBN valido: $isbn")
 
                         coroutineScope.launch {
-                            val book = fetchBookInfoFromGoogleBooks(isbn, "AIzaSyCV2y1_3wYmMuAsgRyu-c5VO3oGCsg8bDo")
+                            val book = fetchBookInfoFromGoogleBooks(isbn, BuildConfig.GOOGLE_BOOKS_API_KEY)
                             if (book != null) {
                                 title = book.title
                                 author = book.authors.joinToString(", ") { it.name }
