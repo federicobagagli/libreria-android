@@ -27,6 +27,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import android.content.ContentValues
+import android.provider.MediaStore
+import android.os.Build
+import java.io.OutputStream
 
 @Composable
 fun ExportView(
@@ -49,10 +53,10 @@ fun ExportView(
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = stringResource(R.string.export_title), style = MaterialTheme.typography.titleLarge)
+        //Text(text = stringResource(R.string.export_title), style = MaterialTheme.typography.titleLarge)
 
         Button(onClick = {
-            val file = exportToCsvFile(context, csvContent, fileName)
+            val file = exportCsvToDownloadsUsingMediaStore(context, csvContent, fileName)
             if (file != null) {
                 savedFilePath = file.absolutePath
                 showDialog = true
@@ -130,3 +134,38 @@ fun shareFileViaIntent(context: Context, file: File, mimeType: String) {
 }
 
 
+fun exportCsvToDownloadsUsingMediaStore(context: Context, content: String, fileName: String): File? {
+    val resolver = context.contentResolver
+    val csvCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+    } else {
+        MediaStore.Files.getContentUri("external")
+    }
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+        put(MediaStore.Downloads.MIME_TYPE, "text/csv")
+        put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+        put(MediaStore.Downloads.IS_PENDING, 1)
+    }
+
+    resolver.delete(csvCollection, "${MediaStore.MediaColumns.DISPLAY_NAME}=?", arrayOf(fileName))
+    val fileUri = resolver.insert(csvCollection, contentValues)
+
+    return if (fileUri != null) {
+        resolver.openOutputStream(fileUri)?.bufferedWriter(Charsets.UTF_8)?.use { writer ->
+            content.lines().forEach { line ->
+                writer.write(line)
+                writer.write("\r\n") // per compatibilità Excel
+            }
+        }
+
+
+
+        contentValues.clear()
+        contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+        resolver.update(fileUri, contentValues, null, null)
+
+        File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), fileName)
+    } else null
+}

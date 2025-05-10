@@ -15,6 +15,20 @@
     <string name="view_all_books">View All Books</string>
     <string name="back">Back</string>
     <string name="view_by_criteria">View by Criteria</string>
+    <string name="logout">Logout</string>
+    <string name="confirm_logout_title">Do you really want to log out?</string>
+    <string name="password_reset_title">Password Reset</string>
+    <string name="password_reset_email_label">Email</string>
+    <string name="password_reset_send_button">Send Reset Link</string>
+    <string name="password_reset_success">Reset email sent</string>
+    <string name="password_reset_error">Error: %1$s</string>
+    <string name="login_button">Login</string>
+    <string name="register_button">Register</string>
+    <string name="login_failed">Login failed: %1$s</string>
+    <string name="registration_failed">Registration failed: %1$s</string>
+
+
+
 
     <!-- Navigation -->
     <string name="screen_books">Library</string>
@@ -31,7 +45,7 @@
     <string name="cancel">Cancel</string>
     <string name="confirm_deletion">Are you sure you want to delete this book?</string>
     <string name="book_updated">Book updated successfully!</string>
-    <string name="export_title_book">Library</string>
+    <string name="export_title_book">Export Library</string>
 
     <!-- Export -->
     <string name="export_title">📤 Export</string>

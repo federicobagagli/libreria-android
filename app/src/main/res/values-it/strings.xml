@@ -14,6 +14,19 @@
     <string name="view_all_books">Visualizza tutti i libri</string>
     <string name="back">Indietro</string>
     <string name="view_by_criteria">Visualizza con filtri</string>
+    <string name="logout">Logout</string>
+    <string name="confirm_logout_title">Vuoi davvero effettuare il logout?</string>
+    <string name="password_reset_title">Recupera password</string>
+    <string name="password_reset_email_label">Email</string>
+    <string name="password_reset_send_button">Invia link di reset</string>
+    <string name="password_reset_success">Email di reset inviata</string>
+    <string name="password_reset_error">Errore: %1$s</string>
+    <string name="login_button">Accedi</string>
+    <string name="register_button">Registrati</string>
+    <string name="login_failed">Accesso fallito: %1$s</string>
+    <string name="registration_failed">Registrazione fallita: %1$s</string>
+
+
 
     <!-- Navigation -->
     <string name="screen_books">Libreria</string>
@@ -31,7 +44,7 @@
     <string name="cancel">Cancella</string>
     <string name="confirm_deletion">Sei sicuro di voler eliminare questo libro?</string>
     <string name="book_updated">Libro aggiornato con successo!</string>
-    <string name="export_title_book">Libreria</string>
+    <string name="export_title_book">Esporta Libreria</string>
 
 
     <!-- Export -->

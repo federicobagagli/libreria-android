@@ -2,6 +2,7 @@
 
 package com.federico.mylibrary
 
+import SettingsScreen
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -29,9 +30,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 val auth = FirebaseAuth.getInstance()
-                val user = auth.currentUser
+                var currentUser by remember { mutableStateOf(auth.currentUser) }
 
-                if (user != null) {
+                DisposableEffect(Unit) {
+                    val listener = FirebaseAuth.AuthStateListener {
+                        currentUser = it.currentUser
+                    }
+                    auth.addAuthStateListener(listener)
+                    onDispose { auth.removeAuthStateListener(listener) }
+                }
+
+                if (currentUser != null) {
                     LibreriaApp()
                 } else {
                     LoginScreen(auth)
