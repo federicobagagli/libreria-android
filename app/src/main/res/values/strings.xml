@@ -31,6 +31,19 @@
     <string name="cancel">Cancel</string>
     <string name="confirm_deletion">Are you sure you want to delete this book?</string>
     <string name="book_updated">Book updated successfully!</string>
+    <string name="export_title_book">Library</string>
+
+    <!-- Export -->
+    <string name="export_title">📤 Export</string>
+    <string name="export_download">Download CSV</string>
+    <string name="export_email">Send via Email</string>
+    <string name="export_whatsapp">Send via WhatsApp</string>
+    <string name="export_success">Export completed!</string>
+    <string name="export_error">Export failed.</string>
+    <string name="export_share">Share</string>
+    <string name="export_copied">path copied to clipboard</string>
+
+
 
 
     <!-- Add Book -->

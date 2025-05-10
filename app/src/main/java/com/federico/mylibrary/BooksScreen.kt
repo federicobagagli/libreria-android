@@ -12,16 +12,22 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.federico.mylibrary.R
 import com.federico.mylibrary.model.Book
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
+import com.federico.mylibrary.export.BookExportItem
+import com.federico.mylibrary.export.ExportView
+import com.federico.mylibrary.export.ExportViewModel
+
 
 @Composable
 fun BooksScreen(
     navController: NavController,
+    exportViewModel: ExportViewModel,
     title: String? = null,
     author: String? = null,
     genre: String? = null,
@@ -62,34 +68,54 @@ fun BooksScreen(
             Text(stringResource(R.string.no_books_found))
         }
     } else {
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(books) { (id, book) ->
-                Card(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.book_title_label, book.title), style = MaterialTheme.typography.titleMedium)
-                        Text(stringResource(R.string.book_author_label, book.author))
-                        Text(stringResource(R.string.book_genre_label, book.genre))
-                        Text(stringResource(R.string.book_publish_date_label, book.publishDate))
+            Button(
+                onClick = {
+                    exportViewModel.setExportData(
+                        items = books.map { (_, book) ->
+                            BookExportItem(book.title, book.author, book.genre, book.publishDate)
+                        },
+                        fileName = "library_export.csv"
+                    )
+                    navController.navigate("exportView")
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("📤 " + stringResource(R.string.export_title_book))
+            }
 
-                        Row(
-                            modifier = Modifier.padding(top = 8.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            IconButton(onClick = {
-                                navController.navigate("edit_book/$id")
-                            }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Edit")
-                            }
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(books) { (id, book) ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(stringResource(R.string.book_title_label, book.title), style = MaterialTheme.typography.titleMedium)
+                            Text(stringResource(R.string.book_author_label, book.author))
+                            Text(stringResource(R.string.book_genre_label, book.genre))
+                            Text(stringResource(R.string.book_publish_date_label, book.publishDate))
 
-                            IconButton(onClick = {
-                                bookToDelete = id to book
-                            }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            Row(
+                                modifier = Modifier.padding(top = 8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                IconButton(onClick = {
+                                    navController.navigate("edit_book/$id")
+                                }) {
+                                    Icon(Icons.Default.Edit, contentDescription = "Edit")
+                                }
+
+                                IconButton(onClick = {
+                                    bookToDelete = id to book
+                                }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                }
                             }
                         }
                     }
@@ -123,3 +149,5 @@ fun BooksScreen(
         )
     }
 }
+
+

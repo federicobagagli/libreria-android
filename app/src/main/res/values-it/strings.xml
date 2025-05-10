@@ -31,6 +31,19 @@
     <string name="cancel">Cancella</string>
     <string name="confirm_deletion">Sei sicuro di voler eliminare questo libro?</string>
     <string name="book_updated">Libro aggiornato con successo!</string>
+    <string name="export_title_book">Libreria</string>
+
+
+    <!-- Export -->
+    <string name="export_title">📤 Esporta</string>
+    <string name="export_download">Scarica CSV</string>
+    <string name="export_email">Invia via Email</string>
+    <string name="export_whatsapp">Invia via WhatsApp</string>
+    <string name="export_success">Esportazione completata!</string>
+    <string name="export_error">Esportazione fallita.</string>
+    <string name="export_share">Condividi</string>
+    <string name="export_copied">Percorso copiato negli appunti</string>
+
 
 
     <!-- Add Book -->

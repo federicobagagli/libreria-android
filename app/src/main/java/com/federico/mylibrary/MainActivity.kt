@@ -2,10 +2,8 @@
 
 package com.federico.mylibrary
 
-import android.app.Activity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -15,17 +13,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.federico.mylibrary.export.ExportViewModel
+import com.federico.mylibrary.export.ExportViewScreen
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.toObject
-import kotlinx.coroutines.tasks.await
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +46,7 @@ fun LibreriaApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-
+    val exportViewModel: ExportViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -85,6 +81,9 @@ fun LibreriaApp() {
             composable("view_library") { ViewLibraryScreen(navController) }
             composable("add") { AddBookScreen() }
             composable("settings") { SettingsScreen() }
+            composable("exportView") {
+                ExportViewScreen(navController = navController, exportViewModel = exportViewModel)
+            }
             composable(
                 route = "books/{title}/{author}/{genre}/{publishDate}",
                 arguments = listOf(
@@ -97,6 +96,7 @@ fun LibreriaApp() {
                 val args = backStackEntry.arguments!!
                 BooksScreen(
                     navController = navController,
+                    exportViewModel = exportViewModel,
                     title = args.getString("title")?.takeIf { it != "_" },
                     author = args.getString("author")?.takeIf { it != "_" },
                     genre = args.getString("genre")?.takeIf { it != "_" },
