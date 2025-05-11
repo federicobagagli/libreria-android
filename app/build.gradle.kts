@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    alias(libs.plugins.kotlin.serialization)
 }
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
@@ -68,6 +69,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("io.ktor:ktor-client-core:2.3.0")
     implementation("io.ktor:ktor-client-cio:2.3.0")
     implementation("io.ktor:ktor-client-okhttp:2.3.0")

@@ -26,6 +26,13 @@
     <string name="login_failed">Accesso fallito: %1$s</string>
     <string name="registration_failed">Registrazione fallita: %1$s</string>
 
+    <!-- Backup -->
+    <string name="backup_section_title">Backup</string>
+    <string name="backup_generate">📤 Genera Backup</string>
+    <string name="backup_restore">📥 Ripristina Backup</string>
+    <string name="backup_generate_library">Genera Backup libreria</string>
+    <string name="backup_restore_library">Ripristina Backup libreria</string>
+
 
 
     <!-- Navigation -->

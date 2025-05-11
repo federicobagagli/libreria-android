@@ -28,6 +28,14 @@
     <string name="registration_failed">Registration failed: %1$s</string>
 
 
+    <!-- Backup -->
+    <string name="backup_section_title">Backup</string>
+    <string name="backup_generate">📤 Generate Backup</string>
+    <string name="backup_restore">📥 Restore Backup</string>
+    <string name="backup_generate_library">Generate Library Backup</string>
+    <string name="backup_restore_library">Restore Library Backup</string>
+
+
 
 
     <!-- Navigation -->

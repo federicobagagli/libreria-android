@@ -2,7 +2,7 @@
 
 package com.federico.mylibrary
 
-import SettingsScreen
+
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -20,6 +20,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.federico.mylibrary.backup.BackupScreen
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
 import com.google.firebase.auth.FirebaseAuth
@@ -89,7 +90,8 @@ fun LibreriaApp() {
             composable("living_room") { LivingRoomScreen(navController) }
             composable("view_library") { ViewLibraryScreen(navController) }
             composable("add") { AddBookScreen() }
-            composable("settings") { SettingsScreen() }
+            composable("backup") { BackupScreen(navController = navController) }
+            composable("settings") { SettingsScreen(navController = navController) }
             composable("exportView") {
                 ExportViewScreen(navController = navController, exportViewModel = exportViewModel)
             }
@@ -122,7 +124,6 @@ fun BottomNavigationBar(navController: NavHostController, currentDestination: an
     NavigationBar {
         val items = listOf(
             NavItem("living_room", Icons.Default.Home, stringResource(R.string.salotto_title)),
-            NavItem("books", Icons.Default.Book, stringResource(R.string.screen_books)),
             NavItem("settings", Icons.Default.Settings, stringResource(R.string.screen_settings)),
             NavItem("back", Icons.Default.ArrowBack, stringResource(R.string.back))
         )
