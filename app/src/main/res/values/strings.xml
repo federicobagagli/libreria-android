@@ -26,6 +26,8 @@
     <string name="register_button">Register</string>
     <string name="login_failed">Login failed: %1$s</string>
     <string name="registration_failed">Registration failed: %1$s</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 
 
     <!-- Backup -->
@@ -34,6 +36,12 @@
     <string name="backup_restore">📥 Restore Backup</string>
     <string name="backup_generate_library">Generate Library Backup</string>
     <string name="backup_restore_library">Restore Library Backup</string>
+    <string name="restore_backup_library">Restore Library Backup</string>
+    <string name="restore_success">Restore completed</string>
+    <string name="restore_failed">Error during restore</string>
+    <string name="restore_confirmation_title">Restore Confirmation</string>
+    <string name="restore_confirmation_message">Are you sure you want to restore the backup? All current library data will be deleted and replaced with the backup content.</string>
+
 
 
 

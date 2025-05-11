@@ -25,6 +25,8 @@
     <string name="register_button">Registrati</string>
     <string name="login_failed">Accesso fallito: %1$s</string>
     <string name="registration_failed">Registrazione fallita: %1$s</string>
+    <string name="yes">Sì</string>
+    <string name="no">No</string>
 
     <!-- Backup -->
     <string name="backup_section_title">Backup</string>
@@ -32,6 +34,12 @@
     <string name="backup_restore">📥 Ripristina Backup</string>
     <string name="backup_generate_library">Genera Backup libreria</string>
     <string name="backup_restore_library">Ripristina Backup libreria</string>
+    <string name="restore_backup_library">Ripristina Backup Libreria</string>
+    <string name="restore_success">Ripristino completato</string>
+    <string name="restore_failed">Errore durante il ripristino</string>
+    <string name="restore_confirmation_title">Conferma ripristino</string>
+    <string name="restore_confirmation_message">Sei sicuro di voler ripristinare il backup? Tutti i dati attuali della libreria saranno cancellati e sostituiti con quelli del backup.</string>
+
 
 
 
