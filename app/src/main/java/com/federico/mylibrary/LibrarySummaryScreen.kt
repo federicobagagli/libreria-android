@@ -44,7 +44,7 @@ fun LibrarySummaryScreen(navController: NavController) {
                 it.getString("readingStatus")?.lowercase() == context.getString(R.string.status_completed).lowercase()
             }
 
-            val genres = snapshot.documents.mapNotNull { it.getString("genre") }
+            val genres = snapshot.documents.mapNotNull { it.getString("genre")?.lowercase() }
             genreCounts = genres.groupingBy { it }.eachCount()
             mostCommonGenre = genreCounts.maxByOrNull { it.value }?.key
 
@@ -112,7 +112,7 @@ fun PieChartSection(data: Map<String, Int>) {
         val center = this.center
 
         data.entries.forEachIndexed { index, (label, count) ->
-            val sweep = 360f * (count / total)
+            val sweep = 360f * (count.toFloat() / total)
             drawArc(
                 color = themedColor(index),
                 startAngle = startAngle,
