@@ -87,6 +87,7 @@
     <string name="last_added_book">Last added book: %1$s</string>
     <string name="genre_distribution">Genre distribution</string>
     <string name="reading_status_distribution">Reading status distribution</string>
+    <string name="undefined_label">Non definito</string>
 
 
     <!-- Export -->

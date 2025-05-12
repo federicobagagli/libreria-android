@@ -91,6 +91,7 @@
     <string name="last_added_book">Ultimo libro aggiunto: %1$s</string>
     <string name="genre_distribution">Distribuzione per genere</string>
     <string name="reading_status_distribution">Distribuzione stato di lettura</string>
+    <string name="undefined_label">Non definito</string>
 
 
 

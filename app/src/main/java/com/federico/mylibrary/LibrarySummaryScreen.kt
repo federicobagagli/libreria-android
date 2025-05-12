@@ -146,7 +146,7 @@ fun Legend(data: Map<String, Int>) {
                         .background(themedColor(index), shape = MaterialTheme.shapes.small)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(label)
+                Text(label.ifBlank { stringResource(R.string.undefined_label) })
             }
         }
     }
