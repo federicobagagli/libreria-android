@@ -24,6 +24,32 @@ fun ViewLibraryScreen(navController: NavController) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
+        Button(onClick = {
+            navController.navigate("books/_/_/_/_")
+        }, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.view_all_books))
+        }
+
+        Button(
+            onClick = {
+                val encodedTitle = title.ifBlank { "_" }
+                val encodedAuthor = author.ifBlank { "_" }
+                val encodedGenre = genre.ifBlank { "_" }
+                val encodedDate = publishDate.ifBlank { "_" }
+                navController.navigate("books/$encodedTitle/$encodedAuthor/$encodedGenre/$encodedDate")
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.view_by_criteria))
+        }
+
+        Button(
+            onClick = { navController.navigate("add") },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6)),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.add_book), color = Color.White)
+        }
 
         OutlinedTextField(
             value = title,
@@ -53,32 +79,7 @@ fun ViewLibraryScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Button(onClick = {
-            navController.navigate("books/_/_/_/_")
-        }, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.view_all_books))
-        }
 
-        Button(
-            onClick = {
-                val encodedTitle = title.ifBlank { "_" }
-                val encodedAuthor = author.ifBlank { "_" }
-                val encodedGenre = genre.ifBlank { "_" }
-                val encodedDate = publishDate.ifBlank { "_" }
-                navController.navigate("books/$encodedTitle/$encodedAuthor/$encodedGenre/$encodedDate")
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.view_by_criteria))
-        }
-
-        Button(
-            onClick = { navController.navigate("add") },
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6)),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.add_book), color = Color.White)
-        }
 
     }
 }

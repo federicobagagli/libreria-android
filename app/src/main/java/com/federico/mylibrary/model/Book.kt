@@ -1,10 +1,23 @@
 package com.federico.mylibrary.model
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Book(
+    val id: String = "",
     val title: String = "",
     val author: String = "",
+    val publisher: String = "",
     val genre: String = "",
+    val language: String = "",
     val publishDate: String = "",
-    val userId: String = "" // ✅ richiesto per Firestore + backup
+    val description: String = "",
+    val pageCount: Int = 0,
+    val format: String = "",
+    val readingStatus: String = "",
+    val addedDate: String = "",
+    val rating: Int = 0,
+    val notes: String = "",
+    val coverUrl: String = "",
+    val userId: String = ""
 )

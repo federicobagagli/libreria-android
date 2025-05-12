@@ -60,6 +60,26 @@
     <string name="confirm_deletion">Sei sicuro di voler eliminare questo libro?</string>
     <string name="book_updated">Libro aggiornato con successo!</string>
     <string name="export_title_book">Esporta Libreria</string>
+    <string name="format">Formato</string>
+    <string name="reading_status">Stato lettura</string>
+    <string name="format_physical">Cartaceo</string>
+    <string name="format_ebook">eBook</string>
+    <string name="format_audio">Audiolibro</string>
+    <string name="status_not_started">Non iniziato</string>
+    <string name="status_reading">In lettura</string>
+    <string name="status_completed">Completato</string>
+    <string name="book_publisher">Editore</string>
+    <string name="book_language">Lingua</string>
+    <string name="book_description">Descrizione</string>
+    <string name="book_page_count">Numero di pagine</string>
+    <string name="book_notes">Note</string>
+    <string name="book_rating">Valutazione (0–10)</string>
+    <string name="book_cover_url">URL immagine di copertina</string>
+    <string name="book_title">Titolo</string>
+    <string name="book_author">Autore</string>
+    <string name="book_genre">Genere</string>
+    <string name="publisher_unknown">Editore non riconosciuto</string>
+
 
 
     <!-- Export -->
@@ -86,9 +106,10 @@
     <string name="photo_taken">Foto acquisita con successo!</string>
     <string name="text_recognized">Testo riconosciuto con successo!</string>
     <string name="scan_isbn">Scansiona ISBN</string>
-    <string name="scan_isbn_started">Avvio scansione ISBN...</string>
+    <string name="scan_isbn_started">Avvio scansione ISBN…</string>
     <string name="no_isbn_found">Nessun ISBN rilevato. Riprova.</string>
     <string name="no_book_found">Nessun libro trovato.</string>
+    <string name="book_added_date">Data di aggiunta</string>
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>

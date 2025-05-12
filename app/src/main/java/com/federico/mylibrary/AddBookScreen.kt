@@ -17,10 +17,6 @@ import com.federico.mylibrary.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.Text
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import io.ktor.client.*
@@ -33,6 +29,15 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import com.federico.mylibrary.BuildConfig
+import com.federico.mylibrary.ui.bookFieldModifier
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.unit.sp
+import com.federico.mylibrary.ui.bookFieldTextStyle
+import com.google.mlkit.vision.common.InputImage
 
 
 @Serializable
@@ -40,7 +45,13 @@ data class BookInfo(
     val title: String = "",
     val authors: List<AuthorInfo> = emptyList(),
     val genre: String = "",
-    val publishDate: String = ""
+    val publishDate: String = "",
+    val publisher: String = "",
+    val language: String = "",
+    val description: String = "",
+    val pageCount: Int = 0,
+    val averageRating: Double = 0.0,
+    val coverUrl: String = ""
 )
 
 @Serializable
@@ -60,7 +71,7 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
                 parameters.append("key", apiKey)
             }
         }.body()
-
+        Log.d("GoogleBooksAPI", "Response JSON: $response")
         val items = response["items"]?.jsonArray ?: return null
         val volumeInfo = items[0].jsonObject["volumeInfo"]?.jsonObject ?: return null
 
@@ -68,17 +79,26 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
         val authorsArray = volumeInfo["authors"]?.jsonArray?.mapNotNull {
             it.jsonPrimitive.contentOrNull
         } ?: emptyList()
-
-        val genre = volumeInfo["categories"]?.jsonArray
-            ?.firstOrNull()?.jsonPrimitive?.content ?: ""
-
+        val genre = volumeInfo["categories"]?.jsonArray?.firstOrNull()?.jsonPrimitive?.content ?: ""
         val publishDate = volumeInfo["publishedDate"]?.jsonPrimitive?.content ?: ""
+        val publisher = volumeInfo["publisher"]?.jsonPrimitive?.content ?: ""
+        val language = volumeInfo["language"]?.jsonPrimitive?.content ?: ""
+        val description = volumeInfo["description"]?.jsonPrimitive?.content ?: ""
+        val pageCount = volumeInfo["pageCount"]?.jsonPrimitive?.intOrNull ?: 0
+        val averageRating = volumeInfo["averageRating"]?.jsonPrimitive?.doubleOrNull ?: 0.0
+        val coverUrl = volumeInfo["imageLinks"]?.jsonObject?.get("thumbnail")?.jsonPrimitive?.content ?: ""
 
         BookInfo(
             title = title,
             authors = authorsArray.map { AuthorInfo(it) },
             genre = genre,
-            publishDate = publishDate
+            publishDate = publishDate,
+            publisher = publisher,
+            language = language,
+            description = description,
+            pageCount = pageCount,
+            averageRating = averageRating,
+            coverUrl = coverUrl
         )
     } catch (e: Exception) {
         null
@@ -87,8 +107,23 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen() {
+
+    val formatOptions = listOf(
+        stringResource(R.string.format_physical),
+        stringResource(R.string.format_ebook),
+        stringResource(R.string.format_audio)
+    )
+
+
+    val readingOptions = listOf(
+        stringResource(R.string.status_not_started),
+        stringResource(R.string.status_reading),
+        stringResource(R.string.status_completed)
+    )
+
     val coroutineScope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
@@ -98,6 +133,21 @@ fun AddBookScreen() {
     var author by remember { mutableStateOf("") }
     var genre by remember { mutableStateOf("") }
     var publishDate by remember { mutableStateOf("") }
+    var publisher by remember { mutableStateOf("") }
+    var language by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var pageCount by remember { mutableStateOf("") }
+    var selectedFormat by remember { mutableStateOf(formatOptions[0]) }
+    var selectedReadingStatus by remember { mutableStateOf("") }
+    var addedDate by remember { mutableStateOf("") }
+    var rating by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+    var coverUrl by remember { mutableStateOf("") }
+    var expandedFormat by remember { mutableStateOf(false) }
+    var expandedReading by remember { mutableStateOf(false) }
+
+    val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    addedDate = currentDate
 
     val saveBookLabel = stringResource(R.string.save_book)
     val bookAdded = stringResource(R.string.book_added)
@@ -112,26 +162,6 @@ fun AddBookScreen() {
         cameraPermissionGranted = granted
         if (!granted) {
             Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap ->
-        if (bitmap != null) {
-            val options = TextRecognizerOptions.Builder().build()
-            val recognizer = TextRecognition.getClient(options)
-            val image = InputImage.fromBitmap(bitmap, 0)
-
-            recognizer.process(image)
-                .addOnSuccessListener { visionText: Text ->
-                    title = visionText.textBlocks.firstOrNull()?.text?.take(50) ?: title
-                    author = visionText.textBlocks.getOrNull(1)?.text?.take(50) ?: author
-                    Toast.makeText(context, context.getString(R.string.text_recognized), Toast.LENGTH_SHORT).show()
-                }
-                .addOnFailureListener {
-                    Toast.makeText(context, context.getString(R.string.error_prefix) + " ${it.message}", Toast.LENGTH_SHORT).show()
-                }
         }
     }
 
@@ -172,6 +202,13 @@ fun AddBookScreen() {
                                 author = book.authors.joinToString(", ") { it.name }
                                 genre = book.genre
                                 publishDate = book.publishDate
+                                publisher = book.publisher
+                                language = book.language
+                                description = book.description
+                                pageCount = if (book.pageCount > 0) book.pageCount.toString() else ""
+                                rating = if (book.averageRating > 0.0) book.averageRating.toInt().toString() else ""
+                                coverUrl = book.coverUrl
+
                                 Toast.makeText(context, context.getString(R.string.text_recognized), Toast.LENGTH_SHORT).show()
                                 Log.d("ScanISBN", "Libro trovato: ${book.title} - ${book.authors.joinToString(", ") { it.name }}")
                             } else {
@@ -193,28 +230,121 @@ fun AddBookScreen() {
             Log.d("ScanISBN", "Bitmap nullo ricevuto dal TakePicturePreview.")
         }
     }
-
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxSize(),
+            .fillMaxSize()
+            .verticalScroll(scrollState), // Scroll abilitato
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text(stringResource(R.string.title)) }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = author, onValueChange = { author = it }, label = { Text(stringResource(R.string.author)) }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = genre, onValueChange = { genre = it }, label = { Text(stringResource(R.string.genre)) }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(value = publishDate, onValueChange = { publishDate = it }, label = { Text(stringResource(R.string.publish_date)) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text(stringResource(R.string.title), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = author,
+            onValueChange = { author = it },
+            label = { Text(stringResource(R.string.author), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = publisher,
+            onValueChange = { publisher = it },
+            label = { Text(stringResource(R.string.book_publisher), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = genre,
+            onValueChange = { genre = it },
+            label = { Text(stringResource(R.string.genre), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = language,
+            onValueChange = { language = it },
+            label = { Text(stringResource(R.string.book_language), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = publishDate,
+            onValueChange = { publishDate = it },
+            label = { Text(stringResource(R.string.publish_date), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text(stringResource(R.string.book_description), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
+        OutlinedTextField(
+            value = pageCount,
+            onValueChange = { pageCount = it.filter { c -> c.isDigit() } },
+            label = { Text(stringResource(R.string.book_page_count), fontSize = 14.sp) },
+            textStyle = bookFieldTextStyle,
+            modifier = bookFieldModifier
+        )
 
-        Button(
-            onClick = {
-                if (cameraPermissionGranted) cameraLauncher.launch(null)
-                else permissionLauncher.launch(Manifest.permission.CAMERA)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6))
-        ) {
-            Text(stringResource(R.string.add_with_camera), color = Color.White)
+        ExposedDropdownMenuBox(expanded = expandedFormat, onExpandedChange = { expandedFormat = !expandedFormat }) {
+            OutlinedTextField(
+                readOnly = true,
+                value = selectedFormat,
+                onValueChange = {},
+                label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier.menuAnchor()
+            )
+            ExposedDropdownMenu(expanded = expandedFormat, onDismissRequest = { expandedFormat = false }) {
+                formatOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option, fontSize = 14.sp) },
+                        onClick = {
+                            selectedFormat = option
+                            expandedFormat = false
+                        }
+                    )
+                }
+            }
         }
+
+
+        ExposedDropdownMenuBox(expanded = expandedReading, onExpandedChange = { expandedReading = !expandedReading }) {
+            OutlinedTextField(
+                readOnly = true,
+                value = selectedReadingStatus,
+                onValueChange = {},
+                label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier.menuAnchor()
+            )
+            ExposedDropdownMenu(expanded = expandedReading, onDismissRequest = { expandedReading = false }) {
+                readingOptions.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option, fontSize = 14.sp) },
+                        onClick = {
+                            selectedReadingStatus = option
+                            expandedReading = false
+                        }
+                    )
+                }
+            }
+        }
+
+
+        OutlinedTextField(value = rating, onValueChange = { rating = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.book_rating)) }, modifier = bookFieldModifier)
+        OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.book_notes)) }, modifier = bookFieldModifier)
+        OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
+
 
         Button(
             onClick = {
@@ -239,13 +369,36 @@ fun AddBookScreen() {
                     "author" to author,
                     "genre" to genre,
                     "publishDate" to publishDate,
+                    "userId" to userId,
+                    "language" to language,
+                    "publishDate" to publishDate,
+                    "description" to description,
+                    "pageCount" to (pageCount.toIntOrNull() ?: 0),
+                    "format" to selectedFormat,
+                    "readingStatus" to selectedReadingStatus,
+                    "addedDate" to addedDate,
+                    "rating" to (rating.toIntOrNull() ?: 0),
+                    "notes" to notes,
+                    "coverUrl" to coverUrl,
                     "userId" to userId
                 )
                 db.collection("books")
                     .add(book)
                     .addOnSuccessListener {
                         Toast.makeText(context, bookAdded, Toast.LENGTH_SHORT).show()
-                        title = ""; author = ""; genre = ""; publishDate = ""
+                        title = ""
+                        author = ""
+                        publisher = ""
+                        genre = ""
+                        language = ""
+                        publishDate = ""
+                        description = ""
+                        pageCount = ""
+                        selectedFormat = formatOptions[0]
+                        selectedReadingStatus = readingOptions[0]
+                        rating = ""
+                        notes = ""
+                        coverUrl = ""
                     }
                     .addOnFailureListener {
                         Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
