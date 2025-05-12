@@ -69,6 +69,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.compose.ui:ui:1.5.1") // o più recente
+    implementation("androidx.compose.foundation:foundation:1.5.1") // o più recente
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     implementation("io.ktor:ktor-client-core:2.3.0")

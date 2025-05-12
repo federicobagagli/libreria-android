@@ -39,7 +39,7 @@ fun LivingRoomScreen(navController: NavController) {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Button(onClick = { navController.navigate("view_library") }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { navController.navigate("library_room") }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.library))
             }
 

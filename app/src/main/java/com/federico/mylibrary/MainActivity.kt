@@ -94,9 +94,9 @@ fun LibreriaApp() {
             composable("add") { AddBookScreen() }
             composable("backup") { BackupScreen(navController = navController) }
             composable("settings") { SettingsScreen(navController = navController) }
-            composable("exportView") {
-                ExportViewScreen(navController = navController, exportViewModel = exportViewModel)
-            }
+            composable("library_room") { LibraryRoomScreen(navController) }
+            composable("library_summary") { LibrarySummaryScreen(navController) }
+            composable("exportView") { ExportViewScreen(navController = navController, exportViewModel = exportViewModel) }
             composable("books") {
                 BooksScreen(
                     navController = navController,

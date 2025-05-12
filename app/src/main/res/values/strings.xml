@@ -83,6 +83,10 @@
     <string name="publisher_unknown">Publisher unknown</string>
     <string name="filters_cleared">Reset Filters</string>
     <string name="clear_filters">Clear filters</string>
+    <string name="most_common_genre">Most common genre: %1$s</string>
+    <string name="last_added_book">Last added book: %1$s</string>
+    <string name="genre_distribution">Genre distribution</string>
+    <string name="reading_status_distribution">Reading status distribution</string>
 
 
     <!-- Export -->
@@ -119,9 +123,11 @@
     <string name="duplicate_book_title">Book already exists</string>
     <string name="duplicate_book_message">A book with the same title and author already exists. Do you want to add it anyway?</string>
     <string name="confirm">Confirm</string>
-
-
-
+    <string name="library_room_title">Your Library</string>
+    <string name="view_books">View Books</string>
+    <string name="summary">Summary</string>
+    <string name="total_books">Totale libri: %1$d</string>
+    <string name="books_read">Libri letti: %1$d</string>
 
 
     <!-- Settings -->

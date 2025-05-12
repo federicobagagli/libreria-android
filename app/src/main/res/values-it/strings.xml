@@ -84,7 +84,13 @@
     <string name="duplicate_book_title">Libro già presente</string>
     <string name="duplicate_book_message">Hai già un libro con lo stesso titolo e autore. Vuoi aggiungerlo comunque?</string>
     <string name="confirm">Conferma</string>
-
+    <string name="library_room_title">La tua libreria</string>
+    <string name="view_books">Visualizza libri</string>
+    <string name="summary">Sommario</string>
+    <string name="most_common_genre">Genere più frequente: %1$s</string>
+    <string name="last_added_book">Ultimo libro aggiunto: %1$s</string>
+    <string name="genre_distribution">Distribuzione per genere</string>
+    <string name="reading_status_distribution">Distribuzione stato di lettura</string>
 
 
 
@@ -118,6 +124,9 @@
     <string name="no_book_found">Nessun libro trovato.</string>
     <string name="book_added_date">Data di aggiunta</string>
     <string name="book_not_found">Libro non trovato</string>
+    <string name="total_books">Totale libri: %1$d</string>
+    <string name="books_read">Libri letti: %1$d</string>
+
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>
