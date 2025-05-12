@@ -81,6 +81,9 @@
     <string name="publisher_unknown">Editore non riconosciuto</string>
     <string name="filters_cleared">Filtri azzerati</string>
     <string name="clear_filters">Pulisci filtri</string>
+    <string name="duplicate_book_title">Libro già presente</string>
+    <string name="duplicate_book_message">Hai già un libro con lo stesso titolo e autore. Vuoi aggiungerlo comunque?</string>
+    <string name="confirm">Conferma</string>
 
 
 

@@ -111,6 +111,8 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 @Composable
 fun AddBookScreen() {
 
+
+
     val formatOptions = listOf(
         stringResource(R.string.format_physical),
         stringResource(R.string.format_ebook),
@@ -124,6 +126,8 @@ fun AddBookScreen() {
         stringResource(R.string.status_completed)
     )
 
+    var showDuplicateDialog by remember { mutableStateOf(false) }
+    var pendingBookData by remember { mutableStateOf<Map<String, Any>?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
@@ -231,6 +235,30 @@ fun AddBookScreen() {
         }
     }
     val scrollState = rememberScrollState()
+    fun saveBook(book: Map<String, Any>) {
+        db.collection("books")
+            .add(book)
+            .addOnSuccessListener {
+                Toast.makeText(context, context.getString(R.string.book_added), Toast.LENGTH_SHORT).show()
+                title = ""
+                author = ""
+                publisher = ""
+                genre = ""
+                language = ""
+                publishDate = ""
+                description = ""
+                pageCount = ""
+                selectedFormat = formatOptions[0]
+                selectedReadingStatus = readingOptions[0]
+                rating = ""
+                notes = ""
+                coverUrl = ""
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, context.getString(R.string.error_prefix) + " ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -383,22 +411,17 @@ fun AddBookScreen() {
                     "userId" to userId
                 )
                 db.collection("books")
-                    .add(book)
-                    .addOnSuccessListener {
-                        Toast.makeText(context, bookAdded, Toast.LENGTH_SHORT).show()
-                        title = ""
-                        author = ""
-                        publisher = ""
-                        genre = ""
-                        language = ""
-                        publishDate = ""
-                        description = ""
-                        pageCount = ""
-                        selectedFormat = formatOptions[0]
-                        selectedReadingStatus = readingOptions[0]
-                        rating = ""
-                        notes = ""
-                        coverUrl = ""
+                    .whereEqualTo("userId", userId)
+                    .whereEqualTo("title", title)
+                    .whereEqualTo("author", author)
+                    .get()
+                    .addOnSuccessListener { snapshot ->
+                        if (!snapshot.isEmpty) {
+                            pendingBookData = book
+                            showDuplicateDialog = true
+                        } else {
+                            saveBook(book)
+                        }
                     }
                     .addOnFailureListener {
                         Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
@@ -410,4 +433,31 @@ fun AddBookScreen() {
             Text(saveBookLabel)
         }
     }
+
+    if (showDuplicateDialog && pendingBookData != null) {
+        AlertDialog(
+            onDismissRequest = { showDuplicateDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    saveBook(pendingBookData!!)
+                    showDuplicateDialog = false
+                    pendingBookData = null
+                }) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDuplicateDialog = false
+                    pendingBookData = null
+                }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+            title = { Text(stringResource(R.string.duplicate_book_title)) },
+            text = { Text(stringResource(R.string.duplicate_book_message)) }
+        )
+    }
+
+
 }
