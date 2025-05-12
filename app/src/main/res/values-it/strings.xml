@@ -79,6 +79,10 @@
     <string name="book_author">Autore</string>
     <string name="book_genre">Genere</string>
     <string name="publisher_unknown">Editore non riconosciuto</string>
+    <string name="filters_cleared">Filtri azzerati</string>
+    <string name="clear_filters">Pulisci filtri</string>
+
+
 
 
 
@@ -110,6 +114,7 @@
     <string name="no_isbn_found">Nessun ISBN rilevato. Riprova.</string>
     <string name="no_book_found">Nessun libro trovato.</string>
     <string name="book_added_date">Data di aggiunta</string>
+    <string name="book_not_found">Libro non trovato</string>
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>

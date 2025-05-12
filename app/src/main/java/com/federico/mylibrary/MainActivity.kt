@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import com.federico.mylibrary.backup.BackupScreen
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
+import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +58,7 @@ fun LibreriaApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val exportViewModel: ExportViewModel = viewModel()
+    val libraryFilterViewModel: LibraryFilterViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -88,33 +90,23 @@ fun LibreriaApp() {
                 EditBookScreen(navController, backStackEntry)
             }
             composable("living_room") { LivingRoomScreen(navController) }
-            composable("view_library") { ViewLibraryScreen(navController) }
+            composable("view_library") { ViewLibraryScreen(navController, libraryFilterViewModel) }
             composable("add") { AddBookScreen() }
             composable("backup") { BackupScreen(navController = navController) }
             composable("settings") { SettingsScreen(navController = navController) }
             composable("exportView") {
                 ExportViewScreen(navController = navController, exportViewModel = exportViewModel)
             }
-            composable(
-                route = "books/{title}/{author}/{genre}/{publishDate}",
-                arguments = listOf(
-                    navArgument("title") { defaultValue = "_" },
-                    navArgument("author") { defaultValue = "_" },
-                    navArgument("genre") { defaultValue = "_" },
-                    navArgument("publishDate") { defaultValue = "_" }
-                )
-            ) { backStackEntry ->
-                val args = backStackEntry.arguments!!
+            composable("books") {
                 BooksScreen(
                     navController = navController,
                     exportViewModel = exportViewModel,
-                    title = args.getString("title")?.takeIf { it != "_" },
-                    author = args.getString("author")?.takeIf { it != "_" },
-                    genre = args.getString("genre")?.takeIf { it != "_" },
-                    publishDate = args.getString("publishDate")?.takeIf { it != "_" }
+                    filterViewModel = libraryFilterViewModel
                 )
             }
-
+            composable("details_book/{bookId}") { backStackEntry ->
+                DetailsBookScreen(navController, backStackEntry)
+            }
         }
     }
 }
