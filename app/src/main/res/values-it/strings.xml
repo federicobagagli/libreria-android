@@ -92,7 +92,18 @@
     <string name="genre_distribution">Distribuzione per genere</string>
     <string name="reading_status_distribution">Distribuzione stato di lettura</string>
     <string name="undefined_label">Non definito</string>
-
+    <string name="advanced_summary_title">Statistiche Avanzate</string>
+    <string name="view_pie_charts">📊 Grafici a torta</string>
+    <string name="pie_charts_title">Grafici a torta</string>
+    <string name="bar_charts_title">Libri aggiunti per mese</string>
+    <string name="no_data_available">Nessun dato disponibile</string>
+    <string name="format_distribution">Distribuzione per formato</string>
+    <string name="language_distribution">Distribuzione per lingua</string>
+    <string name="rating_distribution">Distribuzione per valutazione</string>
+    <string name="view_monthly_bar_chart">📈 Grafico mensile</string>
+    <string name="unknown_format">Formato non rilevato</string>
+    <string name="unknown_language">Lingua non rilevata</string>
+    <string name="no_rating">Senza valutazione</string>
 
 
 
@@ -131,4 +142,6 @@
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>
+    <string name="debug_tools_title">Strumenti di Debug</string>
+    <string name="migrate_ratings_button">Migra rating in formato testo</string>
 </resources>

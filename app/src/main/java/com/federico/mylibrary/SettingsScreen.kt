@@ -35,6 +35,7 @@ fun SettingsScreen(navController: NavController) {
         ) {
             Text(stringResource(R.string.logout), color = Color.White)
         }
+        
     }
 
     if (showLogoutDialog) {

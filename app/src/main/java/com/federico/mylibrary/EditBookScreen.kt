@@ -72,7 +72,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
             selectedFormat = book.format
             selectedReadingStatus = book.readingStatus
             addedDate = book.addedDate
-            rating = if (book.rating > 0) book.rating.toString() else ""
+            rating = book.rating.takeIf { it.toIntOrNull() != null && it.toInt() > 0 } ?: ""
             notes = book.notes
             coverUrl = book.coverUrl
         }
@@ -171,7 +171,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                         "format" to selectedFormat,
                         "readingStatus" to selectedReadingStatus,
                         "addedDate" to addedDate,
-                        "rating" to (rating.toIntOrNull() ?: 0),
+                        "rating" to rating.trim(),
                         "notes" to notes,
                         "coverUrl" to coverUrl
                     )

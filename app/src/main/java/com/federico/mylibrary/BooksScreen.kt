@@ -64,7 +64,7 @@ fun BooksScreen(
                         (filters.pageCount.isBlank() || book.pageCount.toString() == filters.pageCount) &&
                         match(book.format, filters.format) &&
                         match(book.readingStatus, filters.readingStatus) &&
-                        (filters.rating.isBlank() || book.rating.toString() == filters.rating) &&
+                        (filters.rating.isBlank() || book.rating == filters.rating) &&
                         match(book.notes, filters.notes) &&
                         match(book.coverUrl, filters.coverUrl)
             }

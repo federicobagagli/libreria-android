@@ -16,7 +16,7 @@ data class Book(
     val format: String = "",
     val readingStatus: String = "",
     val addedDate: String = "",
-    val rating: Int = 0,
+    val rating: String = "", // era Int
     val notes: String = "",
     val coverUrl: String = "",
     val userId: String = ""

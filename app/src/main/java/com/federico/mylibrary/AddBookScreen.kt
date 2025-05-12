@@ -298,7 +298,7 @@ fun AddBookScreen() {
                                 "format" to selectedFormat,
                                 "readingStatus" to selectedReadingStatus,
                                 "addedDate" to addedDate,
-                                "rating" to (rating.toIntOrNull() ?: 0),
+                                "rating" to rating.trim(),
                                 "notes" to notes,
                                 "coverUrl" to coverUrl
                             )

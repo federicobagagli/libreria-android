@@ -14,7 +14,7 @@ class BookExportItem(
     private val format: String,
     private val readingStatus: String,
     private val addedDate: String,
-    private val rating: Int,
+    private val rating: String,
     private val notes: String,
     private val coverUrl: String,
     private val publishDate: String
@@ -24,7 +24,7 @@ class BookExportItem(
 
     override fun toExportRow(): List<String> = listOf(
         title, author, publisher, genre, language, description, pageCount.toString(),
-        format, readingStatus, addedDate, rating.toString(), notes, coverUrl, publishDate
+        format, readingStatus, addedDate, rating, notes, coverUrl, publishDate
     )
 
     companion object {

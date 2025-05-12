@@ -88,6 +88,19 @@
     <string name="genre_distribution">Genre distribution</string>
     <string name="reading_status_distribution">Reading status distribution</string>
     <string name="undefined_label">Non definito</string>
+    <string name="advanced_summary_title">Advanced Statistics</string>
+    <string name="view_pie_charts">📊 Pie Charts</string>
+    <string name="pie_charts_title">Pie Charts</string>
+    <string name="bar_charts_title">Books added per month</string>
+    <string name="no_data_available">No data available</string>
+    <string name="format_distribution">Distribution by format</string>
+    <string name="language_distribution">Distribution by language</string>
+    <string name="rating_distribution">Distribution by rating</string>
+    <string name="view_monthly_bar_chart">📈 Monthly Chart</string>
+    <string name="unknown_format">Unknown format</string>
+    <string name="unknown_language">Unknown language</string>
+    <string name="no_rating">No rating</string>
+
 
 
     <!-- Export -->
@@ -133,4 +146,7 @@
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Settings</string>
+    <string name="debug_tools_title">Debug Tools</string>
+    <string name="migrate_ratings_button">Migrate ratings to text format</string>
+
 </resources>
