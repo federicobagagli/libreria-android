@@ -95,7 +95,22 @@ fun BooksScreen(
                     onClick = {
                         exportViewModel.setExportData(
                             items = books.map { (_, book) ->
-                                BookExportItem(book.title, book.author, book.genre, book.publishDate)
+                                BookExportItem(
+                                    title = book.title,
+                                    author = book.author,
+                                    publisher = book.publisher,
+                                    genre = book.genre,
+                                    language = book.language,
+                                    description = book.description,
+                                    pageCount = book.pageCount,
+                                    format = book.format,
+                                    readingStatus = book.readingStatus,
+                                    addedDate = book.addedDate,
+                                    rating = book.rating,
+                                    notes = book.notes,
+                                    coverUrl = book.coverUrl,
+                                    publishDate = book.publishDate
+                                )
                             },
                             fileName = "library_export.csv"
                         )
