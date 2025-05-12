@@ -69,6 +69,7 @@ android {
 }
 
 dependencies {
+    implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("androidx.compose.ui:ui:1.5.1") // o più recente
     implementation("androidx.compose.foundation:foundation:1.5.1") // o più recente
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")

@@ -1,5 +1,6 @@
 package com.federico.mylibrary
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +16,7 @@ import com.federico.mylibrary.R
 import com.federico.mylibrary.model.Book
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import coil.compose.AsyncImage
 
 @Composable
 fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStackEntry) {
@@ -28,6 +30,7 @@ fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStack
     LaunchedEffect(bookId) {
         val doc = db.collection("books").document(bookId).get().await()
         book = doc.toObject(Book::class.java)
+        Log.d("COVER_URL", "URL = ${book?.coverUrl}")
         isLoading = false
     }
 
@@ -56,6 +59,16 @@ fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStack
                 Text(text = stringResource(R.string.book_rating) + ": ${it.rating}")
                 Text(text = stringResource(R.string.book_notes) + ": " + it.notes)
                 Text(text = stringResource(R.string.book_cover_url) + ": " + it.coverUrl)
+                if (it.coverUrl.isNotBlank()) {
+                    val coverUrl = it.coverUrl.replace("http://", "https://")
+                    AsyncImage(
+                        model = coverUrl,
+                        contentDescription = stringResource(R.string.book_cover_url),
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .size(width = 100.dp, height = 150.dp)
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth()) {

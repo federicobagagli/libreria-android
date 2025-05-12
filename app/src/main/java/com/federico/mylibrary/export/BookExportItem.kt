@@ -21,7 +21,7 @@ class BookExportItem(
 ) : ExportableItem {
 
     override fun getExportHeaders(): List<String> = emptyList() // non più usato
-    
+
     override fun toExportRow(): List<String> = listOf(
         title, author, publisher, genre, language, description, pageCount.toString(),
         format, readingStatus, addedDate, rating.toString(), notes, coverUrl, publishDate
