@@ -259,7 +259,79 @@ fun AddBookScreen() {
             }
     }
 
-    Column(
+    Column(modifier = Modifier.fillMaxSize()) {
+
+        // 🔼 Bottoni fissi in alto
+        Surface(shadowElevation = 4.dp) {
+            Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            if (cameraPermissionGranted) barcodeScannerLauncher.launch(null)
+                            else permissionLauncher.launch(Manifest.permission.CAMERA)
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784))
+                    ) {
+                        Text(stringResource(R.string.scan_isbn), color = Color.White)
+                    }
+
+                    Button(
+                        onClick = {
+                            if (title.isBlank()) {
+                                Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            val book = hashMapOf(
+                                "title" to title,
+                                "author" to author,
+                                "genre" to genre,
+                                "publishDate" to publishDate,
+                                "userId" to userId,
+                                "language" to language,
+                                "description" to description,
+                                "pageCount" to (pageCount.toIntOrNull() ?: 0),
+                                "format" to selectedFormat,
+                                "readingStatus" to selectedReadingStatus,
+                                "addedDate" to addedDate,
+                                "rating" to (rating.toIntOrNull() ?: 0),
+                                "notes" to notes,
+                                "coverUrl" to coverUrl
+                            )
+
+                            db.collection("books")
+                                .whereEqualTo("userId", userId)
+                                .whereEqualTo("title", title)
+                                .whereEqualTo("author", author)
+                                .get()
+                                .addOnSuccessListener { snapshot ->
+                                    if (!snapshot.isEmpty) {
+                                        pendingBookData = book
+                                        showDuplicateDialog = true
+                                    } else {
+                                        saveBook(book)
+                                    }
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        },
+                        modifier = Modifier.weight(1f),
+                        enabled = title.isNotBlank()
+                    ) {
+                        Text(saveBookLabel)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+        
+        Column(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
@@ -374,64 +446,7 @@ fun AddBookScreen() {
         OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
 
 
-        Button(
-            onClick = {
-                if (cameraPermissionGranted) barcodeScannerLauncher.launch(null)
-                else permissionLauncher.launch(Manifest.permission.CAMERA)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784))
-        ) {
-            Text(stringResource(R.string.scan_isbn), color = Color.White)
-        }
 
-        Button(
-            onClick = {
-                if (title.isBlank()) {
-                    Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-
-                val book = hashMapOf(
-                    "title" to title,
-                    "author" to author,
-                    "genre" to genre,
-                    "publishDate" to publishDate,
-                    "userId" to userId,
-                    "language" to language,
-                    "publishDate" to publishDate,
-                    "description" to description,
-                    "pageCount" to (pageCount.toIntOrNull() ?: 0),
-                    "format" to selectedFormat,
-                    "readingStatus" to selectedReadingStatus,
-                    "addedDate" to addedDate,
-                    "rating" to (rating.toIntOrNull() ?: 0),
-                    "notes" to notes,
-                    "coverUrl" to coverUrl,
-                    "userId" to userId
-                )
-                db.collection("books")
-                    .whereEqualTo("userId", userId)
-                    .whereEqualTo("title", title)
-                    .whereEqualTo("author", author)
-                    .get()
-                    .addOnSuccessListener { snapshot ->
-                        if (!snapshot.isEmpty) {
-                            pendingBookData = book
-                            showDuplicateDialog = true
-                        } else {
-                            saveBook(book)
-                        }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
-                    }
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = title.isNotBlank()
-        ) {
-            Text(saveBookLabel)
-        }
     }
 
     if (showDuplicateDialog && pendingBookData != null) {
@@ -458,6 +473,6 @@ fun AddBookScreen() {
             text = { Text(stringResource(R.string.duplicate_book_message)) }
         )
     }
-
+    }
 
 }
