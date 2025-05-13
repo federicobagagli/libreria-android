@@ -28,6 +28,14 @@
     <string name="registration_failed">Registration failed: %1$s</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="camera_permission_denied">Camera permission denied</string>
+    <string name="processing_image">Processing image…</string>
+    <string name="isbn_found">ISBN found: %1$s</string>
+    <string name="no_image_captured">Image not captured (bitmap is null)</string>
+    <string name="isbn_not_found_dialog_title">ISBN not found</string>
+    <string name="isbn_not_found_dialog_message">To be correctly recognized, make sure the ISBN code fills most of the frame.You can also try flipping the camera or zooming in.</string>
+    <string name="ok">OK</string>
+
 
 
     <!-- Backup -->

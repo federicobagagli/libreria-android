@@ -27,6 +27,15 @@
     <string name="registration_failed">Registrazione fallita: %1$s</string>
     <string name="yes">Sì</string>
     <string name="no">No</string>
+    <string name="camera_permission_denied">Permesso fotocamera negato</string>
+    <string name="processing_image">Elaborazione immagine…</string>
+    <string name="isbn_found">ISBN trovato: %1$s</string>
+    <string name="no_image_captured">Immagine non acquisita (bitmap null)</string>
+    <string name="isbn_not_found_dialog_title">ISBN non trovato</string>
+    <string name="isbn_not_found_dialog_message">Per essere riconosciuto correttamente assicurati che il codice ISBN occupi la maggior parte dell inquadratura. Puoi anche provare a girare la fotocamera o aumentare lo zoom.</string>
+    <string name="ok">OK</string>
+
+
 
     <!-- Backup -->
     <string name="backup_section_title">Backup</string>

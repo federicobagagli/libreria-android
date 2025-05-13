@@ -115,7 +115,7 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 @Composable
 fun AddBookScreen() {
 
-
+    var showIsbnHelpDialog by remember { mutableStateOf(false) }
     val formatOptions = listOf(
         stringResource(R.string.format_physical),
         stringResource(R.string.format_ebook),
@@ -169,7 +169,7 @@ fun AddBookScreen() {
     ) { granted ->
         cameraPermissionGranted = granted
         if (!granted) {
-            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -185,7 +185,7 @@ fun AddBookScreen() {
 
             val image = InputImage.fromBitmap(bitmap, 0)
 
-            Toast.makeText(context, "Elaborazione immagine...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.processing_image), Toast.LENGTH_SHORT).show()
             Log.d("ScanISBN", "Elaborazione immagine per barcode...")
 
             scanner.process(image)
@@ -201,7 +201,7 @@ fun AddBookScreen() {
                     val isbn = isbnBarcode?.rawValue
 
                     if (isbn != null) {
-                        Toast.makeText(context, "ISBN trovato: $isbn", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.isbn_found, isbn), Toast.LENGTH_SHORT).show()
                         Log.d("ScanISBN", "ISBN valido: $isbn")
 
                         coroutineScope.launch {
@@ -241,11 +241,7 @@ fun AddBookScreen() {
                             }
                         }
                     } else {
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.no_isbn_found),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showIsbnHelpDialog = true
                         Log.d("ScanISBN", "Nessun ISBN EAN-13 valido trovato.")
                     }
                 }
@@ -258,8 +254,7 @@ fun AddBookScreen() {
                     Log.e("ScanISBN", "Errore scansione barcode: ${it.message}")
                 }
         } else {
-            Toast.makeText(context, "Immagine non acquisita (bitmap null)", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(context, context.getString(R.string.no_image_captured), Toast.LENGTH_SHORT).show()
             Log.d("ScanISBN", "Bitmap nullo ricevuto dal TakePicturePreview.")
         }
     }
@@ -544,5 +539,16 @@ fun AddBookScreen() {
             )
         }
     }
-
+    if (showIsbnHelpDialog) {
+        AlertDialog(
+            onDismissRequest = { showIsbnHelpDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showIsbnHelpDialog = false }) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            title = { Text(stringResource(R.string.isbn_not_found_dialog_title)) },
+            text = { Text(stringResource(R.string.isbn_not_found_dialog_message)) }
+        )
+    }
 }
