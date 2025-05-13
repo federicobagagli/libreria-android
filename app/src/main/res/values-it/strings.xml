@@ -157,4 +157,6 @@
     <string name="settings_title">⚙️ Configurazione</string>
     <string name="debug_tools_title">Strumenti di Debug</string>
     <string name="migrate_ratings_button">Migra rating in formato testo</string>
+    <string name="dark_mode">Tema scuro</string>
+
 </resources>

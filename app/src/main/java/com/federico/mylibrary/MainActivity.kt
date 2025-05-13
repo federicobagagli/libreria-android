@@ -23,6 +23,7 @@ import androidx.navigation.navArgument
 import com.federico.mylibrary.backup.BackupScreen
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
+import com.federico.mylibrary.ui.theme.LibraryAppTheme
 import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -30,7 +31,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
+            var isDarkMode by remember { mutableStateOf(false) }
+            LibraryAppTheme(darkTheme = isDarkMode) {
                 val auth = FirebaseAuth.getInstance()
                 var currentUser by remember { mutableStateOf(auth.currentUser) }
 
@@ -43,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (currentUser != null) {
-                    LibreriaApp()
+                    LibreriaApp(isDarkMode = isDarkMode, onToggleDarkMode = {isDarkMode = it})
                 } else {
                     LoginScreen(auth)
                 }
@@ -53,7 +55,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LibreriaApp() {
+fun LibreriaApp(isDarkMode: Boolean,
+                onToggleDarkMode: (Boolean) -> Unit) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -93,7 +96,7 @@ fun LibreriaApp() {
             composable("view_library") { ViewLibraryScreen(navController, libraryFilterViewModel) }
             composable("add") { AddBookScreen() }
             composable("backup") { BackupScreen(navController = navController) }
-            composable("settings") { SettingsScreen(navController = navController) }
+            composable("settings") { SettingsScreen(navController = navController, isDarkMode = isDarkMode, onToggleDarkMode = onToggleDarkMode) }
             composable("library_room") { LibraryRoomScreen(navController) }
             composable("library_summary") { LibrarySummaryScreen(navController) }
             composable("exportView") { ExportViewScreen(navController = navController, exportViewModel = exportViewModel) }

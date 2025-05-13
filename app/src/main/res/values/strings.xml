@@ -161,5 +161,6 @@
     <string name="settings_title">⚙️ Settings</string>
     <string name="debug_tools_title">Debug Tools</string>
     <string name="migrate_ratings_button">Migrate ratings to text format</string>
+    <string name="dark_mode">Dark theme</string>
 
 </resources>

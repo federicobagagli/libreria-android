@@ -3,6 +3,7 @@ package com.federico.mylibrary
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -11,7 +12,9 @@ import androidx.navigation.NavController
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController,
+                   isDarkMode: Boolean,
+                   onToggleDarkMode: (Boolean) -> Unit) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -26,6 +29,19 @@ fun SettingsScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.backup_section_title))
+        }
+
+        // 🎨 Toggle Tema Scuro
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(stringResource(R.string.dark_mode))
+            Switch(
+                checked = isDarkMode,
+                onCheckedChange = onToggleDarkMode
+            )
         }
 
         Button(
