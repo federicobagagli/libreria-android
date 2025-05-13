@@ -158,5 +158,6 @@
     <string name="debug_tools_title">Strumenti di Debug</string>
     <string name="migrate_ratings_button">Migra rating in formato testo</string>
     <string name="dark_mode">Tema scuro</string>
+    <string name="theme_selector_label">Tema</string>
 
 </resources>

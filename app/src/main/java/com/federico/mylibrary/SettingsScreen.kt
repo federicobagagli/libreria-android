@@ -9,12 +9,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.federico.mylibrary.ui.ThemeSelector
+import com.federico.mylibrary.ui.theme.AppThemeStyle
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SettingsScreen(navController: NavController,
-                   isDarkMode: Boolean,
-                   onToggleDarkMode: (Boolean) -> Unit) {
+fun SettingsScreen(
+    navController: NavController,
+    selectedTheme: AppThemeStyle,
+    onThemeSelected: (AppThemeStyle) -> Unit
+) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -31,18 +35,10 @@ fun SettingsScreen(navController: NavController,
             Text(stringResource(R.string.backup_section_title))
         }
 
-        // 🎨 Toggle Tema Scuro
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(stringResource(R.string.dark_mode))
-            Switch(
-                checked = isDarkMode,
-                onCheckedChange = onToggleDarkMode
-            )
-        }
+        ThemeSelector(
+            selectedTheme = selectedTheme,
+            onThemeSelected = { onThemeSelected(it) }
+        )
 
         Button(
             onClick = { showLogoutDialog = true },

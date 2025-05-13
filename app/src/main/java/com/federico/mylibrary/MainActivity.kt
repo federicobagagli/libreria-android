@@ -24,6 +24,7 @@ import com.federico.mylibrary.backup.BackupScreen
 import com.federico.mylibrary.datastore.ThemePreferences
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
+import com.federico.mylibrary.ui.theme.AppThemeStyle
 import com.federico.mylibrary.ui.theme.LibraryAppTheme
 import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -34,12 +35,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val context = applicationContext
-            val darkModeFlow = remember { ThemePreferences.darkModeFlow(context) }
-            val isDarkMode by darkModeFlow.collectAsState(initial = false)
+            val selectedThemeStyle by ThemePreferences.themeStyleFlow(context).collectAsState(initial = AppThemeStyle.SYSTEM)
+
 
             val coroutineScope = rememberCoroutineScope()
 
-            LibraryAppTheme(darkTheme = isDarkMode) {
+            LibraryAppTheme(themeStyle = selectedThemeStyle) {
                 val auth = FirebaseAuth.getInstance()
                 var currentUser by remember { mutableStateOf(auth.currentUser) }
 
@@ -53,10 +54,10 @@ class MainActivity : ComponentActivity() {
 
                 if (currentUser != null) {
                     LibreriaApp(
-                        isDarkMode = isDarkMode,
-                        onToggleDarkMode = { enabled ->
+                        selectedTheme = selectedThemeStyle,
+                        onThemeSelected = { theme ->
                             coroutineScope.launch {
-                                ThemePreferences.setDarkMode(context, enabled)
+                                ThemePreferences.setThemeStyle(context, theme)
                             }
                         }
                     )
@@ -69,8 +70,8 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun LibreriaApp(isDarkMode: Boolean,
-                onToggleDarkMode: (Boolean) -> Unit) {
+fun LibreriaApp(selectedTheme: AppThemeStyle,
+                onThemeSelected: (AppThemeStyle) -> Unit) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -112,7 +113,13 @@ fun LibreriaApp(isDarkMode: Boolean,
             composable("view_library") { ViewLibraryScreen(navController, libraryFilterViewModel) }
             composable("add") { AddBookScreen() }
             composable("backup") { BackupScreen(navController = navController) }
-            composable("settings") { SettingsScreen(navController = navController, isDarkMode = isDarkMode, onToggleDarkMode = onToggleDarkMode) }
+            composable("settings") {
+                SettingsScreen(
+                    navController = navController,
+                    selectedTheme = selectedTheme,
+                    onThemeSelected = onThemeSelected
+                )
+            }
             composable("library_room") { LibraryRoomScreen(navController) }
             composable("library_summary") { LibrarySummaryScreen(navController) }
             composable("exportView") { ExportViewScreen(navController = navController, exportViewModel = exportViewModel) }
