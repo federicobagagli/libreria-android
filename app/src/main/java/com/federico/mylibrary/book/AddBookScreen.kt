@@ -1,8 +1,7 @@
-package com.federico.mylibrary
+package com.federico.mylibrary.book
 
 import android.Manifest
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,10 +38,10 @@ import java.util.Locale
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
+import com.federico.mylibrary.createTempImageUri
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.mlkit.vision.common.InputImage
 import com.federico.mylibrary.uploadCompressedImage
-import com.federico.mylibrary.util.rememberMediaPermissionLauncher
 
 @Serializable
 data class BookInfo(

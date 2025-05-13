@@ -66,6 +66,52 @@ fun LoginScreen(auth: FirebaseAuth) {
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
+        // 1. Pulsante Google
+        Button(
+            onClick = {
+                val signInRequest = BeginSignInRequest.builder()
+                    .setGoogleIdTokenRequestOptions(
+                        BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                            .setSupported(true)
+                            .setServerClientId("1048852056688-q09i8vblaf6fm9sdopok83vusv3vpino.apps.googleusercontent.com")
+                            .setFilterByAuthorizedAccounts(false)
+                            .build()
+                    )
+                    .setAutoSelectEnabled(true)
+                    .build()
+
+                oneTapClient.beginSignIn(signInRequest)
+                    .addOnSuccessListener { result ->
+                        try {
+                            val intentSender = result.pendingIntent.intentSender
+                            googleLoginLauncher.launch(
+                                IntentSenderRequest.Builder(intentSender).build()
+                            )
+                        } catch (e: IntentSender.SendIntentException) {
+                            Toast.makeText(context, context.getString(R.string.google_intent_error, e.message ?: ""), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(context, context.getString(R.string.google_login_failed, it.message ?: ""), Toast.LENGTH_SHORT).show()
+                    }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.login_with_google))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+// 2. Frase "oppure accedi con"
+        Text(
+            text = stringResource(R.string.or_login_with),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+// 3. Campi email + password
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -82,8 +128,9 @@ fun LoginScreen(auth: FirebaseAuth) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
+// 4. Bottoni login/registrazione email
         Button(
             onClick = {
                 auth.signInWithEmailAndPassword(email.trim(), password)
@@ -130,43 +177,9 @@ fun LoginScreen(auth: FirebaseAuth) {
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Button(
-            onClick = {
-                val signInRequest = BeginSignInRequest.builder()
-                    .setGoogleIdTokenRequestOptions(
-                        BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                            .setSupported(true)
-                            .setServerClientId("1048852056688-q09i8vblaf6fm9sdopok83vusv3vpino.apps.googleusercontent.com")
-                            .setFilterByAuthorizedAccounts(false)
-                            .build()
-                    )
-                    .setAutoSelectEnabled(true)
-                    .build()
-
-                oneTapClient.beginSignIn(signInRequest)
-                    .addOnSuccessListener { result ->
-                        try {
-                            val intentSender = result.pendingIntent.intentSender
-                            googleLoginLauncher.launch(
-                                IntentSenderRequest.Builder(intentSender).build()
-                            )
-                        } catch (e: IntentSender.SendIntentException) {
-                            Toast.makeText(context, context.getString(R.string.google_intent_error, e.message ?: ""), Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    .addOnFailureListener {
-                        Toast.makeText(context, context.getString(R.string.google_login_failed, it.message ?: ""), Toast.LENGTH_SHORT).show()
-                    }
-            },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(R.string.login_with_google))
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         TextButton(onClick = { showReset = true }, modifier = Modifier.align(Alignment.End)) {
             Text(text = stringResource(R.string.password_reset_title))
         }
+
     }
 }

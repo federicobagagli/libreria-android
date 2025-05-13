@@ -1,4 +1,4 @@
-package com.federico.mylibrary
+package com.federico.mylibrary.book
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -22,15 +22,11 @@ import kotlinx.coroutines.tasks.await
 import com.federico.mylibrary.uploadCompressedImage
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.Alignment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.runtime.remember
-import androidx.core.content.FileProvider
-import com.federico.mylibrary.uploadCompressedImage
 import com.federico.mylibrary.createTempImageUri
 
 

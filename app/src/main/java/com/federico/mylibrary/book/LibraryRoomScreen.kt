@@ -1,4 +1,4 @@
-package com.federico.mylibrary
+package com.federico.mylibrary.book
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

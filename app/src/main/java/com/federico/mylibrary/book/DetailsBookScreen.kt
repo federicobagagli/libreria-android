@@ -1,4 +1,4 @@
-package com.federico.mylibrary
+package com.federico.mylibrary.book
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
