@@ -104,6 +104,8 @@
     <string name="unknown_format">Formato non rilevato</string>
     <string name="unknown_language">Lingua non rilevata</string>
     <string name="no_rating">Senza valutazione</string>
+    <string name="book_location">Dove si trova</string>
+    <string name="book_location_label">📦 Dove si trova: %1$s</string>
 
 
 
@@ -148,7 +150,7 @@
     <string name="sort_by_genre">Per genere</string>
     <string name="sort_by_publisher">Per editore</string>
     <string name="sort_by_publish_date">Per data pubblicazione</string>
-
+    <string name="sort_by_location">Per collocazione</string>
 
 
     <!-- Settings -->

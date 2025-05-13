@@ -67,11 +67,11 @@ fun LibreriaApp() {
                     Text(
                         text = when (currentDestination?.route) {
                             "living_room" -> stringResource(R.string.salotto_title)
-                            "view_library" -> stringResource(R.string.view_library_title)
+                            "view_library" -> ""//stringResource(R.string.view_library_title)
                             "books" -> ""//stringResource(R.string.screen_books)
                             "add" -> stringResource(R.string.screen_add)
                             "settings" -> stringResource(R.string.screen_settings)
-                            else -> stringResource(R.string.app_name)
+                            else -> ""//stringResource(R.string.app_name)
                         }
                     )
                 }

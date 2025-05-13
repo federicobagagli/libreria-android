@@ -73,6 +73,12 @@ fun ViewLibraryScreen(navController: NavController, filterViewModel: LibraryFilt
             OutlinedTextField(filters.rating, { filters = filters.copy(rating = it) }, label = { Text(stringResource(R.string.book_rating)) }, modifier = Modifier.full())
             OutlinedTextField(filters.notes, { filters = filters.copy(notes = it) }, label = { Text(stringResource(R.string.book_notes)) }, modifier = Modifier.full())
             OutlinedTextField(filters.coverUrl, { filters = filters.copy(coverUrl = it) }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = Modifier.full())
+            OutlinedTextField(
+                filters.location,
+                { filters = filters.copy(location = it) },
+                label = { Text(stringResource(R.string.book_location)) },
+                modifier = Modifier.full()
+            )
         }
     }
 }

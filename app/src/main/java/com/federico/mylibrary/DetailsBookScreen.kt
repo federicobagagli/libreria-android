@@ -59,6 +59,7 @@ fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStack
                 Text(text = stringResource(R.string.book_rating) + ": ${it.rating}")
                 Text(text = stringResource(R.string.book_notes) + ": " + it.notes)
                 Text(text = stringResource(R.string.book_cover_url) + ": " + it.coverUrl)
+                Text(text = stringResource(R.string.book_location) + ": " + it.location)
                 if (it.coverUrl.isNotBlank()) {
                     val coverUrl = it.coverUrl.replace("http://", "https://")
                     AsyncImage(

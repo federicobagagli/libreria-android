@@ -19,5 +19,6 @@ data class Book(
     val rating: String = "", // era Int
     val notes: String = "",
     val coverUrl: String = "",
-    val userId: String = ""
+    val userId: String = "",
+    val location: String = ""
 )

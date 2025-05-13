@@ -19,7 +19,8 @@ data class BookFilterState(
     val addedDate: String = "",
     val rating: String = "",
     val notes: String = "",
-    val coverUrl: String = ""
+    val coverUrl: String = "",
+    val location: String = ""
 )
 
 class LibraryFilterViewModel : ViewModel() {

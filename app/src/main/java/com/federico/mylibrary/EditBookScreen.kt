@@ -53,6 +53,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
     var rating by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
     var coverUrl by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
     var expandedFormat by remember { mutableStateOf(false) }
     var expandedReading by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
@@ -75,6 +76,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
             rating = book.rating.takeIf { it.toIntOrNull() != null && it.toInt() > 0 } ?: ""
             notes = book.notes
             coverUrl = book.coverUrl
+            location = book.location
         }
         isLoading = false
     }
@@ -151,6 +153,12 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
             OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.book_notes)) }, modifier = bookFieldModifier)
             OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
             OutlinedTextField(value = addedDate, onValueChange = {}, enabled = false, label = { Text(stringResource(R.string.book_added_date)) }, modifier = bookFieldModifier)
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text(stringResource(R.string.book_location)) },
+                modifier = bookFieldModifier
+            )
 
             Button(
                 onClick = {
@@ -173,7 +181,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                         "addedDate" to addedDate,
                         "rating" to rating.trim(),
                         "notes" to notes,
-                        "coverUrl" to coverUrl
+                        "coverUrl" to coverUrl,
+                        "location" to location
                     )
 
                     db.collection("books").document(bookId)

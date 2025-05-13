@@ -51,7 +51,8 @@ data class BookInfo(
     val description: String = "",
     val pageCount: Int = 0,
     val averageRating: Double = 0.0,
-    val coverUrl: String = ""
+    val coverUrl: String = "",
+    val location: String = ""
 )
 
 @Serializable
@@ -86,7 +87,9 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
         val description = volumeInfo["description"]?.jsonPrimitive?.content ?: ""
         val pageCount = volumeInfo["pageCount"]?.jsonPrimitive?.intOrNull ?: 0
         val averageRating = volumeInfo["averageRating"]?.jsonPrimitive?.doubleOrNull ?: 0.0
-        val coverUrl = volumeInfo["imageLinks"]?.jsonObject?.get("thumbnail")?.jsonPrimitive?.content ?: ""
+        val coverUrl =
+            volumeInfo["imageLinks"]?.jsonObject?.get("thumbnail")?.jsonPrimitive?.content ?: ""
+        val location = volumeInfo["location"]?.jsonPrimitive?.content ?: ""
 
         BookInfo(
             title = title,
@@ -98,7 +101,8 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
             description = description,
             pageCount = pageCount,
             averageRating = averageRating,
-            coverUrl = coverUrl
+            coverUrl = coverUrl,
+            location = location
         )
     } catch (e: Exception) {
         null
@@ -110,7 +114,6 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen() {
-
 
 
     val formatOptions = listOf(
@@ -147,6 +150,7 @@ fun AddBookScreen() {
     var rating by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
     var coverUrl by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
     var expandedFormat by remember { mutableStateOf(false) }
     var expandedReading by remember { mutableStateOf(false) }
 
@@ -189,7 +193,8 @@ fun AddBookScreen() {
                     Log.d("ScanISBN", "Barcode trovati: ${barcodes.size}")
 
                     val isbnBarcode = barcodes.firstOrNull {
-                        Toast.makeText(context, "Rilevato: ${it.rawValue}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Rilevato: ${it.rawValue}", Toast.LENGTH_SHORT)
+                            .show()
                         it.rawValue?.length == 13 && it.format == Barcode.FORMAT_EAN_13
                     }
 
@@ -200,7 +205,8 @@ fun AddBookScreen() {
                         Log.d("ScanISBN", "ISBN valido: $isbn")
 
                         coroutineScope.launch {
-                            val book = fetchBookInfoFromGoogleBooks(isbn, BuildConfig.GOOGLE_BOOKS_API_KEY)
+                            val book =
+                                fetchBookInfoFromGoogleBooks(isbn, BuildConfig.GOOGLE_BOOKS_API_KEY)
                             if (book != null) {
                                 title = book.title
                                 author = book.authors.joinToString(", ") { it.name }
@@ -209,28 +215,51 @@ fun AddBookScreen() {
                                 publisher = book.publisher
                                 language = book.language
                                 description = book.description
-                                pageCount = if (book.pageCount > 0) book.pageCount.toString() else ""
-                                rating = if (book.averageRating > 0.0) book.averageRating.toInt().toString() else ""
+                                pageCount =
+                                    if (book.pageCount > 0) book.pageCount.toString() else ""
+                                rating = if (book.averageRating > 0.0) book.averageRating.toInt()
+                                    .toString() else ""
                                 coverUrl = book.coverUrl
+                                location = book.location
 
-                                Toast.makeText(context, context.getString(R.string.text_recognized), Toast.LENGTH_SHORT).show()
-                                Log.d("ScanISBN", "Libro trovato: ${book.title} - ${book.authors.joinToString(", ") { it.name }}")
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.text_recognized),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                Log.d(
+                                    "ScanISBN",
+                                    "Libro trovato: ${book.title} - ${book.authors.joinToString(", ") { it.name }}"
+                                )
                             } else {
-                                Toast.makeText(context, context.getString(R.string.no_book_found), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.no_book_found),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 Log.d("ScanISBN", "Nessun libro trovato via Google Books API")
                             }
                         }
                     } else {
-                        Toast.makeText(context, context.getString(R.string.no_isbn_found), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.no_isbn_found),
+                            Toast.LENGTH_SHORT
+                        ).show()
                         Log.d("ScanISBN", "Nessun ISBN EAN-13 valido trovato.")
                     }
                 }
                 .addOnFailureListener {
-                    Toast.makeText(context, "${context.getString(R.string.error_prefix)} ${it.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "${context.getString(R.string.error_prefix)} ${it.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     Log.e("ScanISBN", "Errore scansione barcode: ${it.message}")
                 }
         } else {
-            Toast.makeText(context, "Immagine non acquisita (bitmap null)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Immagine non acquisita (bitmap null)", Toast.LENGTH_SHORT)
+                .show()
             Log.d("ScanISBN", "Bitmap nullo ricevuto dal TakePicturePreview.")
         }
     }
@@ -239,7 +268,8 @@ fun AddBookScreen() {
         db.collection("books")
             .add(book)
             .addOnSuccessListener {
-                Toast.makeText(context, context.getString(R.string.book_added), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.book_added), Toast.LENGTH_SHORT)
+                    .show()
                 title = ""
                 author = ""
                 publisher = ""
@@ -253,9 +283,14 @@ fun AddBookScreen() {
                 rating = ""
                 notes = ""
                 coverUrl = ""
+                location = ""
             }
             .addOnFailureListener {
-                Toast.makeText(context, context.getString(R.string.error_prefix) + " ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.error_prefix) + " ${it.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
@@ -263,7 +298,9 @@ fun AddBookScreen() {
 
         // 🔼 Bottoni fissi in alto
         Surface(shadowElevation = 4.dp) {
-            Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -300,7 +337,8 @@ fun AddBookScreen() {
                                 "addedDate" to addedDate,
                                 "rating" to rating.trim(),
                                 "notes" to notes,
-                                "coverUrl" to coverUrl
+                                "coverUrl" to coverUrl,
+                                "location" to location
                             )
 
                             db.collection("books")
@@ -317,7 +355,11 @@ fun AddBookScreen() {
                                     }
                                 }
                                 .addOnFailureListener {
-                                    Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "$errorPrefix ${it.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                         },
                         modifier = Modifier.weight(1f),
@@ -332,147 +374,175 @@ fun AddBookScreen() {
         }
 
         Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .verticalScroll(scrollState), // Scroll abilitato
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text(stringResource(R.string.title), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = author,
-            onValueChange = { author = it },
-            label = { Text(stringResource(R.string.author), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = publisher,
-            onValueChange = { publisher = it },
-            label = { Text(stringResource(R.string.book_publisher), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = genre,
-            onValueChange = { genre = it },
-            label = { Text(stringResource(R.string.genre), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = language,
-            onValueChange = { language = it },
-            label = { Text(stringResource(R.string.book_language), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = publishDate,
-            onValueChange = { publishDate = it },
-            label = { Text(stringResource(R.string.publish_date), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text(stringResource(R.string.book_description), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-        OutlinedTextField(
-            value = pageCount,
-            onValueChange = { pageCount = it.filter { c -> c.isDigit() } },
-            label = { Text(stringResource(R.string.book_page_count), fontSize = 14.sp) },
-            textStyle = bookFieldTextStyle,
-            modifier = bookFieldModifier
-        )
-
-        ExposedDropdownMenuBox(expanded = expandedFormat, onExpandedChange = { expandedFormat = !expandedFormat }) {
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()
+                .verticalScroll(scrollState), // Scroll abilitato
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             OutlinedTextField(
-                readOnly = true,
-                value = selectedFormat,
-                onValueChange = {},
-                label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
+                value = title,
+                onValueChange = { title = it },
+                label = { Text(stringResource(R.string.title), fontSize = 14.sp) },
                 textStyle = bookFieldTextStyle,
-                modifier = bookFieldModifier.menuAnchor()
+                modifier = bookFieldModifier
             )
-            ExposedDropdownMenu(expanded = expandedFormat, onDismissRequest = { expandedFormat = false }) {
-                formatOptions.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option, fontSize = 14.sp) },
-                        onClick = {
-                            selectedFormat = option
-                            expandedFormat = false
-                        }
-                    )
+            OutlinedTextField(
+                value = author,
+                onValueChange = { author = it },
+                label = { Text(stringResource(R.string.author), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = publisher,
+                onValueChange = { publisher = it },
+                label = { Text(stringResource(R.string.book_publisher), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = genre,
+                onValueChange = { genre = it },
+                label = { Text(stringResource(R.string.genre), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = language,
+                onValueChange = { language = it },
+                label = { Text(stringResource(R.string.book_language), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = publishDate,
+                onValueChange = { publishDate = it },
+                label = { Text(stringResource(R.string.publish_date), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text(stringResource(R.string.book_description), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = pageCount,
+                onValueChange = { pageCount = it.filter { c -> c.isDigit() } },
+                label = { Text(stringResource(R.string.book_page_count), fontSize = 14.sp) },
+                textStyle = bookFieldTextStyle,
+                modifier = bookFieldModifier
+            )
+
+            ExposedDropdownMenuBox(
+                expanded = expandedFormat,
+                onExpandedChange = { expandedFormat = !expandedFormat }) {
+                OutlinedTextField(
+                    readOnly = true,
+                    value = selectedFormat,
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedFormat,
+                    onDismissRequest = { expandedFormat = false }) {
+                    formatOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, fontSize = 14.sp) },
+                            onClick = {
+                                selectedFormat = option
+                                expandedFormat = false
+                            }
+                        )
+                    }
                 }
             }
-        }
 
 
-        ExposedDropdownMenuBox(expanded = expandedReading, onExpandedChange = { expandedReading = !expandedReading }) {
-            OutlinedTextField(
-                readOnly = true,
-                value = selectedReadingStatus,
-                onValueChange = {},
-                label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
-                textStyle = bookFieldTextStyle,
-                modifier = bookFieldModifier.menuAnchor()
-            )
-            ExposedDropdownMenu(expanded = expandedReading, onDismissRequest = { expandedReading = false }) {
-                readingOptions.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option, fontSize = 14.sp) },
-                        onClick = {
-                            selectedReadingStatus = option
-                            expandedReading = false
-                        }
-                    )
+            ExposedDropdownMenuBox(
+                expanded = expandedReading,
+                onExpandedChange = { expandedReading = !expandedReading }) {
+                OutlinedTextField(
+                    readOnly = true,
+                    value = selectedReadingStatus,
+                    onValueChange = {},
+                    label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier.menuAnchor()
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedReading,
+                    onDismissRequest = { expandedReading = false }) {
+                    readingOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, fontSize = 14.sp) },
+                            onClick = {
+                                selectedReadingStatus = option
+                                expandedReading = false
+                            }
+                        )
+                    }
                 }
             }
+
+
+            OutlinedTextField(
+                value = rating,
+                onValueChange = { rating = it.filter { c -> c.isDigit() } },
+                label = { Text(stringResource(R.string.book_rating)) },
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = notes,
+                onValueChange = { notes = it },
+                label = { Text(stringResource(R.string.book_notes)) },
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = location,
+                onValueChange = { location = it },
+                label = { Text(stringResource(R.string.book_location)) },
+                modifier = bookFieldModifier
+            )
+            OutlinedTextField(
+                value = coverUrl,
+                onValueChange = { coverUrl = it },
+                label = { Text(stringResource(R.string.book_cover_url)) },
+                modifier = bookFieldModifier
+            )
+
+
         }
 
-
-        OutlinedTextField(value = rating, onValueChange = { rating = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.book_rating)) }, modifier = bookFieldModifier)
-        OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.book_notes)) }, modifier = bookFieldModifier)
-        OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
-
-
-
-    }
-
-    if (showDuplicateDialog && pendingBookData != null) {
-        AlertDialog(
-            onDismissRequest = { showDuplicateDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    saveBook(pendingBookData!!)
-                    showDuplicateDialog = false
-                    pendingBookData = null
-                }) {
-                    Text(stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showDuplicateDialog = false
-                    pendingBookData = null
-                }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-            title = { Text(stringResource(R.string.duplicate_book_title)) },
-            text = { Text(stringResource(R.string.duplicate_book_message)) }
-        )
-    }
+        if (showDuplicateDialog && pendingBookData != null) {
+            AlertDialog(
+                onDismissRequest = { showDuplicateDialog = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        saveBook(pendingBookData!!)
+                        showDuplicateDialog = false
+                        pendingBookData = null
+                    }) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showDuplicateDialog = false
+                        pendingBookData = null
+                    }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                },
+                title = { Text(stringResource(R.string.duplicate_book_title)) },
+                text = { Text(stringResource(R.string.duplicate_book_message)) }
+            )
+        }
     }
 
 }

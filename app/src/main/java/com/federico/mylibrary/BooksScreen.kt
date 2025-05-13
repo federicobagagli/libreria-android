@@ -80,7 +80,8 @@ fun BooksScreen(
                         match(book.readingStatus, filters.readingStatus) &&
                         (filters.rating.isBlank() || book.rating == filters.rating) &&
                         match(book.notes, filters.notes) &&
-                        match(book.coverUrl, filters.coverUrl)
+                        match(book.coverUrl, filters.coverUrl) &&
+                        match(book.location, filters.location)
             }
         }
         isLoading = false
@@ -123,7 +124,8 @@ fun BooksScreen(
                                     rating = book.rating,
                                     notes = book.notes,
                                     coverUrl = book.coverUrl,
-                                    publishDate = book.publishDate
+                                    publishDate = book.publishDate,
+                                    location = book.location
                                 )
                             },
                             fileName = "library_export.csv"
@@ -177,6 +179,9 @@ fun BooksScreen(
                     })
                     DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_publish_date)) }, onClick = {
                         sortField = "publishDate"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_location)) }, onClick = {
+                        sortField = "location"; showFieldMenu = false; showDirectionMenu = true
                     })
                 }
 

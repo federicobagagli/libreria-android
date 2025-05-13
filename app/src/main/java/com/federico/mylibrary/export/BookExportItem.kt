@@ -17,14 +17,15 @@ class BookExportItem(
     private val rating: String,
     private val notes: String,
     private val coverUrl: String,
-    private val publishDate: String
+    private val publishDate: String,
+    private val location: String
 ) : ExportableItem {
 
     override fun getExportHeaders(): List<String> = emptyList() // non più usato
 
     override fun toExportRow(): List<String> = listOf(
         title, author, publisher, genre, language, description, pageCount.toString(),
-        format, readingStatus, addedDate, rating, notes, coverUrl, publishDate
+        format, readingStatus, addedDate, rating, notes, coverUrl, publishDate,location
     )
 
     companion object {
@@ -42,7 +43,8 @@ class BookExportItem(
             context.getString(R.string.book_rating),
             context.getString(R.string.book_notes),
             context.getString(R.string.book_cover_url),
-            context.getString(R.string.publish_date)
+            context.getString(R.string.publish_date),
+            context.getString(R.string.book_location)
         )
     }
 }
