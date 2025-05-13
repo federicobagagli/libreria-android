@@ -25,6 +25,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.Alignment
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.compose.runtime.remember
+import androidx.core.content.FileProvider
+import com.federico.mylibrary.uploadCompressedImage
+import com.federico.mylibrary.createTempImageUri
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,8 +75,10 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
     var uploadingCover by remember { mutableStateOf(false) }
 
     val coroutineScope = rememberCoroutineScope()
-    val coverImageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri?.let {
             uploadingCover = true
@@ -90,6 +100,28 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
         }
     }
 
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && imageUri.value != null) {
+            uploadingCover = true
+            coroutineScope.launch {
+                try {
+                    val downloadUrl = uploadCompressedImage(
+                        context = context,
+                        imageUri = imageUri.value!!,
+                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                    )
+                    coverUrl = downloadUrl
+                    Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+                } finally {
+                    uploadingCover = false
+                }
+            }
+        }
+    }
 
     LaunchedEffect(bookId) {
         val doc = db.collection("books").document(bookId).get().await()
@@ -192,18 +224,25 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                 modifier = bookFieldModifier
             )
             OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(onClick = { coverImageLauncher.launch("image/*") }) {
-                    Text(stringResource(R.string.upload_cover))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
+                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }) {
+                    Text(stringResource(R.string.select_from_gallery))
                 }
 
-                if (uploadingCover) {
-                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                Button(onClick = {
+                    imageUri.value = createTempImageUri(context)
+                    imageUri.value?.let { cameraLauncher.launch(it) }
+                }) {
+                    Text(stringResource(R.string.take_photo))
                 }
             }
+
+            if (uploadingCover) {
+                CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+            }
+
 
 
             Button(
