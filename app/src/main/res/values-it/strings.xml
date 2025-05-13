@@ -173,6 +173,54 @@
     <string name="sort_by_location">Per collocazione</string>
 
 
+    <!-- Record -->
+    <string name="record_room_title">Discoteca</string>
+    <string name="view_records">Visualizza dischi</string>
+    <string name="add_record">Aggiungi disco</string>
+    <string name="edit_record">Modifica disco</string>
+    <string name="record_summary">Riepilogo dischi</string>
+    <string name="record_details">Dettagli disco</string>
+    <string name="export_title_record">Esporta dischi</string>
+    <string name="select_cover_photo">Scegli dalla galleria</string>
+    <string name="take_cover_photo">Scatta foto</string>
+    <string name="cover_url">URL copertina</string>
+    <string name="view_all_records">Visualizza tutti i dischi</string>
+    <string name="no_records_found">Nessun disco trovato.</string>
+    <string name="sort_by_titolo">Per titolo</string>
+    <string name="sort_by_artista">Per artista</string>
+    <string name="sort_by_genere">Per genere</string>
+    <string name="sort_by_anno">Per anno</string>
+    <string name="sort_by_formato">Per formato</string>
+    <string name="physical_support">Supporto fisico</string>
+    <string name="track_number">Numero traccia</string>
+    <string name="album">Album</string>
+    <string name="duration">Durata</string>
+    <string name="label">Etichetta</string>
+    <string name="soloists">Solisti</string>
+    <string name="tracklist">Tracklist</string>
+    <string name="total_tracks">Numero tracce</string>
+    <string name="multi_album">Multi-album</string>
+    <string name="added_date">Data aggiunta</string>
+    <string name="artist">Artista</string>
+    <string name="year">Anno</string>
+    <string name="type">Tipo</string>
+    <string name="language">Lingua</string>
+    <string name="description">Descrizione</string>
+    <string name="rating">Valutazione</string>
+    <string name="notes">Note</string>
+    <string name="location">Posizione / Cartella</string>
+    <string name="save_record">Salva disco</string>
+    <string name="track">Brano</string>
+    <string name="record_added">Disco aggiunto!</string>
+    <string name="edit">Modifica</string>
+    <string name="details">Dettagli</string>
+    <string name="record_updated">Disco aggiornato!</string>
+    <string name="no_data_found">Nessun dato trovato.</string>
+    <string name="cover_image">Copertina del disco</string>
+
+
+
+
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>
     <string name="debug_tools_title">Strumenti di Debug</string>

@@ -176,6 +176,55 @@
     <string name="book_location_label">📦 Location: %1$s</string>
 
 
+    <!-- Record -->
+    <string name="record_room_title">Record Collection</string>
+    <string name="view_records">View Records</string>
+    <string name="add_record">Add Record</string>
+    <string name="edit_record">Edit Record</string>
+    <string name="record_summary">Record Summary</string>
+    <string name="record_details">Record Details</string>
+    <string name="export_title_record">Export Records</string>
+    <string name="select_cover_photo">Select from gallery</string>
+    <string name="take_cover_photo">Take photo</string>
+    <string name="cover_url">Cover URL</string>
+    <string name="view_all_records">View all records</string>
+    <string name="no_records_found">No records found.</string>
+    <string name="sort_by_titolo">By title</string>
+    <string name="sort_by_artista">By artist</string>
+    <string name="sort_by_genere">By genre</string>
+    <string name="sort_by_anno">By year</string>
+    <string name="sort_by_formato">By format</string>
+    <string name="physical_support">Physical support</string>
+    <string name="track_number">Track number</string>
+    <string name="album">Album</string>
+    <string name="duration">Duration</string>
+    <string name="label">Label</string>
+    <string name="soloists">Soloists</string>
+    <string name="tracklist">Tracklist</string>
+    <string name="total_tracks">Track count</string>
+    <string name="multi_album">Multi-album</string>
+    <string name="added_date">Added date</string>
+    <string name="artist">Artist</string>
+    <string name="year">Year</string>
+    <string name="type">Type</string>
+    <string name="language">Language</string>
+    <string name="description">Description</string>
+    <string name="rating">Rating</string>
+    <string name="notes">Notes</string>
+    <string name="location">Location / Folder</string>
+    <string name="save_record">Save record</string>
+    <string name="track">Track</string>
+    <string name="record_added">Record added!</string>
+    <string name="edit">Edit</string>
+    <string name="details">Details</string>
+    <string name="record_updated">Record updated!</string>
+    <string name="no_data_found">No data found.</string>
+    <string name="cover_image">Record cover image</string>
+
+
+
+
+
     <!-- Settings -->
     <string name="settings_title">⚙️ Settings</string>
     <string name="debug_tools_title">Debug Tools</string>

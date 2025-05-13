@@ -33,11 +33,18 @@ import com.federico.mylibrary.book.ViewLibraryScreen
 import com.federico.mylibrary.datastore.ThemePreferences
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
+import com.federico.mylibrary.record.RecordRoomScreen
 import com.federico.mylibrary.ui.theme.AppThemeStyle
 import com.federico.mylibrary.ui.theme.LibraryAppTheme
 import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
+import com.federico.mylibrary.record.AddRecordScreen
+import com.federico.mylibrary.record.DetailsRecordScreen
+import com.federico.mylibrary.record.EditRecordScreen
+import com.federico.mylibrary.record.RecordsScreen
+import com.federico.mylibrary.record.ViewRecordsScreen
+import com.federico.mylibrary.viewmodel.RecordFilterViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,7 +93,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
     val currentDestination = navBackStackEntry?.destination
     val exportViewModel: ExportViewModel = viewModel()
     val libraryFilterViewModel: LibraryFilterViewModel = viewModel()
-
+    val recordFilterViewModel: RecordFilterViewModel = viewModel()
 
 
     Scaffold(
@@ -145,6 +152,25 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("details_book/{bookId}") { backStackEntry ->
                 DetailsBookScreen(navController, backStackEntry)
             }
+
+            //Records
+            composable("edit_record/{recordId}") { backStackEntry ->
+                EditRecordScreen(navController, backStackEntry)
+            }
+            composable("record_room") { RecordRoomScreen(navController) }
+            composable("add_record") { AddRecordScreen(navController) }
+            composable("view_records") { ViewRecordsScreen(navController, recordFilterViewModel) }
+            composable("records") {
+                RecordsScreen(
+                    navController = navController,
+                    exportViewModel = exportViewModel,
+                    filterViewModel = recordFilterViewModel
+                )
+            }
+            composable("details_record/{recordId}") { backStackEntry ->
+                DetailsRecordScreen(navController, backStackEntry)
+            }
+
         }
     }
 }
