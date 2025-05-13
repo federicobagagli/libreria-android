@@ -8,12 +8,14 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import androidx.core.content.FileProvider
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import androidx.core.graphics.scale
+import java.io.File
 
 suspend fun uploadCompressedImage(
     context: Context,
@@ -71,4 +73,13 @@ suspend fun uploadCompressedImage(
 
     storageRef.putBytes(data).await()
     return storageRef.downloadUrl.await().toString()
+}
+
+fun createTempImageUri(context: Context): Uri {
+    val file = File(context.cacheDir, "temp_photo.jpg")
+    return FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
+    )
 }

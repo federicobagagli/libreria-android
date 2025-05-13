@@ -1,6 +1,7 @@
 package com.federico.mylibrary
 
 import android.Manifest
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -117,7 +118,7 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen() {
-
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
     var uploadingCover by remember { mutableStateOf(false) }
     var showIsbnHelpDialog by remember { mutableStateOf(false) }
     val formatOptions = listOf(
@@ -322,6 +323,29 @@ fun AddBookScreen() {
         }
     }
 
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && imageUri.value != null) {
+            uploadingCover = true
+            coroutineScope.launch {
+                try {
+                    val downloadUrl = uploadCompressedImage(
+                        context = context,
+                        imageUri = imageUri.value!!,
+                        userId = userId
+                    )
+                    coverUrl = downloadUrl
+                    Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+                } finally {
+                    uploadingCover = false
+                }
+            }
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -545,10 +569,19 @@ fun AddBookScreen() {
                 modifier = bookFieldModifier
             )
 
-            Button(onClick = {
-                photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            }) {
-                Text(stringResource(R.string.upload_cover))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = {
+                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                }) {
+                    Text(stringResource(R.string.select_from_gallery))
+                }
+
+                Button(onClick = {
+                    imageUri.value = createTempImageUri(context)
+                    imageUri.value?.let { cameraLauncher.launch(it) }
+                }) {
+                    Text(stringResource(R.string.take_photo))
+                }
             }
 
             if (uploadingCover) {

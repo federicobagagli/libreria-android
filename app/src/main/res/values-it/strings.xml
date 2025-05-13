@@ -38,6 +38,8 @@
     <string name="cover_uploaded">Copertina caricata con successo</string>
     <string name="upload_failed">Errore durante il caricamento: %1$s</string>
     <string name="permission_denied">Permesso negato per accedere alla galleria</string>
+    <string name="select_from_gallery">Scegli dalla galleria</string>
+    <string name="take_photo">Scatta foto</string>
 
 
 

@@ -39,6 +39,8 @@
     <string name="cover_uploaded">Cover uploaded successfully</string>
     <string name="upload_failed">Upload failed: %1$s</string>
     <string name="permission_denied">Permission denied to access the gallery</string>
+    <string name="select_from_gallery">Scegli dalla galleria</string>
+    <string name="take_photo">Scatta foto</string>
 
 
 
