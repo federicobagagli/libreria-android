@@ -35,6 +35,10 @@
     <string name="isbn_not_found_dialog_title">ISBN not found</string>
     <string name="isbn_not_found_dialog_message">To be correctly recognized, make sure the ISBN code fills most of the frame.You can also try flipping the camera or zooming in.</string>
     <string name="ok">OK</string>
+    <string name="upload_cover">Upload cover image</string>
+    <string name="cover_uploaded">Cover uploaded successfully</string>
+    <string name="upload_failed">Upload failed: %1$s</string>
+    <string name="permission_denied">Permission denied to access the gallery</string>
 
 
 

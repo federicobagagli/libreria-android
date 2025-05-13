@@ -34,6 +34,10 @@
     <string name="isbn_not_found_dialog_title">ISBN non trovato</string>
     <string name="isbn_not_found_dialog_message">Per essere riconosciuto correttamente assicurati che il codice ISBN occupi la maggior parte dell inquadratura. Puoi anche provare a girare la fotocamera o aumentare lo zoom.</string>
     <string name="ok">OK</string>
+    <string name="upload_cover">Carica immagine di copertina</string>
+    <string name="cover_uploaded">Copertina caricata con successo</string>
+    <string name="upload_failed">Errore durante il caricamento: %1$s</string>
+    <string name="permission_denied">Permesso negato per accedere alla galleria</string>
 
 
 

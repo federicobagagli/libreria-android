@@ -19,6 +19,12 @@ import com.federico.mylibrary.ui.bookFieldModifier
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import com.federico.mylibrary.uploadCompressedImage
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.Alignment
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +63,33 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
     var expandedFormat by remember { mutableStateOf(false) }
     var expandedReading by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(true) }
+
+    var uploadingCover by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val coverImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            uploadingCover = true
+            coroutineScope.launch {
+                try {
+                    val downloadUrl = uploadCompressedImage(
+                        context = context,
+                        imageUri = it,
+                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                    )
+                    coverUrl = downloadUrl
+                    Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+                } finally {
+                    uploadingCover = false
+                }
+            }
+        }
+    }
+
 
     LaunchedEffect(bookId) {
         val doc = db.collection("books").document(bookId).get().await()
@@ -151,7 +184,6 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
 
             OutlinedTextField(value = rating, onValueChange = { rating = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.book_rating)) }, modifier = bookFieldModifier)
             OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.book_notes)) }, modifier = bookFieldModifier)
-            OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
             OutlinedTextField(value = addedDate, onValueChange = {}, enabled = false, label = { Text(stringResource(R.string.book_added_date)) }, modifier = bookFieldModifier)
             OutlinedTextField(
                 value = location,
@@ -159,6 +191,20 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                 label = { Text(stringResource(R.string.book_location)) },
                 modifier = bookFieldModifier
             )
+            OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = { coverImageLauncher.launch("image/*") }) {
+                    Text(stringResource(R.string.upload_cover))
+                }
+
+                if (uploadingCover) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                }
+            }
+
 
             Button(
                 onClick = {

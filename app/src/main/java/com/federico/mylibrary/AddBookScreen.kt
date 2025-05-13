@@ -1,9 +1,11 @@
 package com.federico.mylibrary
 
 import android.Manifest
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -38,7 +40,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.sp
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.mlkit.vision.common.InputImage
-
+import com.federico.mylibrary.uploadCompressedImage
+import com.federico.mylibrary.util.rememberMediaPermissionLauncher
 
 @Serializable
 data class BookInfo(
@@ -115,6 +118,7 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 @Composable
 fun AddBookScreen() {
 
+    var uploadingCover by remember { mutableStateOf(false) }
     var showIsbnHelpDialog by remember { mutableStateOf(false) }
     val formatOptions = listOf(
         stringResource(R.string.format_physical),
@@ -288,6 +292,36 @@ fun AddBookScreen() {
                 ).show()
             }
     }
+
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri == null) {
+            Log.d("PhotoPicker", "Nessuna immagine selezionata")
+            return@rememberLauncherForActivityResult
+        }
+
+        Log.d("PhotoPicker", "URI selezionato: $uri")
+        uploadingCover = true
+        coroutineScope.launch {
+            try {
+                val downloadUrl = uploadCompressedImage(
+                    context = context,
+                    imageUri = uri,
+                    userId = userId
+                )
+                coverUrl = downloadUrl
+                Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.e("PhotoPicker", "Errore upload: ${e.message}", e)
+                Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+            } finally {
+                uploadingCover = false
+            }
+        }
+    }
+
 
     Column(modifier = Modifier.fillMaxSize()) {
 
@@ -510,6 +544,16 @@ fun AddBookScreen() {
                 label = { Text(stringResource(R.string.book_cover_url)) },
                 modifier = bookFieldModifier
             )
+
+            Button(onClick = {
+                photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }) {
+                Text(stringResource(R.string.upload_cover))
+            }
+
+            if (uploadingCover) {
+                CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+            }
 
 
         }
