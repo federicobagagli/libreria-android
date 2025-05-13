@@ -142,6 +142,16 @@
     <string name="summary">Summary</string>
     <string name="total_books">Totale libri: %1$d</string>
     <string name="books_read">Libri letti: %1$d</string>
+    <string name="sort_button">Sort</string>
+    <string name="sort_by_title">By title</string>
+    <string name="sort_by_author">By author</string>
+    <string name="sort_by_added_date">By added date</string>
+    <string name="sort_by_rating">By rating</string>
+    <string name="sort_asc">Ascending</string>
+    <string name="sort_desc">Descending</string>
+    <string name="sort_by_genre">By genre</string>
+    <string name="sort_by_publisher">By publisher</string>
+    <string name="sort_by_publish_date">By publish date</string>
 
 
     <!-- Settings -->

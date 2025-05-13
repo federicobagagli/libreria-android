@@ -36,9 +36,23 @@ fun BooksScreen(
     val filters by filterViewModel.filterState.collectAsState()
     val context = LocalContext.current
 
-    var books by remember { mutableStateOf<List<Pair<String, Book>>>(emptyList()) }
+    var booksRaw by remember { mutableStateOf<List<Pair<String, Book>>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var bookToDelete by remember { mutableStateOf<Pair<String, Book>?>(null) }
+    // 🔽 Stato per ordinamento
+    var sortField by remember { mutableStateOf("title") }
+    var sortDirection by remember { mutableStateOf("asc") }
+    var showFieldMenu by remember { mutableStateOf(false) }
+    var showDirectionMenu by remember { mutableStateOf(false) }
+
+
+    val books by remember(sortField, sortDirection, booksRaw) {
+        derivedStateOf {
+            val sorted = booksRaw.sortedWith(compareBy { bookSortKey(it.second, sortField) })
+            if (sortDirection == "desc") sorted.reversed() else sorted
+        }
+    }
+
 
     LaunchedEffect(userId, filters) {
         if (userId != null) {
@@ -47,7 +61,7 @@ fun BooksScreen(
                 .get()
                 .await()
 
-            books = snapshot.documents.mapNotNull {
+            booksRaw  = snapshot.documents.mapNotNull {
                 val book = it.toObject<Book>()
                 if (book != null) it.id to book else null
             }.filter { (_, book) ->
@@ -89,7 +103,7 @@ fun BooksScreen(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Button(
                     onClick = {
@@ -133,6 +147,46 @@ fun BooksScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
                     Text("🔄 " + stringResource(R.string.clear_filters))
+                }
+
+                Button(
+                    onClick = { showFieldMenu = true },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.sort_button))
+                }
+
+                DropdownMenu(expanded = showFieldMenu, onDismissRequest = { showFieldMenu = false }) {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_title)) }, onClick = {
+                        sortField = "title"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_author)) }, onClick = {
+                        sortField = "author"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_added_date)) }, onClick = {
+                        sortField = "addedDate"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_rating)) }, onClick = {
+                        sortField = "rating"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_genre)) }, onClick = {
+                        sortField = "genre"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_publisher)) }, onClick = {
+                        sortField = "publisher"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_publish_date)) }, onClick = {
+                        sortField = "publishDate"; showFieldMenu = false; showDirectionMenu = true
+                    })
+                }
+
+                DropdownMenu(expanded = showDirectionMenu, onDismissRequest = { showDirectionMenu = false }) {
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_asc)) }, onClick = {
+                        sortDirection = "asc"; showDirectionMenu = false
+                    })
+                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_desc)) }, onClick = {
+                        sortDirection = "desc"; showDirectionMenu = false
+                    })
                 }
             }
 
@@ -188,7 +242,7 @@ fun BooksScreen(
                     FirebaseFirestore.getInstance().collection("books").document(bookId)
                         .delete()
                         .addOnSuccessListener {
-                            books = books.filterNot { it.first == bookId }
+                            booksRaw  = booksRaw.filterNot { it.first == bookId }
                         }
                     bookToDelete = null
                 }) {
@@ -203,5 +257,17 @@ fun BooksScreen(
             title = { Text(stringResource(R.string.confirm_deletion)) },
             text = { Text("\"${book.title}\"") }
         )
+    }
+}
+fun bookSortKey(book: Book, field: String): Comparable<*> {
+    return when (field) {
+        "title" -> book.title.lowercase()
+        "author" -> book.author.lowercase()
+        "addedDate" -> book.addedDate
+        "rating" -> book.rating.toIntOrNull() ?: 0
+        "genre" -> book.genre.lowercase()
+        "publisher" -> book.publisher.lowercase()
+        "publishDate" -> book.publishDate
+        else -> book.title.lowercase()
     }
 }
