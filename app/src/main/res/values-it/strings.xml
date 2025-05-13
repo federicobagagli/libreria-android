@@ -21,7 +21,7 @@
     <string name="password_reset_send_button">Invia link di reset</string>
     <string name="password_reset_success">Email di reset inviata</string>
     <string name="password_reset_error">Errore: %1$s</string>
-    <string name="login_button">Accedi</string>
+    <string name="login_button">Accedi via mail</string>
     <string name="register_button">Registrati</string>
     <string name="login_failed">Accesso fallito: %1$s</string>
     <string name="registration_failed">Registrazione fallita: %1$s</string>
@@ -40,6 +40,9 @@
     <string name="permission_denied">Permesso negato per accedere alla galleria</string>
     <string name="select_from_gallery">Scegli dalla galleria</string>
     <string name="take_photo">Scatta foto</string>
+    <string name="login_with_google">Accedi con Google</string>
+    <string name="google_login_failed">Errore login Google: %1$s</string>
+    <string name="google_intent_error">Errore IntentSender: %1$s</string>
 
 
 

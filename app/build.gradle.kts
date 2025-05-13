@@ -69,6 +69,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("io.coil-kt:coil-compose:2.5.0")
     implementation("androidx.compose.ui:ui:1.5.1") // o più recente
