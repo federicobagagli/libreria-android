@@ -8,6 +8,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import androidx.compose.ui.text.input.KeyboardType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +44,7 @@ fun EditRecordScreen(navController: NavController, backStackEntry: NavBackStackE
     var year by remember { mutableStateOf("") }
     var genre by remember { mutableStateOf("") }
     var physicalSupport by remember { mutableStateOf(false) }
-    var type by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf(context.getString(R.string.track)) }
 
     var trackNumber by remember { mutableStateOf("") }
     var album by remember { mutableStateOf("") }
@@ -73,12 +75,7 @@ fun EditRecordScreen(navController: NavController, backStackEntry: NavBackStackE
             uploading = true
             coroutineScope.launch {
                 try {
-                    val downloadUrl = uploadCompressedImage(
-                        context = context,
-                        imageUri = it,
-                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch,
-                        folder = "records"
-                    )
+                    val downloadUrl = uploadCompressedImage(context, it, FirebaseAuth.getInstance().currentUser?.uid ?: return@launch, "records")
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -97,12 +94,7 @@ fun EditRecordScreen(navController: NavController, backStackEntry: NavBackStackE
             uploading = true
             coroutineScope.launch {
                 try {
-                    val downloadUrl = uploadCompressedImage(
-                        context = context,
-                        imageUri = imageUri.value!!,
-                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch,
-                        folder = "records"
-                    )
+                    val downloadUrl = uploadCompressedImage(context, imageUri.value!!, FirebaseAuth.getInstance().currentUser?.uid ?: return@launch, "records")
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -147,84 +139,129 @@ fun EditRecordScreen(navController: NavController, backStackEntry: NavBackStackE
     if (isLoading) {
         CircularProgressIndicator(modifier = Modifier.padding(16.dp))
     } else {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text(stringResource(R.string.title)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = artist, onValueChange = { artist = it }, label = { Text(stringResource(R.string.artist)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = format, onValueChange = { format = it }, label = { Text(stringResource(R.string.format)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = year, onValueChange = { year = it }, label = { Text(stringResource(R.string.year)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = genre, onValueChange = { genre = it }, label = { Text(stringResource(R.string.genre)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = language, onValueChange = { language = it }, label = { Text(stringResource(R.string.language)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text(stringResource(R.string.description)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = rating, onValueChange = { rating = it }, label = { Text(stringResource(R.string.rating)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.notes)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = location, onValueChange = { location = it }, label = { Text(stringResource(R.string.location)) }, modifier = Modifier.fillMaxWidth())
-            OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.cover_url)) }, modifier = Modifier.fillMaxWidth())
+        Scaffold(
+            topBar = {
+                Button(
+                    onClick = {
+                        val updated = mapOf(
+                            "title" to title,
+                            "artist" to artist,
+                            "format" to format,
+                            "year" to year,
+                            "genre" to genre,
+                            "physicalSupport" to physicalSupport,
+                            "type" to type,
+                            "trackNumber" to trackNumber.toIntOrNull(),
+                            "album" to album,
+                            "duration" to duration,
+                            "label" to label,
+                            "soloists" to soloists,
+                            "totalTracks" to totalTracks.toIntOrNull(),
+                            "tracklist" to tracklistText.lines(),
+                            "multiAlbum" to multiAlbum,
+                            "language" to language,
+                            "description" to description,
+                            "rating" to rating,
+                            "notes" to notes,
+                            "coverUrl" to coverUrl,
+                            "addedDate" to addedDate,
+                            "location" to location
+                        )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = {
-                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                }) {
-                    Text(stringResource(R.string.select_cover_photo))
-                }
-
-                Button(onClick = {
-                    imageUri.value = createTempImageUri(context)
-                    imageUri.value?.let { cameraLauncher.launch(it) }
-                }) {
-                    Text(stringResource(R.string.take_cover_photo))
+                        db.collection("records").document(recordId)
+                            .update(updated)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, context.getString(R.string.record_updated), Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, context.getString(R.string.error_prefix) + " ${it.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    },
+                    enabled = title.isNotBlank(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(12.dp)
+                ) {
+                    Text(stringResource(R.string.save_record))
                 }
             }
-
-            if (uploading) {
-                CircularProgressIndicator(modifier = Modifier.padding(8.dp))
-            }
-
-            Button(
-                onClick = {
-                    val updated = mapOf(
-                        "title" to title,
-                        "artist" to artist,
-                        "format" to format,
-                        "year" to year,
-                        "genre" to genre,
-                        "physicalSupport" to physicalSupport,
-                        "type" to type,
-                        "trackNumber" to trackNumber.toIntOrNull(),
-                        "album" to album,
-                        "duration" to duration,
-                        "label" to label,
-                        "soloists" to soloists,
-                        "totalTracks" to totalTracks.toIntOrNull(),
-                        "tracklist" to tracklistText.lines(),
-                        "multiAlbum" to multiAlbum,
-                        "language" to language,
-                        "description" to description,
-                        "rating" to rating,
-                        "notes" to notes,
-                        "coverUrl" to coverUrl,
-                        "addedDate" to addedDate,
-                        "location" to location
-                    )
-
-                    db.collection("records").document(recordId)
-                        .update(updated)
-                        .addOnSuccessListener {
-                            Toast.makeText(context, context.getString(R.string.record_updated), Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(context, context.getString(R.string.error_prefix) + " ${it.message}", Toast.LENGTH_SHORT).show()
-                        }
-                },
-                modifier = Modifier.fillMaxWidth()
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(stringResource(R.string.save_record))
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text(stringResource(R.string.title)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = artist, onValueChange = { artist = it }, label = { Text(stringResource(R.string.artist)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = year, onValueChange = { year = it }, label = { Text(stringResource(R.string.year)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(value = genre, onValueChange = { genre = it }, label = { Text(stringResource(R.string.genre)) }, modifier = Modifier.fillMaxWidth())
+
+                Row {
+                    Text(stringResource(R.string.type))
+                    Spacer(Modifier.width(8.dp))
+                    listOf(stringResource(R.string.track), stringResource(R.string.album)).forEach {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            RadioButton(selected = type == it, onClick = { type = it })
+                            Text(it)
+                        }
+                        Spacer(Modifier.width(8.dp))
+                    }
+                }
+
+                OutlinedTextField(value = format, onValueChange = { format = it }, label = { Text(stringResource(R.string.format)) }, modifier = Modifier.fillMaxWidth())
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(checked = physicalSupport, onCheckedChange = { physicalSupport = it })
+                    Text(stringResource(R.string.physical_support))
+                }
+
+                if (type == stringResource(R.string.track)) {
+                    OutlinedTextField(album, { album = it }, label = { Text(stringResource(R.string.album)) }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(trackNumber, { trackNumber = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.track_number)) }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    OutlinedTextField(duration, { duration = it }, label = { Text(stringResource(R.string.duration)) }, modifier = Modifier.fillMaxWidth())
+                } else {
+                    OutlinedTextField(totalTracks, { totalTracks = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.total_tracks)) }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number))
+                    OutlinedTextField(tracklistText, { tracklistText = it }, label = { Text(stringResource(R.string.tracklist)) }, modifier = Modifier.fillMaxWidth())
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(checked = multiAlbum, onCheckedChange = { multiAlbum = it })
+                        Text(stringResource(R.string.multi_album))
+                    }
+                }
+
+                OutlinedTextField(label, { label = it }, label = { Text(stringResource(R.string.label)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(soloists, { soloists = it }, label = { Text(stringResource(R.string.soloists)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(language, { language = it }, label = { Text(stringResource(R.string.language)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(description, { description = it }, label = { Text(stringResource(R.string.description)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(rating, { rating = it }, label = { Text(stringResource(R.string.rating)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(notes, { notes = it }, label = { Text(stringResource(R.string.notes)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(location, { location = it }, label = { Text(stringResource(R.string.location)) }, modifier = Modifier.fillMaxWidth())
+
+                OutlinedTextField(
+                    value = coverUrl,
+                    onValueChange = { coverUrl = it },
+                    label = { Text(stringResource(R.string.cover_url)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        imageUri.value = createTempImageUri(context)
+                        cameraLauncher.launch(imageUri.value)
+                    }) {
+                        Text(stringResource(R.string.take_cover_photo))
+                    }
+                    Button(onClick = {
+                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }) {
+                        Text(stringResource(R.string.select_cover_photo))
+                    }
+                }
+
+                if (uploading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                }
             }
         }
     }

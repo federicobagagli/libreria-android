@@ -1,17 +1,14 @@
 
 package com.federico.mylibrary.record
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
@@ -53,8 +50,8 @@ fun DetailsRecordScreen(navController: NavController, backStackEntry: NavBackSta
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            val coverUrl = record?.get("coverUrl")?.toString()
-            if (!coverUrl.isNullOrBlank()) {
+            val coverUrl = record?.get("coverUrl")?.toString().orEmpty()
+            if (coverUrl.isNotBlank()) {
                 AsyncImage(
                     model = ImageRequest.Builder(context).data(coverUrl).crossfade(true).build(),
                     contentDescription = stringResource(R.string.cover_image),
@@ -64,37 +61,46 @@ fun DetailsRecordScreen(navController: NavController, backStackEntry: NavBackSta
                     contentScale = ContentScale.Crop
                 )
             }
+            val yes = stringResource(R.string.yes)
+            val no = stringResource(R.string.no)
+            fun getString(key: String) = record?.get(key)?.toString().orEmpty()
+            fun getLongString(key: String) = (record?.get(key) as? Long)?.toString().orEmpty()
+            fun getBooleanLabel(key: String) = when (record?.get(key) as? Boolean) {
+                true -> yes
+                false -> no
+                null -> "-"
+            }
 
-            Text("${stringResource(R.string.title)}: ${record?.get("title")}", style = MaterialTheme.typography.headlineSmall)
-            Text("${stringResource(R.string.artist)}: ${record?.get("artist")}")
-            Text("${stringResource(R.string.genre)}: ${record?.get("genre")}")
-            Text("${stringResource(R.string.year)}: ${record?.get("year")}")
-            Text("${stringResource(R.string.type)}: ${record?.get("type")}")
-            Text("${stringResource(R.string.format)}: ${record?.get("format")}")
-            Text("${stringResource(R.string.album)}: ${record?.get("album")}")
-            Text("${stringResource(R.string.track_number)}: ${record?.get("trackNumber")}")
-            Text("${stringResource(R.string.duration)}: ${record?.get("duration")}")
-            Text("${stringResource(R.string.label)}: ${record?.get("label")}")
-            Text("${stringResource(R.string.soloists)}: ${record?.get("soloists")}")
-            Text("${stringResource(R.string.total_tracks)}: ${record?.get("totalTracks")}")
-            Text("${stringResource(R.string.multi_album)}: ${(record?.get("multiAlbum") as? Boolean)?.toString()}")
-            Text("${stringResource(R.string.physical_support)}: ${(record?.get("physicalSupport") as? Boolean)?.toString()}")
-            Text("${stringResource(R.string.language)}: ${record?.get("language")}")
-            Text("${stringResource(R.string.rating)}: ${record?.get("rating")}")
-            Text("${stringResource(R.string.notes)}: ${record?.get("notes")}")
-            Text("${stringResource(R.string.location)}: ${record?.get("location")}")
-            Text("${stringResource(R.string.added_date)}: ${record?.get("addedDate")}")
-            Text("${stringResource(R.string.cover_url)}: ${record?.get("coverUrl")}")
+            Text("${stringResource(R.string.title)}: ${getString("title")}", style = MaterialTheme.typography.headlineSmall)
+            Text("${stringResource(R.string.artist)}: ${getString("artist")}")
+            Text("${stringResource(R.string.genre)}: ${getString("genre")}")
+            Text("${stringResource(R.string.year)}: ${getString("year")}")
+            Text("${stringResource(R.string.type)}: ${getString("type")}")
+            Text("${stringResource(R.string.format)}: ${getString("format")}")
+            Text("${stringResource(R.string.album)}: ${getString("album")}")
+            Text("${stringResource(R.string.track_number)}: ${getLongString("trackNumber")}")
+            Text("${stringResource(R.string.duration)}: ${getString("duration")}")
+            Text("${stringResource(R.string.label)}: ${getString("label")}")
+            Text("${stringResource(R.string.soloists)}: ${getString("soloists")}")
+            Text("${stringResource(R.string.total_tracks)}: ${getLongString("totalTracks")}")
+            Text("${stringResource(R.string.multi_album)}: ${getBooleanLabel("multiAlbum")}")
+            Text("${stringResource(R.string.physical_support)}: ${getBooleanLabel("physicalSupport")}")
+            Text("${stringResource(R.string.language)}: ${getString("language")}")
+            Text("${stringResource(R.string.rating)}: ${getString("rating")}")
+            Text("${stringResource(R.string.notes)}: ${getString("notes")}")
+            Text("${stringResource(R.string.location)}: ${getString("location")}")
+            Text("${stringResource(R.string.added_date)}: ${getString("addedDate")}")
+            Text("${stringResource(R.string.cover_url)}: $coverUrl")
+
             val tracklist = (record?.get("tracklist") as? List<*>)?.filterIsInstance<String>()?.joinToString("\n") ?: ""
             if (tracklist.isNotBlank()) {
                 Text("${stringResource(R.string.tracklist)}:\n$tracklist")
             }
 
-            val description = record?.get("description")?.toString() ?: ""
+            val description = getString("description")
             if (description.isNotBlank()) {
                 Text("${stringResource(R.string.description)}:\n$description")
             }
-
         }
     }
 }
