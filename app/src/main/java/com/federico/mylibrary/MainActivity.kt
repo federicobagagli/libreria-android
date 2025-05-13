@@ -21,17 +21,24 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.federico.mylibrary.backup.BackupScreen
+import com.federico.mylibrary.datastore.ThemePreferences
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
 import com.federico.mylibrary.ui.theme.LibraryAppTheme
 import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var isDarkMode by remember { mutableStateOf(false) }
+            val context = applicationContext
+            val darkModeFlow = remember { ThemePreferences.darkModeFlow(context) }
+            val isDarkMode by darkModeFlow.collectAsState(initial = false)
+
+            val coroutineScope = rememberCoroutineScope()
+
             LibraryAppTheme(darkTheme = isDarkMode) {
                 val auth = FirebaseAuth.getInstance()
                 var currentUser by remember { mutableStateOf(auth.currentUser) }
@@ -45,7 +52,14 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (currentUser != null) {
-                    LibreriaApp(isDarkMode = isDarkMode, onToggleDarkMode = {isDarkMode = it})
+                    LibreriaApp(
+                        isDarkMode = isDarkMode,
+                        onToggleDarkMode = { enabled ->
+                            coroutineScope.launch {
+                                ThemePreferences.setDarkMode(context, enabled)
+                            }
+                        }
+                    )
                 } else {
                     LoginScreen(auth)
                 }
@@ -62,6 +76,8 @@ fun LibreriaApp(isDarkMode: Boolean,
     val currentDestination = navBackStackEntry?.destination
     val exportViewModel: ExportViewModel = viewModel()
     val libraryFilterViewModel: LibraryFilterViewModel = viewModel()
+
+
 
     Scaffold(
         topBar = {
