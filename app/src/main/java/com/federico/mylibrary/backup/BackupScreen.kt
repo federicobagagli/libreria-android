@@ -12,13 +12,23 @@ import androidx.navigation.NavController
 import com.federico.mylibrary.R
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun BackupScreen(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    var showRestoreLibraryDialog by remember { mutableStateOf(false) }
+    var showRestoreRecordsDialog by remember { mutableStateOf(false) }
+    var showRestoreMoviesDialog by remember { mutableStateOf(false) }
+
     var isRestoring by remember { mutableStateOf(false) }
-    var showDialog by remember { mutableStateOf(false) }
+
+    val restoreLibrarySuccess = stringResource(R.string.restore_library_success)
+    val restoreLibraryFailed = stringResource(R.string.restore_library_failed)
+    val restoreRecordSuccess = stringResource(R.string.restore_records_success)
+    val restoreRecordFailed = stringResource(R.string.restore_records_failed)
+    val restoreMovieSuccess = stringResource(R.string.restore_movies_success)
+    val restoreMovieFailed = stringResource(R.string.restore_movies_failed)
 
     Column(
         modifier = Modifier
@@ -41,12 +51,13 @@ fun BackupScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { showDialog = true },
-            modifier = Modifier.fillMaxWidth()
+            onClick = { showRestoreLibraryDialog = true },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isRestoring
         ) {
             Text("♻️ " + stringResource(R.string.restore_backup_library))
         }
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
         Button(
             onClick = {
                 scope.launch { BackupUtils.backupRecords(context) }
@@ -57,25 +68,13 @@ fun BackupScreen(navController: NavController) {
         }
 
         Button(
-            onClick = {
-                isRestoring = true
-                scope.launch {
-                    val success = BackupUtils.restoreRecordBackup(context)
-                    isRestoring = false
-                    Toast.makeText(
-                        context,
-                        if (success) context.getString(R.string.restore_records_success)
-                        else context.getString(R.string.restore_records_failed),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            },
+            onClick = { showRestoreRecordsDialog = true },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isRestoring
         ) {
             Text("♻️ " + stringResource(R.string.restore_backup_records))
         }
-        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+
         Button(
             onClick = {
                 scope.launch { BackupUtils.backupMovies(context) }
@@ -86,19 +85,7 @@ fun BackupScreen(navController: NavController) {
         }
 
         Button(
-            onClick = {
-                isRestoring = true
-                scope.launch {
-                    val success = BackupUtils.restoreMovieBackup(context)
-                    isRestoring = false
-                    Toast.makeText(
-                        context,
-                        if (success) context.getString(R.string.restore_movies_success)
-                        else context.getString(R.string.restore_movies_failed),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            },
+            onClick = { showRestoreMoviesDialog = true },
             modifier = Modifier.fillMaxWidth(),
             enabled = !isRestoring
         ) {
@@ -106,40 +93,106 @@ fun BackupScreen(navController: NavController) {
         }
 
         if (isRestoring) {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 CircularProgressIndicator()
             }
         }
     }
 
-    if (showDialog) {
+    // 📚 Conferma ripristino libreria
+    if (showRestoreLibraryDialog) {
         AlertDialog(
-            onDismissRequest = { showDialog = false },
+            onDismissRequest = { showRestoreLibraryDialog = false },
+            title = { Text(stringResource(R.string.confirm_restore_title)) },
+            text = { Text(stringResource(R.string.confirm_restore_message)) },
             confirmButton = {
                 TextButton(onClick = {
-                    showDialog = false
+                    showRestoreLibraryDialog = false
                     isRestoring = true
                     scope.launch {
                         val success = BackupUtils.restoreLibraryBackup(context)
                         isRestoring = false
+
                         Toast.makeText(
                             context,
-                            if (success) context.getString(R.string.restore_library_success)
-                            else context.getString(R.string.restore_library_failed),
+                            if (success) restoreLibrarySuccess
+                            else restoreLibraryFailed,
                             Toast.LENGTH_SHORT
                         ).show()
                     }
                 }) {
-                    Text(stringResource(R.string.confirm))
+                    Text(stringResource(R.string.yes))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text(stringResource(R.string.cancel))
+                TextButton(onClick = { showRestoreLibraryDialog = false }) {
+                    Text(stringResource(R.string.no))
+                }
+            }
+        )
+    }
+
+    // 💿 Conferma ripristino discoteca
+    if (showRestoreRecordsDialog) {
+        AlertDialog(
+            onDismissRequest = { showRestoreRecordsDialog = false },
+            title = { Text(stringResource(R.string.confirm_restore_title)) },
+            text = { Text(stringResource(R.string.confirm_restore_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRestoreRecordsDialog = false
+                    isRestoring = true
+                    scope.launch {
+                        val success = BackupUtils.restoreRecordBackup(context)
+                        isRestoring = false
+                        Toast.makeText(
+                            context,
+                            if (success) restoreRecordSuccess
+                            else restoreRecordFailed,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }) {
+                    Text(stringResource(R.string.yes))
                 }
             },
+            dismissButton = {
+                TextButton(onClick = { showRestoreRecordsDialog = false }) {
+                    Text(stringResource(R.string.no))
+                }
+            }
+        )
+    }
+
+    // 🎬 Conferma ripristino cineteca
+    if (showRestoreMoviesDialog) {
+        AlertDialog(
+            onDismissRequest = { showRestoreMoviesDialog = false },
             title = { Text(stringResource(R.string.confirm_restore_title)) },
-            text = { Text(stringResource(R.string.confirm_restore_message)) }
+            text = { Text(stringResource(R.string.confirm_restore_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRestoreMoviesDialog = false
+                    isRestoring = true
+                    scope.launch {
+                        val success = BackupUtils.restoreMovieBackup(context)
+                        isRestoring = false
+                        Toast.makeText(
+                            context,
+                            if (success) restoreMovieSuccess
+                            else restoreMovieFailed,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }) {
+                    Text(stringResource(R.string.yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestoreMoviesDialog = false }) {
+                    Text(stringResource(R.string.no))
+                }
+            }
         )
     }
 }
