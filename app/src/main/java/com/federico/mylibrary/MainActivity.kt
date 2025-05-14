@@ -37,6 +37,7 @@ import com.federico.mylibrary.movie.AddMovieScreen
 import com.federico.mylibrary.movie.DetailsMovieScreen
 import com.federico.mylibrary.movie.EditMovieScreen
 import com.federico.mylibrary.movie.MovieRoomScreen
+import com.federico.mylibrary.movie.MovieSummaryScreen
 import com.federico.mylibrary.movie.MoviesScreen
 import com.federico.mylibrary.movie.ViewMoviesScreen
 import com.federico.mylibrary.record.RecordRoomScreen
@@ -207,6 +208,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("edit_movie/{movieId}") { backStackEntry ->
                 EditMovieScreen(navController, backStackEntry)
             }
+            composable("movie_summary") { MovieSummaryScreen(navController) }
         }
     }
 }

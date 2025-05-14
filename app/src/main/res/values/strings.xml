@@ -265,6 +265,9 @@
     <string name="movie_updated">Movie updated</string>
     <string name="movie_not_found">Movie not found</string>
     <string name="select_movie_title">Select a movie</string>
+    <string name="total_movies">Total movies: %1$d</string>
+    <string name="most_common_movie_genre">Most common genre: %1$s</string>
+    <string name="last_added_movie">Last added movie: %1$s</string>
 
 
 
