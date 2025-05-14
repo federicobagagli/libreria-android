@@ -41,7 +41,9 @@ fun ViewRecordsScreen(navController: NavController, filterViewModel: RecordFilte
                     onClick = {
                         filterViewModel.updateFilters(filters)
                         navController.navigate("records")
-                    },
+                    },colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(stringResource(R.string.view_by_criteria))

@@ -37,7 +37,10 @@ fun ViewLibraryScreen(navController: NavController, filterViewModel: LibraryFilt
                 Button(onClick = {
                     filterViewModel.updateFilters(filters)
                     navController.navigate("books")
-                }, modifier = Modifier.weight(1f)) {
+                },colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ), modifier = Modifier.weight(1f)) {
                     Text(stringResource(R.string.view_by_criteria))
                 }
 
