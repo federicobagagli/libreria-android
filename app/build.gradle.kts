@@ -13,6 +13,7 @@ val localProperties = Properties().apply {
     }
 }
 val googleBooksApiKey = localProperties["GOOGLE_BOOKS_API_KEY"] as String
+val tmdbApiKey = localProperties["TMDB_API_KEY"] as String
 android {
     namespace = "com.federico.mylibrary"
     compileSdk = 35
@@ -53,6 +54,7 @@ android {
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
             buildConfigField("String", "GOOGLE_BOOKS_API_KEY", "\"$googleBooksApiKey\"")
+            buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
         }
         getByName("release") {
             isMinifyEnabled = false
@@ -61,6 +63,7 @@ android {
                 "proguard-rules.pro"
             )
             buildConfigField("String", "GOOGLE_BOOKS_API_KEY", "\"$googleBooksApiKey\"")
+            buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
         }
     }
 

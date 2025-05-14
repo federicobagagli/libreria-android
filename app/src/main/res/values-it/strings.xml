@@ -233,6 +233,36 @@
     <string name="bar_record_charts_title">Dischi aggiunti per mese</string>
 
 
+    <!-- Movie -->
+    <string name="movie_room_title">Cineteca</string>
+    <string name="view_movies">🎬 Visualizza film</string>
+    <string name="add_movie">➕ Aggiungi film</string>
+    <string name="original_title">Titolo originale</string>
+    <string name="director">Regista</string>
+    <string name="cast">Cast</string>
+    <string name="production_company">Casa di produzione</string>
+    <string name="duration_minutes">Durata (minuti)</string>
+    <string name="trailer_url">Trailer (URL)</string>
+    <string name="movie_added">Film aggiunto</string>
+    <string name="save_movie">Salva film</string>
+    <string name="format_dvd">DVD</string>
+    <string name="format_bluray">Blu-ray</string>
+    <string name="format_digital">Digitale</string>
+    <string name="select_date">Seleziona data</string>
+    <string name="no_movie_found">Nessun film trovato</string>
+    <string name="movie_data_loaded">Dati film caricati</string>
+    <string name="no_movies_found">Nessun film trovato</string>
+    <string name="export_title_movie">Esporta film</string>
+    <string name="view_all_movies">🎬 Visualizza tutti</string>
+    <string name="movie_title_label">Titolo: %1$s</string>
+    <string name="movie_director_label">Regista: %1$s</string>
+    <string name="movie_genre_label">Genere: %1$s</string>
+    <string name="movie_publish_date_label">Data: %1$s</string>
+    <string name="sort_by_director">Ordina per regista</string>
+    <string name="movie_updated">Film aggiornato</string>
+    <string name="movie_not_found">Film non trovato</string>
+
+
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>
     <string name="debug_tools_title">Strumenti di Debug</string>
@@ -247,6 +277,10 @@
     <string name="verify_email_sent">È stata inviata un email di verifica. Controlla la casella di posta prima di accedere.</string>
     <string name="weak_password_title">Password troppo debole</string>
     <string name="weak_password_message">a password deve contenere almeno 8 caratteri, una lettera maiuscola, una minuscola, un numero e un simbolo speciale.</string>
+    <string name="about_title">Informazioni</string>
+    <string name="app_version">Versione: %1$s</string>
+    <string name="app_description">Questa è un app per la gestione personale di libri, film e musica.</string>
+    <string name="tmdb_credit">Questa app utilizza l API di TMDb ma non è approvata o certificata da TMDb.</string>
 
 
 </resources>

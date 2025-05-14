@@ -1,0 +1,89 @@
+package com.federico.mylibrary.movie
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.federico.mylibrary.R
+import com.federico.mylibrary.viewmodel.MovieFilterState
+import com.federico.mylibrary.viewmodel.MovieFilterViewModel
+
+@Composable
+fun ViewMoviesScreen(navController: NavController, filterViewModel: MovieFilterViewModel) {
+    var filters by remember { mutableStateOf(MovieFilterState()) }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Surface(shadowElevation = 4.dp) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(onClick = {
+                    filterViewModel.clearFilters()
+                    navController.navigate("movies")
+                }, modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.view_all_movies))
+                }
+
+                Button(
+                    onClick = {
+                        filterViewModel.updateFilters(filters)
+                        navController.navigate("movies")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.view_by_criteria))
+                }
+
+                Button(
+                    onClick = { navController.navigate("add_movie") },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6)),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(stringResource(R.string.add_movie), color = Color.White)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.select_filters_label),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            fun Modifier.full() = this.fillMaxWidth()
+            OutlinedTextField(filters.title, { filters = filters.copy(title = it) }, label = { Text(stringResource(R.string.title)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.director, { filters = filters.copy(director = it) }, label = { Text(stringResource(R.string.director)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.productionCompany, { filters = filters.copy(productionCompany = it) }, label = { Text(stringResource(R.string.production_company)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.genre, { filters = filters.copy(genre = it) }, label = { Text(stringResource(R.string.genre)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.language, { filters = filters.copy(language = it) }, label = { Text(stringResource(R.string.book_language)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.publishDate, { filters = filters.copy(publishDate = it) }, label = { Text(stringResource(R.string.publish_date)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.description, { filters = filters.copy(description = it) }, label = { Text(stringResource(R.string.book_description)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.duration, { filters = filters.copy(duration = it) }, label = { Text(stringResource(R.string.duration_minutes)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.format, { filters = filters.copy(format = it) }, label = { Text(stringResource(R.string.format)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.rating, { filters = filters.copy(rating = it) }, label = { Text(stringResource(R.string.book_rating)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.notes, { filters = filters.copy(notes = it) }, label = { Text(stringResource(R.string.book_notes)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.coverUrl, { filters = filters.copy(coverUrl = it) }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = Modifier.full())
+            OutlinedTextField(filters.location, { filters = filters.copy(location = it) }, label = { Text(stringResource(R.string.book_location)) }, modifier = Modifier.full())
+        }
+    }
+}

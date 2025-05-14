@@ -236,6 +236,39 @@
     <string name="bar_record_charts_title">Records added per month</string>
 
 
+    <!-- Movie -->
+    <string name="movie_room_title">Movie Library</string>
+    <string name="view_movies">🎬 View movies</string>
+    <string name="add_movie">➕ Add movie</string>
+    <string name="original_title">Original title</string>
+    <string name="director">Director</string>
+    <string name="cast">Cast</string>
+    <string name="production_company">Production company</string>
+    <string name="duration_minutes">Duration (minutes)</string>
+    <string name="trailer_url">Trailer (URL)</string>
+    <string name="movie_added">Movie added</string>
+    <string name="save_movie">Save movie</string>
+    <string name="format_dvd">DVD</string>
+    <string name="format_bluray">Blu-ray</string>
+    <string name="format_digital">Digital</string>
+    <string name="select_date">Select date</string>
+    <string name="no_movie_found">No movie found</string>
+    <string name="movie_data_loaded">Movie data loaded</string>
+    <string name="no_movies_found">No movies found</string>
+    <string name="export_title_movie">Export movies</string>
+    <string name="view_all_movies">🎬 View all</string>
+    <string name="movie_title_label">Title: %1$s</string>
+    <string name="movie_director_label">Director: %1$s</string>
+    <string name="movie_genre_label">Genre: %1$s</string>
+    <string name="movie_publish_date_label">Date: %1$s</string>
+    <string name="sort_by_director">Sort by director</string>
+    <string name="movie_updated">Movie updated</string>
+    <string name="movie_not_found">Movie not found</string>
+
+
+
+
+
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Settings</string>
@@ -251,6 +284,10 @@
     <string name="verify_email_sent">A verification email has been sent. Please check your inbox before logging in.</string>
     <string name="weak_password_title">Password too weak</string>
     <string name="weak_password_message">Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.</string>
+    <string name="about_title">About</string>
+    <string name="app_version">Version: %1$s</string>
+    <string name="app_description">This is an app for personal management of books, movies, and music.</string>
+    <string name="tmdb_credit">This app uses the TMDb API but is not endorsed or certified by TMDb.</string>
 
 
 

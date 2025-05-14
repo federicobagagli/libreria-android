@@ -33,6 +33,12 @@ import com.federico.mylibrary.book.ViewLibraryScreen
 import com.federico.mylibrary.datastore.ThemePreferences
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
+import com.federico.mylibrary.movie.AddMovieScreen
+import com.federico.mylibrary.movie.DetailsMovieScreen
+import com.federico.mylibrary.movie.EditMovieScreen
+import com.federico.mylibrary.movie.MovieRoomScreen
+import com.federico.mylibrary.movie.MoviesScreen
+import com.federico.mylibrary.movie.ViewMoviesScreen
 import com.federico.mylibrary.record.RecordRoomScreen
 import com.federico.mylibrary.ui.theme.AppThemeStyle
 import com.federico.mylibrary.ui.theme.LibraryAppTheme
@@ -49,6 +55,7 @@ import com.federico.mylibrary.record.RecordSummaryScreen
 import com.federico.mylibrary.record.RecordAdvancedSummaryScreen
 import com.federico.mylibrary.record.RecordBarChartsScreen
 import com.federico.mylibrary.record.RecordPieChartsScreen
+import com.federico.mylibrary.viewmodel.MovieFilterViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,7 +105,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
     val exportViewModel: ExportViewModel = viewModel()
     val libraryFilterViewModel: LibraryFilterViewModel = viewModel()
     val recordFilterViewModel: RecordFilterViewModel = viewModel()
-
+    val movieFilterViewModel: MovieFilterViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -126,6 +133,10 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             startDestination = "living_room",
             modifier = Modifier.padding(innerPadding)
         ) {
+
+            composable("about") {
+                AboutScreen()
+            }
             composable("edit_book/{bookId}") { backStackEntry ->
                 EditBookScreen(navController, backStackEntry)
             }
@@ -178,6 +189,24 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("record_advanced_summary") { RecordAdvancedSummaryScreen(navController) }
             composable("record_pie_charts") { RecordPieChartsScreen(navController) }
             composable("record_bar_charts") { RecordBarChartsScreen(navController) }
+
+            //Movies
+            composable("movie_room") { MovieRoomScreen(navController) }
+            composable("add_movie") { AddMovieScreen(navController) }
+            composable("view_movies") { ViewMoviesScreen(navController, movieFilterViewModel) }
+            composable("movies") {
+                MoviesScreen(
+                    navController = navController,
+                    exportViewModel = exportViewModel,
+                    filterViewModel = movieFilterViewModel
+                )
+            }
+            composable("details_movie/{movieId}") { backStackEntry ->
+                DetailsMovieScreen(navController, backStackEntry)
+            }
+            composable("edit_movie/{movieId}") { backStackEntry ->
+                EditMovieScreen(navController, backStackEntry)
+            }
         }
     }
 }

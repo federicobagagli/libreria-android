@@ -43,8 +43,15 @@ fun SettingsScreen(
             selectedTheme = selectedTheme,
             onThemeSelected = { onThemeSelected(it) }
         )
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        Button(
+            onClick = { navController.navigate("about") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.about_title))
+        }
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+            HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
             Button(
                 onClick = { showLogoutDialog = true },
