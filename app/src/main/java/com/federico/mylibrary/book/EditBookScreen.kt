@@ -153,141 +153,289 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
     if (isLoading) {
         CircularProgressIndicator(modifier = Modifier.padding(16.dp))
     } else {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text(stringResource(R.string.title), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = author, onValueChange = { author = it }, label = { Text(stringResource(R.string.author), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = publisher, onValueChange = { publisher = it }, label = { Text(stringResource(R.string.book_publisher), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = genre, onValueChange = { genre = it }, label = { Text(stringResource(R.string.genre), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = language, onValueChange = { language = it }, label = { Text(stringResource(R.string.book_language), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = publishDate, onValueChange = { publishDate = it }, label = { Text(stringResource(R.string.publish_date), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = description, onValueChange = { description = it }, label = { Text(stringResource(R.string.book_description), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-            OutlinedTextField(value = pageCount, onValueChange = { pageCount = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.book_page_count), fontSize = 14.sp) }, textStyle = bookFieldTextStyle, modifier = bookFieldModifier)
-
-            ExposedDropdownMenuBox(expanded = expandedFormat, onExpandedChange = { expandedFormat = !expandedFormat }) {
-                OutlinedTextField(
-                    readOnly = true,
-                    value = selectedFormat,
-                    onValueChange = {},
-                    label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
-                    textStyle = bookFieldTextStyle,
-                    modifier = bookFieldModifier.menuAnchor()
-                )
-                ExposedDropdownMenu(expanded = expandedFormat, onDismissRequest = { expandedFormat = false }) {
-                    formatOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, fontSize = 14.sp) },
-                            onClick = {
-                                selectedFormat = option
-                                expandedFormat = false
+        Column(modifier = Modifier.fillMaxSize()) {
+            // 🔼 Pulsante "Salva libro" in alto, fisso
+            Surface(shadowElevation = 4.dp) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            if (title.isBlank()) {
+                                Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
+                                return@Button
                             }
-                        )
-                    }
-                }
-            }
 
-            ExposedDropdownMenuBox(expanded = expandedReading, onExpandedChange = { expandedReading = !expandedReading }) {
-                OutlinedTextField(
-                    readOnly = true,
-                    value = selectedReadingStatus,
-                    onValueChange = {},
-                    label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
-                    textStyle = bookFieldTextStyle,
-                    modifier = bookFieldModifier.menuAnchor()
-                )
-                ExposedDropdownMenu(expanded = expandedReading, onDismissRequest = { expandedReading = false }) {
-                    readingOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option, fontSize = 14.sp) },
-                            onClick = {
-                                selectedReadingStatus = option
-                                expandedReading = false
+                            val updateMap = mutableMapOf<String, Any>(
+                                "title" to title,
+                                "author" to author,
+                                "publisher" to publisher,
+                                "genre" to genre,
+                                "language" to language,
+                                "publishDate" to publishDate,
+                                "description" to description,
+                                "pageCount" to (pageCount.toIntOrNull() ?: 0),
+                                "format" to selectedFormat,
+                                "readingStatus" to selectedReadingStatus,
+                                "addedDate" to addedDate,
+                                "rating" to rating.trim(),
+                                "notes" to notes,
+                                "coverUrl" to coverUrl,
+                                "location" to location
+                            )
+
+                            val currentDate = java.text.SimpleDateFormat(
+                                "yyyy-MM-dd",
+                                java.util.Locale.getDefault()
+                            ).format(java.util.Date())
+                            if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed)
+                                    .lowercase()
+                            ) {
+                                updateMap["readDate"] = currentDate
                             }
-                        )
+
+                            db.collection("books").document(bookId)
+                                .update(updateMap)
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, bookUpdated, Toast.LENGTH_SHORT).show()
+                                    navController.popBackStack()
+                                }
+                                .addOnFailureListener {
+                                    Toast.makeText(
+                                        context,
+                                        "$errorPrefix ${it.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.save_book))
                     }
                 }
             }
-
-            OutlinedTextField(value = rating, onValueChange = { rating = it.filter { c -> c.isDigit() } }, label = { Text(stringResource(R.string.book_rating)) }, modifier = bookFieldModifier)
-            OutlinedTextField(value = notes, onValueChange = { notes = it }, label = { Text(stringResource(R.string.book_notes)) }, modifier = bookFieldModifier)
-            OutlinedTextField(value = addedDate, onValueChange = {}, enabled = false, label = { Text(stringResource(R.string.book_added_date)) }, modifier = bookFieldModifier)
-            OutlinedTextField(
-                value = location,
-                onValueChange = { location = it },
-                label = { Text(stringResource(R.string.book_location)) },
-                modifier = bookFieldModifier
-            )
-            OutlinedTextField(value = coverUrl, onValueChange = { coverUrl = it }, label = { Text(stringResource(R.string.book_cover_url)) }, modifier = bookFieldModifier)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = {
-                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                }) {
-                    Text(stringResource(R.string.select_from_gallery))
-                }
-
-                Button(onClick = {
-                    imageUri.value = createTempImageUri(context)
-                    imageUri.value?.let { cameraLauncher.launch(it) }
-                }) {
-                    Text(stringResource(R.string.take_photo))
-                }
-            }
-
-            if (uploadingCover) {
-                CircularProgressIndicator(modifier = Modifier.padding(8.dp))
-            }
-
-
-
-            Button(
-                onClick = {
-                    if (title.isBlank()) {
-                        Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-                    val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-
-                    val updateMap = mutableMapOf<String, Any>(
-                        "title" to title,
-                        "author" to author,
-                        "publisher" to publisher,
-                        "genre" to genre,
-                        "language" to language,
-                        "publishDate" to publishDate,
-                        "description" to description,
-                        "pageCount" to (pageCount.toIntOrNull() ?: 0),
-                        "format" to selectedFormat,
-                        "readingStatus" to selectedReadingStatus,
-                        "addedDate" to addedDate,
-                        "rating" to rating.trim(),
-                        "notes" to notes,
-                        "coverUrl" to coverUrl,
-                        "location" to location
-                    )
-
-                    // Aggiungi readDate solo se si passa a "completato"
-                    if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed).lowercase()) {
-                        updateMap["readDate"] = currentDate
-                    }
-
-                    db.collection("books").document(bookId)
-                        .update(updateMap)
-                        .addOnSuccessListener {
-                            Toast.makeText(context, bookUpdated, Toast.LENGTH_SHORT).show()
-                            navController.popBackStack()
-                        }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
-                        }
-                },
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text(stringResource(R.string.save_book))
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(stringResource(R.string.title), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = author,
+                    onValueChange = { author = it },
+                    label = { Text(stringResource(R.string.author), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = publisher,
+                    onValueChange = { publisher = it },
+                    label = { Text(stringResource(R.string.book_publisher), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = genre,
+                    onValueChange = { genre = it },
+                    label = { Text(stringResource(R.string.genre), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = language,
+                    onValueChange = { language = it },
+                    label = { Text(stringResource(R.string.book_language), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = publishDate,
+                    onValueChange = { publishDate = it },
+                    label = { Text(stringResource(R.string.publish_date), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text(stringResource(R.string.book_description), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = pageCount,
+                    onValueChange = { pageCount = it.filter { c -> c.isDigit() } },
+                    label = { Text(stringResource(R.string.book_page_count), fontSize = 14.sp) },
+                    textStyle = bookFieldTextStyle,
+                    modifier = bookFieldModifier
+                )
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedFormat,
+                    onExpandedChange = { expandedFormat = !expandedFormat }) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = selectedFormat,
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
+                        textStyle = bookFieldTextStyle,
+                        modifier = bookFieldModifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedFormat,
+                        onDismissRequest = { expandedFormat = false }) {
+                        formatOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option, fontSize = 14.sp) },
+                                onClick = {
+                                    selectedFormat = option
+                                    expandedFormat = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedReading,
+                    onExpandedChange = { expandedReading = !expandedReading }) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = selectedReadingStatus,
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
+                        textStyle = bookFieldTextStyle,
+                        modifier = bookFieldModifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedReading,
+                        onDismissRequest = { expandedReading = false }) {
+                        readingOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option, fontSize = 14.sp) },
+                                onClick = {
+                                    selectedReadingStatus = option
+                                    expandedReading = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = rating,
+                    onValueChange = { rating = it.filter { c -> c.isDigit() } },
+                    label = { Text(stringResource(R.string.book_rating)) },
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = notes,
+                    onValueChange = { notes = it },
+                    label = { Text(stringResource(R.string.book_notes)) },
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = addedDate,
+                    onValueChange = {},
+                    enabled = false,
+                    label = { Text(stringResource(R.string.book_added_date)) },
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = location,
+                    onValueChange = { location = it },
+                    label = { Text(stringResource(R.string.book_location)) },
+                    modifier = bookFieldModifier
+                )
+                OutlinedTextField(
+                    value = coverUrl,
+                    onValueChange = { coverUrl = it },
+                    label = { Text(stringResource(R.string.book_cover_url)) },
+                    modifier = bookFieldModifier
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }) {
+                        Text(stringResource(R.string.select_from_gallery))
+                    }
+
+                    Button(onClick = {
+                        imageUri.value = createTempImageUri(context)
+                        imageUri.value?.let { cameraLauncher.launch(it) }
+                    }) {
+                        Text(stringResource(R.string.take_photo))
+                    }
+                }
+
+                if (uploadingCover) {
+                    CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                }
+
+
+
+                Button(
+                    onClick = {
+                        if (title.isBlank()) {
+                            Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+                        val currentDate =
+                            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+                        val updateMap = mutableMapOf<String, Any>(
+                            "title" to title,
+                            "author" to author,
+                            "publisher" to publisher,
+                            "genre" to genre,
+                            "language" to language,
+                            "publishDate" to publishDate,
+                            "description" to description,
+                            "pageCount" to (pageCount.toIntOrNull() ?: 0),
+                            "format" to selectedFormat,
+                            "readingStatus" to selectedReadingStatus,
+                            "addedDate" to addedDate,
+                            "rating" to rating.trim(),
+                            "notes" to notes,
+                            "coverUrl" to coverUrl,
+                            "location" to location
+                        )
+
+                        // Aggiungi readDate solo se si passa a "completato"
+                        if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed)
+                                .lowercase()
+                        ) {
+                            updateMap["readDate"] = currentDate
+                        }
+
+                        db.collection("books").document(bookId)
+                            .update(updateMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, bookUpdated, Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(
+                                    context,
+                                    "$errorPrefix ${it.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.save_book))
+                }
             }
         }
     }
