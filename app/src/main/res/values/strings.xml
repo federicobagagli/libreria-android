@@ -193,11 +193,9 @@
     <string name="cover_url">Cover URL</string>
     <string name="view_all_records">View all records</string>
     <string name="no_records_found">No records found.</string>
-    <string name="sort_by_titolo">By title</string>
-    <string name="sort_by_artista">By artist</string>
-    <string name="sort_by_genere">By genre</string>
-    <string name="sort_by_anno">By year</string>
-    <string name="sort_by_formato">By format</string>
+    <string name="sort_by_artist">By artist</string>
+    <string name="sort_by_year">By year</string>
+    <string name="sort_by_format">By format</string>
     <string name="physical_support">Physical support</string>
     <string name="track_number">Track number</string>
     <string name="album">Album</string>

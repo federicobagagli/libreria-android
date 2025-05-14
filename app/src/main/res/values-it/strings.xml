@@ -190,11 +190,9 @@
     <string name="cover_url">URL copertina</string>
     <string name="view_all_records">Visualizza tutti i dischi</string>
     <string name="no_records_found">Nessun disco trovato.</string>
-    <string name="sort_by_titolo">Per titolo</string>
-    <string name="sort_by_artista">Per artista</string>
-    <string name="sort_by_genere">Per genere</string>
-    <string name="sort_by_anno">Per anno</string>
-    <string name="sort_by_formato">Per formato</string>
+    <string name="sort_by_artist">Per artista</string>
+    <string name="sort_by_year">Per anno</string>
+    <string name="sort_by_format">Per formato</string>
     <string name="physical_support">Supporto fisico</string>
     <string name="track_number">Numero traccia</string>
     <string name="album">Album</string>
