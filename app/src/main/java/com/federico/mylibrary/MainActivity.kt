@@ -36,6 +36,9 @@ import com.federico.mylibrary.export.ExportViewScreen
 import com.federico.mylibrary.movie.AddMovieScreen
 import com.federico.mylibrary.movie.DetailsMovieScreen
 import com.federico.mylibrary.movie.EditMovieScreen
+import com.federico.mylibrary.movie.MovieAdvancedSummaryScreen
+import com.federico.mylibrary.movie.MovieBarChartsScreen
+import com.federico.mylibrary.movie.MoviePieChartsScreen
 import com.federico.mylibrary.movie.MovieRoomScreen
 import com.federico.mylibrary.movie.MovieSummaryScreen
 import com.federico.mylibrary.movie.MoviesScreen
@@ -209,6 +212,9 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
                 EditMovieScreen(navController, backStackEntry)
             }
             composable("movie_summary") { MovieSummaryScreen(navController) }
+            composable("movie_advanced_summary") { MovieAdvancedSummaryScreen(navController) }
+            composable("movie_pie_charts") { MoviePieChartsScreen(navController) }
+            composable("movie_bar_charts") { MovieBarChartsScreen(navController) }
         }
     }
 }

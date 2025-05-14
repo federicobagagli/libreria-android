@@ -268,9 +268,12 @@
     <string name="total_movies">Total movies: %1$d</string>
     <string name="most_common_movie_genre">Most common genre: %1$s</string>
     <string name="last_added_movie">Last added movie: %1$s</string>
-
-
-
+    <string name="pie_charts_button">📊 Pie charts</string>
+    <string name="bar_charts_button">📈 Bar charts</string>
+    <string name="bar_chart_company">Bar chart by production company</string>
+    <string name="bar_chart_genre">Bar chart by genre</string>
+    <string name="movies_added">Film aggiunti</string>
+    <string name="total_movies_added">Totale film aggiunti: %1$d</string>
 
 
 

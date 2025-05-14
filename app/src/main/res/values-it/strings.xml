@@ -265,6 +265,13 @@
     <string name="total_movies">Film totali: %1$d</string>
     <string name="most_common_movie_genre">Genere più frequente: %1$s</string>
     <string name="last_added_movie">Ultimo film aggiunto: %1$s</string>
+    <string name="pie_charts_button">📊 Grafici a torta</string>
+    <string name="bar_charts_button">📈 Grafici a barre</string>
+    <string name="bar_chart_company">Grafico per casa di produzione</string>
+    <string name="bar_chart_genre">Grafico per genere</string>
+    <string name="movies_added">Movies added</string>
+    <string name="total_movies_added">Total movies added: %1$d</string>
+
 
 
     <!-- Settings -->
