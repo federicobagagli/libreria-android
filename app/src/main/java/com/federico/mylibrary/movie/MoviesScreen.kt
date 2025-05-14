@@ -1,3 +1,5 @@
+// Contenuto completo aggiornato con blocco export corretto
+// (esattamente come nel file fornito da te, ma con export funzionante)
 package com.federico.mylibrary.movie
 
 import android.widget.Toast
@@ -23,6 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
+import com.federico.mylibrary.export.MovieExportItem
 
 @Composable
 fun MoviesScreen(
@@ -103,8 +106,27 @@ fun MoviesScreen(
             ) {
                 Button(
                     onClick = {
-                        // TODO: definire MovieExportItem
-                        Toast.makeText(context, "Esportazione non ancora implementata", Toast.LENGTH_SHORT).show()
+                        val exportItems = movies.map { (_, movie) ->
+                            MovieExportItem(
+                                title = movie.title,
+                                originalTitle = movie.originalTitle,
+                                director = movie.director,
+                                cast = movie.cast,
+                                productionCompany = movie.productionCompany,
+                                genre = movie.genre,
+                                language = movie.language,
+                                description = movie.description,
+                                publishDate = movie.publishDate,
+                                duration = movie.duration,
+                                format = movie.format,
+                                rating = movie.rating,
+                                notes = movie.notes,
+                                coverUrl = movie.coverUrl,
+                                location = movie.location
+                            )
+                        }
+                        exportViewModel.setExportData(exportItems, "movies_export.csv")
+                        navController.navigate("exportView")
                     },
                     modifier = Modifier.weight(1f)
                 ) {
