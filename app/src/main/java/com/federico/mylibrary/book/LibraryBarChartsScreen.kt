@@ -16,14 +16,13 @@ import com.federico.mylibrary.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
 fun LibraryBarChartsScreen(navController: NavController) {
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid
-    var monthlyCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
+    var addedCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
+    var readCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -32,11 +31,15 @@ fun LibraryBarChartsScreen(navController: NavController) {
                 .get()
                 .await()
 
-            val formatter = SimpleDateFormat("yyyy-MM", Locale.getDefault())
-            val months = snapshot.documents.mapNotNull {
+            val addedMonths = snapshot.documents.mapNotNull {
                 it.getString("addedDate")?.takeIf { d -> d.length >= 7 }?.substring(0, 7)
             }
-            monthlyCounts = months.groupingBy { it }.eachCount().toSortedMap()
+            addedCounts = addedMonths.groupingBy { it }.eachCount().toSortedMap()
+
+            val readMonths = snapshot.documents.mapNotNull {
+                it.getString("readDate")?.takeIf { d -> d.length >= 7 }?.substring(0, 7)
+            }
+            readCounts = readMonths.groupingBy { it }.eachCount().toSortedMap()
         }
     }
 
@@ -45,13 +48,22 @@ fun LibraryBarChartsScreen(navController: NavController) {
             .fillMaxSize()
             .padding(24.dp)
             .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+        verticalArrangement = Arrangement.spacedBy(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = stringResource(R.string.bar_charts_title), style = MaterialTheme.typography.headlineMedium)
 
-        if (monthlyCounts.isNotEmpty()) {
-            BarChart(monthlyCounts)
-        } else {
+        if (addedCounts.isNotEmpty()) {
+            Text(stringResource(R.string.books_added), style = MaterialTheme.typography.titleMedium)
+            SingleBarChart(data = addedCounts, color = Color(0xFF64B5F6))
+        }
+
+        if (readCounts.isNotEmpty()) {
+            Text(stringResource(R.string.books_read), style = MaterialTheme.typography.titleMedium)
+            SingleBarChart(data = readCounts, color = Color(0xFF81C784))
+        }
+
+        if (addedCounts.isEmpty() && readCounts.isEmpty()) {
             Text(stringResource(R.string.no_data_available))
         }
 
@@ -62,7 +74,7 @@ fun LibraryBarChartsScreen(navController: NavController) {
 }
 
 @Composable
-fun BarChart(data: Map<String, Int>) {
+fun SingleBarChart(data: Map<String, Int>, color: Color) {
     val maxCount = (data.values.maxOrNull() ?: 1).coerceAtLeast(1)
     val barWidth = 40.dp
     val spacing = 16.dp
@@ -79,7 +91,7 @@ fun BarChart(data: Map<String, Int>) {
                 Canvas(modifier = Modifier
                     .height(20.dp)
                     .width(barWidth * count / maxCount + spacing)) {
-                    drawRect(color = Color(0xFF64B5F6))
+                    drawRect(color = color)
                 }
                 Text(" $count", modifier = Modifier.padding(start = 8.dp))
             }

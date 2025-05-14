@@ -160,8 +160,9 @@
     <string name="library_room_title">Your Library</string>
     <string name="view_books">View Books</string>
     <string name="summary">Summary</string>
-    <string name="total_books">Totale libri: %1$d</string>
-    <string name="books_read">Libri letti: %1$d</string>
+    <string name="total_books">Total books: %1$d</string>
+    <string name="books_read">Books read</string>
+    <string name="books_added">Books added</string>
     <string name="sort_button">Sort</string>
     <string name="sort_by_title">By title</string>
     <string name="sort_by_author">By author</string>

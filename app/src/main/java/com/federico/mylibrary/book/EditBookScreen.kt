@@ -28,6 +28,9 @@ import android.net.Uri
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.runtime.remember
 import com.federico.mylibrary.createTempImageUri
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -247,8 +250,9 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                         Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
                         return@Button
                     }
+                    val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
 
-                    val updatedBook = mapOf(
+                    val updateMap = mutableMapOf<String, Any>(
                         "title" to title,
                         "author" to author,
                         "publisher" to publisher,
@@ -266,8 +270,13 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                         "location" to location
                     )
 
+                    // Aggiungi readDate solo se si passa a "completato"
+                    if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed).lowercase()) {
+                        updateMap["readDate"] = currentDate
+                    }
+
                     db.collection("books").document(bookId)
-                        .update(updatedBook)
+                        .update(updateMap)
                         .addOnSuccessListener {
                             Toast.makeText(context, bookUpdated, Toast.LENGTH_SHORT).show()
                             navController.popBackStack()

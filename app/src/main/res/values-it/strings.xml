@@ -160,7 +160,8 @@
     <string name="book_added_date">Data di aggiunta</string>
     <string name="book_not_found">Libro non trovato</string>
     <string name="total_books">Totale libri: %1$d</string>
-    <string name="books_read">Libri letti: %1$d</string>
+    <string name="books_read">Libri letti</string>
+    <string name="books_added">Libri aggiunti</string>
     <string name="sort_button">Ordina</string>
     <string name="sort_by_title">Per titolo</string>
     <string name="sort_by_author">Per autore</string>

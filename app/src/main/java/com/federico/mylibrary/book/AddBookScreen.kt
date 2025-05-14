@@ -375,6 +375,7 @@ fun AddBookScreen() {
                                 return@Button
                             }
 
+                            val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                             val book = hashMapOf(
                                 "title" to title,
                                 "author" to author,
@@ -391,7 +392,12 @@ fun AddBookScreen() {
                                 "notes" to notes,
                                 "coverUrl" to coverUrl,
                                 "location" to location
-                            )
+                            ).apply {
+                                if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed).lowercase()) {
+                                    this["readDate"] = currentDate
+                                }
+                            }
+
 
                             db.collection("books")
                                 .whereEqualTo("userId", userId)
