@@ -32,8 +32,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.Alignment
 import com.federico.mylibrary.fetchMovieInfoFromTmdb
-import kotlinx.coroutines.launch
-
+import com.federico.mylibrary.util.MovieInfoLite
+import com.federico.mylibrary.util.TmdbMoviePickerDialog
+import com.federico.mylibrary.util.searchMoviesFromTmdb
+import com.federico.mylibrary.util.fetchMovieDetailsFromTmdb
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +46,10 @@ fun AddMovieScreen(navController: NavController) {
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+
+    var showPickerDialog by remember { mutableStateOf(false) }
+    var searchResults by remember { mutableStateOf<List<MovieInfoLite>>(emptyList()) }
 
     var title by remember { mutableStateOf("") }
     var originalTitle by remember { mutableStateOf("") }
@@ -217,30 +223,19 @@ fun AddMovieScreen(navController: NavController) {
                         Toast.makeText(context, context.getString(R.string.missing_title), Toast.LENGTH_SHORT).show()
                     } else {
                         coroutineScope.launch {
-                            val movieInfo = fetchMovieInfoFromTmdb(title)
-                            if (movieInfo == null) {
-                                Toast.makeText(context, context.getString(R.string.no_movie_found), Toast.LENGTH_SHORT).show()
+                            val results = searchMoviesFromTmdb(title)
+                            if (results.isNotEmpty()) {
+                                searchResults = results
+                                showPickerDialog = true
                             } else {
-                                title = movieInfo.title
-                                originalTitle = movieInfo.originalTitle
-                                description = movieInfo.description
-                                publishDate = movieInfo.publishDate
-                                genre = movieInfo.genre
-                                duration = if (movieInfo.duration > 0) movieInfo.duration.toString() else ""
-                                productionCompany = movieInfo.productionCompany
-                                director = movieInfo.director
-                                cast = movieInfo.cast
-                                language = movieInfo.language
-                                coverUrl = movieInfo.coverUrl
-                                Toast.makeText(context, context.getString(R.string.movie_data_loaded), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.no_movie_found), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 }) {
-                    Icon(Icons.Default.Search, contentDescription = "Fetch from TMDb")
+                    Icon(Icons.Default.Search, contentDescription = "Search")
                 }
             }
-
 
             OutlinedTextField(originalTitle, { originalTitle = it }, label = { Text(stringResource(R.string.original_title), fontSize = 14.sp) }, textStyle = movieFieldTextStyle, modifier = movieFieldModifier)
             OutlinedTextField(director, { director = it }, label = { Text(stringResource(R.string.director), fontSize = 14.sp) }, textStyle = movieFieldTextStyle, modifier = movieFieldModifier)
@@ -314,6 +309,34 @@ fun AddMovieScreen(navController: NavController) {
             if (uploadingCover) {
                 CircularProgressIndicator(modifier = Modifier.padding(8.dp))
             }
-        }
+
+                if (showPickerDialog) {
+                    TmdbMoviePickerDialog(
+                        movies = searchResults,
+                        onDismiss = { showPickerDialog = false },
+                        onSelect = { selected ->
+                            showPickerDialog = false
+                            coroutineScope.launch {
+                                val details = fetchMovieDetailsFromTmdb(selected.id)
+                                if (details != null) {
+                                    title = details.title
+                                    originalTitle = details.originalTitle
+                                    description = details.description
+                                    publishDate = details.publishDate
+                                    genre = details.genre
+                                    duration = if (details.duration > 0) details.duration.toString() else ""
+                                    productionCompany = details.productionCompany
+                                    director = details.director
+                                    cast = details.cast
+                                    language = details.language
+                                    coverUrl = details.coverUrl
+                                    Toast.makeText(context, context.getString(R.string.movie_data_loaded), Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    )
+                }
+
+            }
     }
 }

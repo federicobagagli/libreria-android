@@ -261,6 +261,7 @@
     <string name="sort_by_director">Ordina per regista</string>
     <string name="movie_updated">Film aggiornato</string>
     <string name="movie_not_found">Film non trovato</string>
+    <string name="select_movie_title">Seleziona un film</string>
 
 
     <!-- Settings -->

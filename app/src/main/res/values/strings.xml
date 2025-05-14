@@ -264,6 +264,7 @@
     <string name="sort_by_director">Sort by director</string>
     <string name="movie_updated">Movie updated</string>
     <string name="movie_not_found">Movie not found</string>
+    <string name="select_movie_title">Select a movie</string>
 
 
 
