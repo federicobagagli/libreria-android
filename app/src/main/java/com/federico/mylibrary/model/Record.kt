@@ -1,5 +1,8 @@
 package com.federico.mylibrary.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Record(
     val title: String = "",
     val artist: String = "",

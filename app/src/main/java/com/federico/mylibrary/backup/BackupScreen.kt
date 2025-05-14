@@ -12,12 +12,13 @@ import androidx.navigation.NavController
 import com.federico.mylibrary.R
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun BackupScreen(navController: NavController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var showDialog by remember { mutableStateOf(false) }
     var isRestoring by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -32,30 +33,80 @@ fun BackupScreen(navController: NavController) {
 
         Button(
             onClick = {
-                scope.launch {
-                    BackupUtils.backupLibrary(context)
-                }
+                scope.launch { BackupUtils.backupLibrary(context) }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.backup_generate_library))
+            Text("📚 " + stringResource(R.string.backup_generate_library))
         }
 
         Button(
             onClick = { showDialog = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("♻️ " + stringResource(R.string.restore_backup_library))
+        }
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        Button(
+            onClick = {
+                scope.launch { BackupUtils.backupRecords(context) }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("💿 " + stringResource(R.string.backup_generate_records))
+        }
+
+        Button(
+            onClick = {
+                isRestoring = true
+                scope.launch {
+                    val success = BackupUtils.restoreRecordBackup(context)
+                    isRestoring = false
+                    Toast.makeText(
+                        context,
+                        if (success) context.getString(R.string.restore_records_success)
+                        else context.getString(R.string.restore_records_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
             enabled = !isRestoring
         ) {
-            Text(text = stringResource(R.string.restore_backup_library))
+            Text("♻️ " + stringResource(R.string.restore_backup_records))
+        }
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        Button(
+            onClick = {
+                scope.launch { BackupUtils.backupMovies(context) }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("🎬 " + stringResource(R.string.backup_generate_movies))
+        }
+
+        Button(
+            onClick = {
+                isRestoring = true
+                scope.launch {
+                    val success = BackupUtils.restoreMovieBackup(context)
+                    isRestoring = false
+                    Toast.makeText(
+                        context,
+                        if (success) context.getString(R.string.restore_movies_success)
+                        else context.getString(R.string.restore_movies_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isRestoring
+        ) {
+            Text("♻️ " + stringResource(R.string.restore_backup_movies))
         }
 
         if (isRestoring) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                 CircularProgressIndicator()
             }
         }
@@ -64,8 +115,6 @@ fun BackupScreen(navController: NavController) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text(stringResource(R.string.restore_confirmation_title)) },
-            text = { Text(stringResource(R.string.restore_confirmation_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showDialog = false
@@ -73,22 +122,24 @@ fun BackupScreen(navController: NavController) {
                     scope.launch {
                         val success = BackupUtils.restoreLibraryBackup(context)
                         isRestoring = false
-                        val message = if (success) {
-                            context.getString(R.string.restore_success)
-                        } else {
-                            context.getString(R.string.restore_failed)
-                        }
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            if (success) context.getString(R.string.restore_library_success)
+                            else context.getString(R.string.restore_library_failed),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }) {
-                    Text(stringResource(R.string.yes))
+                    Text(stringResource(R.string.confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) {
-                    Text(stringResource(R.string.no))
+                    Text(stringResource(R.string.cancel))
                 }
-            }
+            },
+            title = { Text(stringResource(R.string.confirm_restore_title)) },
+            text = { Text(stringResource(R.string.confirm_restore_message)) }
         )
     }
 }

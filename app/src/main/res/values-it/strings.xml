@@ -292,6 +292,24 @@
     <string name="app_version">Versione: %1$s</string>
     <string name="app_description">Questa è un app per la gestione personale di libri, film e musica.</string>
     <string name="tmdb_credit">Questa app utilizza l API di TMDb ma non è approvata o certificata da TMDb.</string>
-
+    <string name="backup_generate_records">Backup discoteca</string>
+    <string name="restore_backup_records">Ripristina discoteca</string>
+    <string name="backup_generate_movies">Backup cineteca</string>
+    <string name="restore_backup_movies">Ripristina cineteca</string>
+    <string name="backup_records_success">✅ Backup discoteca completato</string>
+    <string name="backup_records_error">❌ Errore backup discoteca: %1$s</string>
+    <string name="restore_records_success">✅ Ripristino discoteca completato</string>
+    <string name="restore_records_failed">❌ Errore nel ripristino discoteca</string>
+    <string name="backup_movies_success">✅ Backup cineteca completato</string>
+    <string name="backup_movies_error">❌ Errore backup cineteca: %1$s</string>
+    <string name="restore_movies_success">✅ Ripristino cineteca completato</string>
+    <string name="restore_movies_failed">❌ Errore nel ripristino cineteca</string>
+    <string name="user_not_authenticated">Utente non autenticato</string>
+    <string name="backup_library_success">✅ Backup libreria completato</string>
+    <string name="backup_library_error">❌ Errore durante il backup della libreria: %1$s</string>
+    <string name="restore_library_success">✅ Ripristino della libreria completato</string>
+    <string name="restore_library_failed">❌ Ripristino della libreria non riuscito</string>
+    <string name="confirm_restore_title">Conferma ripristino</string>
+    <string name="confirm_restore_message">Questa operazione sostituirà la tua libreria attuale con la versione del backup. Continuare?</string>
 
 </resources>

@@ -295,7 +295,25 @@
     <string name="app_version">Version: %1$s</string>
     <string name="app_description">This is an app for personal management of books, movies, and music.</string>
     <string name="tmdb_credit">This app uses the TMDb API but is not endorsed or certified by TMDb.</string>
-
+    <string name="backup_generate_records">Backup record library</string>
+    <string name="restore_backup_records">Restore record library</string>
+    <string name="backup_generate_movies">Backup movie library</string>
+    <string name="restore_backup_movies">Restore movie library</string>
+    <string name="backup_records_success">✅ Record backup completed</string>
+    <string name="backup_records_error">❌ Error during record backup: %1$s</string>
+    <string name="restore_records_success">✅ Record restore completed</string>
+    <string name="restore_records_failed">❌ Record restore failed</string>
+    <string name="backup_movies_success">✅ Movie backup completed</string>
+    <string name="backup_movies_error">❌ Error during movie backup: %1$s</string>
+    <string name="restore_movies_success">✅ Movie restore completed</string>
+    <string name="restore_movies_failed">❌ Movie restore failed</string>
+    <string name="user_not_authenticated">User not authenticated</string>
+    <string name="backup_library_success">✅ Library backup completed</string>
+    <string name="backup_library_error">❌ Error during library backup: %1$s</string>
+    <string name="restore_library_success">✅ Library restore completed</string>
+    <string name="restore_library_failed">❌ Library restore failed</string>
+    <string name="confirm_restore_title">Confirm restore</string>
+    <string name="confirm_restore_message">This will replace your current library with the backup version. Continue?</string>
 
 
 </resources>
