@@ -119,6 +119,7 @@
     <string name="unknown_format">Unknown format</string>
     <string name="unknown_language">Unknown language</string>
     <string name="no_rating">No rating</string>
+    <string name="not_defined">Not defined</string>
 
 
 
@@ -225,6 +226,11 @@
     <string name="latest_record_added">Latest record added: %1$s</string>
     <string name="go_to_advanced_summary">Go to advanced summary</string>
     <string name="most_common_record_genre">Most common genre: %1$s</string>
+    <string name="advanced_summary">Advanced summary</string>
+    <string name="record_format_distribution">Distribution by format</string>
+    <string name="record_type_distribution">Distribution by type</string>
+    <string name="record_language_distribution">Distribution by language</string>
+    <string name="record_genre_distribution">Distribution by genre</string>
 
 
 

@@ -126,6 +126,7 @@
     <string name="no_rating">Senza valutazione</string>
     <string name="book_location">Dove si trova</string>
     <string name="book_location_label">📦 Dove si trova: %1$s</string>
+    <string name="not_defined">Non definito</string>
 
 
 
@@ -222,6 +223,11 @@
     <string name="latest_record_added">Ultimo disco aggiunto: %1$s</string>
     <string name="go_to_advanced_summary">Vai al riepilogo avanzato</string>
     <string name="most_common_record_genre">Genere più frequent: %1$s</string>
+    <string name="advanced_summary">Riepilogo avanzato</string>
+    <string name="record_format_distribution">Distribuzione per formato</string>
+    <string name="record_type_distribution">Distribuzione per tipo</string>
+    <string name="record_language_distribution">Distribuzione per lingua</string>
+    <string name="record_genre_distribution">Distribuzione per genere</string>
 
 
     <!-- Settings -->
