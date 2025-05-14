@@ -26,18 +26,20 @@ suspend fun uploadCompressedImage(
     maxHeight: Int = 900,
     quality: Int = 75
 ): String {
-    // ✅ Gestione permesso persistente per Android 13/14+
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    // 👉 Applica solo per URI persistibili (es. da galleria), non FileProvider
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+        imageUri.scheme == "content" &&
+        imageUri.authority != "${context.packageName}.fileprovider"
+    ) {
         try {
             context.contentResolver.takePersistableUriPermission(
                 imageUri,
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
         } catch (e: SecurityException) {
-            Log.w("ImageUpload", "Permesso URI non acquisito: ${e.message}")
-            // Continua comunque, a volte non è necessario
+            Log.w("ImageUpload", "Persistable permission not granted: ${e.message}")
         } catch (e: Exception) {
-            Log.e("ImageUpload", "Errore imprevisto URI: ${e.message}")
+            Log.e("ImageUpload", "Unexpected URI error: ${e.message}")
         }
     }
 
@@ -51,32 +53,36 @@ suspend fun uploadCompressedImage(
                 Log.d("ImageUpload", "Using MediaStore")
                 MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
             }
-            Log.d("ImageUpload", "Bitmap OK, scalatura in corso")
+            Log.d("ImageUpload", "Bitmap decoded, resizing...")
             original.scale(maxWidth, maxHeight)
         } catch (e: SecurityException) {
             Log.e("ImageUpload", "SecurityException: ${e.message}", e)
             throw e
         } catch (e: Exception) {
-            Log.e("ImageUpload", "Errore bitmap: ${e.message}", e)
+            Log.e("ImageUpload", "Bitmap error: ${e.message}", e)
             throw e
         }
     }
-
 
     val baos = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, quality, baos)
     val data = baos.toByteArray()
 
     val filename = "$folder/$userId/${System.currentTimeMillis()}.jpg"
-
     val storageRef = FirebaseStorage.getInstance().reference.child(filename)
 
+    Log.d("ImageUpload", "Uploading image to Firebase Storage...")
     storageRef.putBytes(data).await()
-    return storageRef.downloadUrl.await().toString()
+    val downloadUrl = storageRef.downloadUrl.await().toString()
+    Log.d("ImageUpload", "Upload complete. URL: $downloadUrl")
+    return downloadUrl
 }
 
+
 fun createTempImageUri(context: Context): Uri {
-    val file = File(context.cacheDir, "temp_photo.jpg")
+    val file = File(context.cacheDir, "temp_photo.jpg").apply {
+        if (!exists()) createNewFile()
+    }
     return FileProvider.getUriForFile(
         context,
         "${context.packageName}.fileprovider",
