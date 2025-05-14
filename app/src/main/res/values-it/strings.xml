@@ -127,6 +127,7 @@
     <string name="book_location">Dove si trova</string>
     <string name="book_location_label">📦 Dove si trova: %1$s</string>
     <string name="not_defined">Non definito</string>
+    <string name="select_filters_label">Seleziona filtri</string>
 
 
 

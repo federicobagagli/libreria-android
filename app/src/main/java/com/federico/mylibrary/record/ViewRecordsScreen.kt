@@ -56,7 +56,12 @@ fun ViewRecordsScreen(navController: NavController, filterViewModel: RecordFilte
                 }
             }
         }
-
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = stringResource(R.string.select_filters_label),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
         // Campi filtro
         Column(
             modifier = Modifier

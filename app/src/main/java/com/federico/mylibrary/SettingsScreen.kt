@@ -43,21 +43,24 @@ fun SettingsScreen(
             selectedTheme = selectedTheme,
             onThemeSelected = { onThemeSelected(it) }
         )
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
-        Button(
-            onClick = { showLogoutDialog = true },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-        ) {
-            Text(stringResource(R.string.logout), color = Color.White)
-        }
+            Button(
+                onClick = { showLogoutDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text(stringResource(R.string.logout), color = Color.White)
+            }
 
-        Button(
-            onClick = { showDeleteAccountDialog = true },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
-        ) {
-            Text(stringResource(R.string.delete_account_title), color = Color.White)
+            Button(
+                onClick = { showDeleteAccountDialog = true },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+            ) {
+                Text(stringResource(R.string.delete_account_title), color = Color.White)
+            }
         }
     }
 
