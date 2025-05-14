@@ -57,7 +57,7 @@ fun BackupScreen(navController: NavController) {
         ) {
             Text("♻️ " + stringResource(R.string.restore_backup_library))
         }
-
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
         Button(
             onClick = {
                 scope.launch { BackupUtils.backupRecords(context) }
@@ -74,7 +74,7 @@ fun BackupScreen(navController: NavController) {
         ) {
             Text("♻️ " + stringResource(R.string.restore_backup_records))
         }
-
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
         Button(
             onClick = {
                 scope.launch { BackupUtils.backupMovies(context) }
@@ -91,6 +91,8 @@ fun BackupScreen(navController: NavController) {
         ) {
             Text("♻️ " + stringResource(R.string.restore_backup_movies))
         }
+
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
 
         if (isRestoring) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
