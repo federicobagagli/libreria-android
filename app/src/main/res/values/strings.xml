@@ -176,6 +176,8 @@
     <string name="sort_by_location">By location</string>
     <string name="book_location">Location</string>
     <string name="book_location_label">📦 Location: %1$s</string>
+    <string name="total_books_added">Total books added: %1$d</string>
+    <string name="total_books_read">Total books read: %1$d</string>
 
 
     <!-- Record -->

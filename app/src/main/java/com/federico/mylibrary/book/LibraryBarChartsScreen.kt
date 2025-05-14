@@ -1,5 +1,6 @@
 package com.federico.mylibrary.book
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -24,6 +25,8 @@ fun LibraryBarChartsScreen(navController: NavController) {
     var addedCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var readCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
 
+    var totalAdded by remember { mutableStateOf(0) }
+    var totalRead by remember { mutableStateOf(0) }
     LaunchedEffect(userId) {
         if (userId != null) {
             val snapshot = db.collection("books")
@@ -40,9 +43,14 @@ fun LibraryBarChartsScreen(navController: NavController) {
                 it.getString("readDate")?.takeIf { d -> d.length >= 7 }?.substring(0, 7)
             }
             readCounts = readMonths.groupingBy { it }.eachCount().toSortedMap()
+
+            totalAdded = addedCounts.values.sum()
+            totalRead = readCounts.values.sum()
         }
     }
 
+
+    println("Totale aggiunti: $totalAdded, letti: $totalRead")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -53,12 +61,38 @@ fun LibraryBarChartsScreen(navController: NavController) {
     ) {
         Text(text = stringResource(R.string.bar_charts_title), style = MaterialTheme.typography.headlineMedium)
 
+        Card(
+            modifier = Modifier
+                .fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            border = BorderStroke(1.dp, Color.Gray)
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp) // Spaziatura minima
+            ) {
+                println("Totale aggiunti: $totalAdded, letti: $totalRead")
+                Text(
+                    text = stringResource(R.string.total_books_added, totalAdded),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
+                Text(
+                    text = stringResource(R.string.total_books_read, totalRead),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+
         if (addedCounts.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
             Text(stringResource(R.string.books_added), style = MaterialTheme.typography.titleMedium)
             SingleBarChart(data = addedCounts, color = Color(0xFF64B5F6))
         }
 
         if (readCounts.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
             Text(stringResource(R.string.books_read), style = MaterialTheme.typography.titleMedium)
             SingleBarChart(data = readCounts, color = Color(0xFF81C784))
         }

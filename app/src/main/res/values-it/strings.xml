@@ -173,6 +173,8 @@
     <string name="sort_by_publisher">Per editore</string>
     <string name="sort_by_publish_date">Per data pubblicazione</string>
     <string name="sort_by_location">Per collocazione</string>
+    <string name="total_books_added">Totale libri aggiunti: %1$d</string>
+    <string name="total_books_read">Totale libri letti: %1$d</string>
 
 
     <!-- Record -->
