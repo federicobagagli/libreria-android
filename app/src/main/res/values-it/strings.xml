@@ -228,6 +228,7 @@
     <string name="record_type_distribution">Distribuzione per tipo</string>
     <string name="record_language_distribution">Distribuzione per lingua</string>
     <string name="record_genre_distribution">Distribuzione per genere</string>
+    <string name="bar_record_charts_title">Dischi aggiunti per mese</string>
 
 
     <!-- Settings -->

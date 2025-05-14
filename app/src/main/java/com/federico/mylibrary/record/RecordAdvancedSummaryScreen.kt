@@ -3,7 +3,9 @@ package com.federico.mylibrary.record
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,7 +29,7 @@ fun RecordAdvancedSummaryScreen(navController: NavController) {
     var typeCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var languageCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
     var genreCounts by remember { mutableStateOf<Map<String, Int>>(emptyMap()) }
-
+    val scrollState = rememberScrollState()
     LaunchedEffect(userId) {
         if (userId != null) {
             val snapshot = db.collection("records")
@@ -60,6 +62,7 @@ fun RecordAdvancedSummaryScreen(navController: NavController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -88,6 +91,21 @@ fun RecordAdvancedSummaryScreen(navController: NavController) {
                 title = stringResource(R.string.record_genre_distribution),
                 data = genreCounts
             )
+
+            Button(
+                onClick = { navController.navigate("record_pie_charts") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.view_pie_charts))
+            }
+
+            Button(
+                onClick = { navController.navigate("record_bar_charts") },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(text = stringResource(R.string.view_monthly_bar_chart))
+            }
+
         }
     }
 }

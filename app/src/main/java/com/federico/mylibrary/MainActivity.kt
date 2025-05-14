@@ -47,6 +47,8 @@ import com.federico.mylibrary.record.ViewRecordsScreen
 import com.federico.mylibrary.viewmodel.RecordFilterViewModel
 import com.federico.mylibrary.record.RecordSummaryScreen
 import com.federico.mylibrary.record.RecordAdvancedSummaryScreen
+import com.federico.mylibrary.record.RecordBarChartsScreen
+import com.federico.mylibrary.record.RecordPieChartsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -174,6 +176,8 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             }
             composable("record_summary") { RecordSummaryScreen(navController) }
             composable("record_advanced_summary") { RecordAdvancedSummaryScreen(navController) }
+            composable("record_pie_charts") { RecordPieChartsScreen(navController) }
+            composable("record_bar_charts") { RecordBarChartsScreen(navController) }
         }
     }
 }

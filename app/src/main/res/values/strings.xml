@@ -231,7 +231,7 @@
     <string name="record_type_distribution">Distribution by type</string>
     <string name="record_language_distribution">Distribution by language</string>
     <string name="record_genre_distribution">Distribution by genre</string>
-
+    <string name="bar_record_charts_title">Records added per month</string>
 
 
 
