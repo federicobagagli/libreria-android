@@ -238,5 +238,11 @@
     <string name="migrate_ratings_button">Migra rating in formato testo</string>
     <string name="dark_mode">Tema scuro</string>
     <string name="theme_selector_label">Tema</string>
+    <string name="account_deleted_success">Account eliminato con successo</string>
+    <string name="account_deleted_error">Errore durante l’eliminazione: %1$s</string>
+    <string name="delete_account_title">Elimina account e tutti i dati</string>
+    <string name="delete_account_confirm_title">Conferma eliminazione account</string>
+    <string name="delete_account_confirm_message">Vuoi davvero eliminare il tuo account e tutti i tuoi dati? Questa operazione è irreversibile.</string>
+
 
 </resources>

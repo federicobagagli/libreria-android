@@ -242,5 +242,12 @@
     <string name="migrate_ratings_button">Migrate ratings to text format</string>
     <string name="dark_mode">Dark theme</string>
     <string name="theme_selector_label">Theme</string>
+    <string name="account_deleted_success">Account successfully deleted</string>
+    <string name="account_deleted_error">Error while deleting account: %1$s</string>
+    <string name="delete_account_title">Delete account and all data</string>
+    <string name="delete_account_confirm_title">Confirm account deletion</string>
+    <string name="delete_account_confirm_message">Do you really want to delete your account and all your data? This action cannot be undone.</string>
+
+
 
 </resources>

@@ -6,11 +6,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.federico.mylibrary.ui.ThemeSelector
 import com.federico.mylibrary.ui.theme.AppThemeStyle
+import com.federico.mylibrary.util.deleteUserAndData
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -19,7 +21,9 @@ fun SettingsScreen(
     selectedTheme: AppThemeStyle,
     onThemeSelected: (AppThemeStyle) -> Unit
 ) {
+    val context = LocalContext.current
     var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteAccountDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -47,7 +51,14 @@ fun SettingsScreen(
         ) {
             Text(stringResource(R.string.logout), color = Color.White)
         }
-        
+
+        Button(
+            onClick = { showDeleteAccountDialog = true },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+        ) {
+            Text(stringResource(R.string.delete_account_title), color = Color.White)
+        }
     }
 
     if (showLogoutDialog) {
@@ -65,6 +76,29 @@ fun SettingsScreen(
             dismissButton = {
                 TextButton(onClick = { showLogoutDialog = false }) {
                     Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showDeleteAccountDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteAccountDialog = false },
+            title = { Text(stringResource(R.string.delete_account_confirm_title)) },
+            text = { Text(stringResource(R.string.delete_account_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    deleteUserAndData(context) {
+                        FirebaseAuth.getInstance().signOut()
+                        showDeleteAccountDialog = false
+                    }
+                }) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteAccountDialog = false }) {
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
