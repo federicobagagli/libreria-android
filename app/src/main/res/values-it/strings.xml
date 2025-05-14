@@ -217,8 +217,11 @@
     <string name="record_updated">Disco aggiornato!</string>
     <string name="no_data_found">Nessun dato trovato.</string>
     <string name="cover_image">Copertina del disco</string>
-
-
+    <string name="total_records">Totale dischi: %1$d</string>
+    <string name="most_common_type">Tipo più frequente: %1$s</string>
+    <string name="latest_record_added">Ultimo disco aggiunto: %1$s</string>
+    <string name="go_to_advanced_summary">Vai al riepilogo avanzato</string>
+    <string name="most_common_record_genre">Genere più frequent: %1$s</string>
 
 
     <!-- Settings -->

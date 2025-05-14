@@ -220,7 +220,11 @@
     <string name="record_updated">Record updated!</string>
     <string name="no_data_found">No data found.</string>
     <string name="cover_image">Record cover image</string>
-
+    <string name="total_records">Total records: %1$d</string>
+    <string name="most_common_type">Most common type: %1$s</string>
+    <string name="latest_record_added">Latest record added: %1$s</string>
+    <string name="go_to_advanced_summary">Go to advanced summary</string>
+    <string name="most_common_record_genre">Most common genre: %1$s</string>
 
 
 
