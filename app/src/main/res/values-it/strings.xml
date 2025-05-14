@@ -243,6 +243,9 @@
     <string name="delete_account_title">Elimina account e tutti i dati</string>
     <string name="delete_account_confirm_title">Conferma eliminazione account</string>
     <string name="delete_account_confirm_message">Vuoi davvero eliminare il tuo account e tutti i tuoi dati? Questa operazione è irreversibile.</string>
+    <string name="verify_email_sent">È stata inviata un email di verifica. Controlla la casella di posta prima di accedere.</string>
+    <string name="weak_password_title">Password troppo debole</string>
+    <string name="weak_password_message">a password deve contenere almeno 8 caratteri, una lettera maiuscola, una minuscola, un numero e un simbolo speciale.</string>
 
 
 </resources>

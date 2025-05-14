@@ -247,6 +247,9 @@
     <string name="delete_account_title">Delete account and all data</string>
     <string name="delete_account_confirm_title">Confirm account deletion</string>
     <string name="delete_account_confirm_message">Do you really want to delete your account and all your data? This action cannot be undone.</string>
+    <string name="verify_email_sent">A verification email has been sent. Please check your inbox before logging in.</string>
+    <string name="weak_password_title">Password too weak</string>
+    <string name="weak_password_message">Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character.</string>
 
 
 

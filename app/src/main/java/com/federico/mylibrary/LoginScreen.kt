@@ -19,6 +19,17 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.GoogleAuthProvider
 
+fun isStrongPassword(password: String): Boolean {
+    val lengthOk = password.length >= 8
+    val upper = password.any { it.isUpperCase() }
+    val lower = password.any { it.isLowerCase() }
+    val digit = password.any { it.isDigit() }
+    val special = password.any { !it.isLetterOrDigit() }
+
+    return lengthOk && upper && lower && digit && special
+}
+
+
 @Composable
 fun LoginScreen(auth: FirebaseAuth) {
     val context = LocalContext.current
@@ -28,6 +39,7 @@ fun LoginScreen(auth: FirebaseAuth) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showReset by remember { mutableStateOf(false) }
+    var showWeakPasswordDialog by remember { mutableStateOf(false) }
 
     val oneTapClient = remember { Identity.getSignInClient(context) }
 
@@ -66,7 +78,6 @@ fun LoginScreen(auth: FirebaseAuth) {
             .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        // 1. Pulsante Google
         Button(
             onClick = {
                 val signInRequest = BeginSignInRequest.builder()
@@ -102,7 +113,6 @@ fun LoginScreen(auth: FirebaseAuth) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-// 2. Frase "oppure accedi con"
         Text(
             text = stringResource(R.string.or_login_with),
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -111,7 +121,6 @@ fun LoginScreen(auth: FirebaseAuth) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-// 3. Campi email + password
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -130,12 +139,22 @@ fun LoginScreen(auth: FirebaseAuth) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-// 4. Bottoni login/registrazione email
         Button(
             onClick = {
                 auth.signInWithEmailAndPassword(email.trim(), password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            val user = auth.currentUser
+                            if (user != null && !user.isEmailVerified) {
+                                user.sendEmailVerification()
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.verify_email_sent),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                FirebaseAuth.getInstance().signOut()
+                                return@addOnCompleteListener
+                            }
                             Toast.makeText(context, context.getString(R.string.login_success), Toast.LENGTH_SHORT).show()
                             activity.recreate()
                         } else {
@@ -156,17 +175,32 @@ fun LoginScreen(auth: FirebaseAuth) {
 
         Button(
             onClick = {
+                if (!isStrongPassword(password)) {
+                    showWeakPasswordDialog = true
+                    return@Button
+                }
                 auth.createUserWithEmailAndPassword(email.trim(), password)
                     .addOnCompleteListener { registerTask ->
                         if (registerTask.isSuccessful) {
-                            Toast.makeText(context, context.getString(R.string.registration_success), Toast.LENGTH_SHORT).show()
-                            activity.recreate()
-                        } else {
+                            val user = auth.currentUser
+                            user?.sendEmailVerification()
                             Toast.makeText(
                                 context,
-                                context.getString(R.string.registration_failed, registerTask.exception?.message ?: ""),
+                                context.getString(R.string.verify_email_sent),
                                 Toast.LENGTH_LONG
                             ).show()
+                            FirebaseAuth.getInstance().signOut()
+                        } else {
+                            val errorMsg = registerTask.exception?.message.orEmpty()
+                            if ("password" in errorMsg.lowercase() && "6" in errorMsg) {
+                                showWeakPasswordDialog = true
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.registration_failed, errorMsg),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
                     }
             },
@@ -180,6 +214,18 @@ fun LoginScreen(auth: FirebaseAuth) {
         TextButton(onClick = { showReset = true }, modifier = Modifier.align(Alignment.End)) {
             Text(text = stringResource(R.string.password_reset_title))
         }
+    }
 
+    if (showWeakPasswordDialog) {
+        AlertDialog(
+            onDismissRequest = { showWeakPasswordDialog = false },
+            title = { Text(stringResource(R.string.weak_password_title)) },
+            text = { Text(stringResource(R.string.weak_password_message)) },
+            confirmButton = {
+                TextButton(onClick = { showWeakPasswordDialog = false }) {
+                    Text(stringResource(R.string.ok))
+                }
+            }
+        )
     }
 }
