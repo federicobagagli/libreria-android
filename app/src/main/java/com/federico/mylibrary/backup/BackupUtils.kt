@@ -192,4 +192,15 @@ object BackupUtils {
             false
         }
     }
+
+    suspend fun getBackupTimestamp(context: Context, type: String): Long? {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return null
+        return try {
+            val ref = FirebaseStorage.getInstance().reference
+                .child("backups/$userId/${type}_backup.json")
+            ref.metadata.await().updatedTimeMillis
+        } catch (e: Exception) {
+            null
+        }
+    }
 }

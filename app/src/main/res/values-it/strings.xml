@@ -311,5 +311,6 @@
     <string name="restore_library_failed">❌ Ripristino della libreria non riuscito</string>
     <string name="confirm_restore_title">Conferma ripristino</string>
     <string name="confirm_restore_message">Questa operazione sostituirà la tua libreria attuale con la versione del backup. Continuare?</string>
+    <string name="last_backup_time">Ultimo backup: %1$s</string>
 
 </resources>

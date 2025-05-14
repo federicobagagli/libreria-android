@@ -314,6 +314,7 @@
     <string name="restore_library_failed">❌ Library restore failed</string>
     <string name="confirm_restore_title">Confirm restore</string>
     <string name="confirm_restore_message">This will replace your current library with the backup version. Continue?</string>
+    <string name="last_backup_time">Last backup: %1$s</string>
 
 
 </resources>

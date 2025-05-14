@@ -2,6 +2,8 @@ package com.federico.mylibrary.backup
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -30,9 +32,30 @@ fun BackupScreen(navController: NavController) {
     val restoreMovieSuccess = stringResource(R.string.restore_movies_success)
     val restoreMovieFailed = stringResource(R.string.restore_movies_failed)
 
+    var lastLibraryBackup by remember { mutableStateOf<Long?>(null) }
+    var lastRecordBackup by remember { mutableStateOf<Long?>(null) }
+    var lastMovieBackup by remember { mutableStateOf<Long?>(null) }
+
+    LaunchedEffect(Unit) {
+        scope.launch {
+            lastLibraryBackup = BackupUtils.getBackupTimestamp(context, "library")
+            lastRecordBackup = BackupUtils.getBackupTimestamp(context, "record")
+            lastMovieBackup = BackupUtils.getBackupTimestamp(context, "movie")
+        }
+    }
+
+    fun formatTimestamp(timestamp: Long?): String {
+        return timestamp?.let {
+            java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+                .format(java.util.Date(it))
+        } ?: "-"
+    }
+
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
             .padding(24.dp)
+            .verticalScroll(scrollState)
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -49,6 +72,10 @@ fun BackupScreen(navController: NavController) {
         ) {
             Text("📚 " + stringResource(R.string.backup_generate_library))
         }
+        Text(
+            text = stringResource(R.string.last_backup_time, formatTimestamp(lastLibraryBackup)),
+            style = MaterialTheme.typography.bodySmall
+        )
 
         Button(
             onClick = { showRestoreLibraryDialog = true },
@@ -66,6 +93,10 @@ fun BackupScreen(navController: NavController) {
         ) {
             Text("💿 " + stringResource(R.string.backup_generate_records))
         }
+        Text(
+            text = stringResource(R.string.last_backup_time, formatTimestamp(lastRecordBackup)),
+            style = MaterialTheme.typography.bodySmall
+        )
 
         Button(
             onClick = { showRestoreRecordsDialog = true },
@@ -83,7 +114,10 @@ fun BackupScreen(navController: NavController) {
         ) {
             Text("🎬 " + stringResource(R.string.backup_generate_movies))
         }
-
+        Text(
+            text = stringResource(R.string.last_backup_time, formatTimestamp(lastMovieBackup)),
+            style = MaterialTheme.typography.bodySmall
+        )
         Button(
             onClick = { showRestoreMoviesDialog = true },
             modifier = Modifier.fillMaxWidth(),
