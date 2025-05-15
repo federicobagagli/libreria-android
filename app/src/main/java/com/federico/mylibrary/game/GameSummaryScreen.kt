@@ -1,5 +1,6 @@
 package com.federico.mylibrary.game
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +16,8 @@ import com.federico.mylibrary.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun GameSummaryScreen(navController: NavController) {
@@ -40,9 +43,18 @@ fun GameSummaryScreen(navController: NavController) {
             }
             mostCommonGenre = genres.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
 
+            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+
             lastAddedGame = snapshot.documents
-                .maxByOrNull { it.getString("addedDate") ?: "" }
-                ?.getString("title")
+                .mapNotNull { doc ->
+                    val dateStr = doc.getString("addedDate") ?: return@mapNotNull null
+                    val title = doc.getString("title") ?: return@mapNotNull null
+                    runCatching {
+                        sdf.parse(dateStr) to title
+                    }.getOrNull()
+                }
+                .maxByOrNull { it.first }
+                ?.second
         }
     }
 

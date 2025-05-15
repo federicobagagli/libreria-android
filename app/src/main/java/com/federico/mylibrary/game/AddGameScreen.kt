@@ -56,7 +56,7 @@ fun AddGameScreen() {
     var coverUrl by remember { mutableStateOf("") }
     var uploadingCover by remember { mutableStateOf(false) }
 
-    val currentDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+    val currentDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
     val typeOptions = listOf(
         stringResource(R.string.game_type_board),
