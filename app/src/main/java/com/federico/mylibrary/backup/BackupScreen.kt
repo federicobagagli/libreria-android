@@ -22,6 +22,7 @@ fun BackupScreen(navController: NavController) {
     var showRestoreLibraryDialog by remember { mutableStateOf(false) }
     var showRestoreRecordsDialog by remember { mutableStateOf(false) }
     var showRestoreMoviesDialog by remember { mutableStateOf(false) }
+    var showRestoreGamesDialog by remember { mutableStateOf(false) }
 
     var isRestoring by remember { mutableStateOf(false) }
 
@@ -35,12 +36,14 @@ fun BackupScreen(navController: NavController) {
     var lastLibraryBackup by remember { mutableStateOf<Long?>(null) }
     var lastRecordBackup by remember { mutableStateOf<Long?>(null) }
     var lastMovieBackup by remember { mutableStateOf<Long?>(null) }
+    var lastGameBackup by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(Unit) {
         scope.launch {
             lastLibraryBackup = BackupUtils.getBackupTimestamp(context, "library")
             lastRecordBackup = BackupUtils.getBackupTimestamp(context, "record")
             lastMovieBackup = BackupUtils.getBackupTimestamp(context, "movie")
+            lastGameBackup = BackupUtils.getBackupTimestamp(context,"game")
         }
     }
 
@@ -124,6 +127,28 @@ fun BackupScreen(navController: NavController) {
             enabled = !isRestoring
         ) {
             Text("♻️ " + stringResource(R.string.restore_backup_movies))
+        }
+
+
+        HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
+        Button(
+            onClick = {
+                scope.launch { BackupUtils.backupGames(context) }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("🎬 " + stringResource(R.string.backup_generate_games))
+        }
+        Text(
+            text = stringResource(R.string.last_backup_time, formatTimestamp(lastGameBackup)),
+            style = MaterialTheme.typography.bodySmall
+        )
+        Button(
+            onClick = { showRestoreGamesDialog = true },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isRestoring
+        ) {
+            Text("♻️ " + stringResource(R.string.restore_backup_games))
         }
 
         HorizontalDivider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
@@ -231,4 +256,37 @@ fun BackupScreen(navController: NavController) {
             }
         )
     }
+
+// 🎬 Conferma ripristino ludoteca
+    if (showRestoreGamesDialog) {
+        AlertDialog(
+            onDismissRequest = { showRestoreGamesDialog = false },
+            title = { Text(stringResource(R.string.restore_confirmation_title)) },
+            text = { Text(stringResource(R.string.restore_confirmation_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRestoreGamesDialog = false
+                    isRestoring = true
+                    scope.launch {
+                        val success = BackupUtils.restoreGamesBackup(context)
+                        isRestoring = false
+                        val message = if (success) {
+                            context.getString(R.string.restore_success)
+                        } else {
+                            context.getString(R.string.restore_failed)
+                        }
+                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Text(stringResource(R.string.yes))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestoreGamesDialog = false }) {
+                    Text(stringResource(R.string.no))
+                }
+            }
+        )
+    }
+
 }

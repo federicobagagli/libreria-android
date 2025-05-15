@@ -33,6 +33,16 @@ import com.federico.mylibrary.book.ViewLibraryScreen
 import com.federico.mylibrary.datastore.ThemePreferences
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
+import com.federico.mylibrary.game.AddGameScreen
+import com.federico.mylibrary.game.DetailsGameScreen
+import com.federico.mylibrary.game.EditGameScreen
+import com.federico.mylibrary.game.GameAdvancedSummaryScreen
+import com.federico.mylibrary.game.GameBarChartsScreen
+import com.federico.mylibrary.game.GamePieChartsScreen
+import com.federico.mylibrary.game.GameRoomScreen
+import com.federico.mylibrary.game.GameSummaryScreen
+import com.federico.mylibrary.game.GamesScreen
+import com.federico.mylibrary.game.ViewGamesScreen
 import com.federico.mylibrary.movie.AddMovieScreen
 import com.federico.mylibrary.movie.DetailsMovieScreen
 import com.federico.mylibrary.movie.EditMovieScreen
@@ -59,6 +69,7 @@ import com.federico.mylibrary.record.RecordSummaryScreen
 import com.federico.mylibrary.record.RecordAdvancedSummaryScreen
 import com.federico.mylibrary.record.RecordBarChartsScreen
 import com.federico.mylibrary.record.RecordPieChartsScreen
+import com.federico.mylibrary.viewmodel.GameFilterViewModel
 import com.federico.mylibrary.viewmodel.MovieFilterViewModel
 
 class MainActivity : ComponentActivity() {
@@ -110,6 +121,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
     val libraryFilterViewModel: LibraryFilterViewModel = viewModel()
     val recordFilterViewModel: RecordFilterViewModel = viewModel()
     val movieFilterViewModel: MovieFilterViewModel = viewModel()
+    val gameFilterViewModel: GameFilterViewModel = viewModel()
 
     Scaffold(
         topBar = {
@@ -215,6 +227,28 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("movie_advanced_summary") { MovieAdvancedSummaryScreen(navController) }
             composable("movie_pie_charts") { MoviePieChartsScreen(navController) }
             composable("movie_bar_charts") { MovieBarChartsScreen(navController) }
+
+            //Games
+            composable("game_room") { GameRoomScreen(navController) }
+            composable("add_game") { AddGameScreen() }
+            composable("view_games") { ViewGamesScreen(navController, gameFilterViewModel) }
+            composable("games") {
+                GamesScreen(
+                    navController = navController,
+                    exportViewModel = exportViewModel,
+                    filterViewModel = gameFilterViewModel
+                )
+            }
+            composable("details_game/{gameId}") { backStackEntry ->
+                DetailsGameScreen(navController, backStackEntry)
+            }
+            composable("edit_game/{gameId}") { backStackEntry ->
+                EditGameScreen(navController, backStackEntry)
+            }
+            composable("game_summary") { GameSummaryScreen(navController) }
+            composable("game_advanced_summary") { GameAdvancedSummaryScreen(navController) }
+            composable("game_pie_charts") { GamePieChartsScreen(navController) }
+            composable("game_bar_charts") { GameBarChartsScreen(navController) }
         }
     }
 }

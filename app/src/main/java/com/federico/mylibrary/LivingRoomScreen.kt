@@ -51,7 +51,7 @@ fun LivingRoomScreen(navController: NavController) {
                 Text(stringResource(R.string.movie_library))
             }
 
-            Button(onClick = { /* TODO: navigate to playroom */ }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { navController.navigate("game_room") }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.playroom))
             }
         }

@@ -21,7 +21,7 @@ suspend fun uploadCompressedImage(
     context: Context,
     imageUri: Uri,
     userId: String,
-    folder: String = "covers",
+    folder: String,  //folder: String = "covers",
     maxWidth: Int = 600,
     maxHeight: Int = 900,
     quality: Int = 75

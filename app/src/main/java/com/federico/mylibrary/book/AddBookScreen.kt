@@ -309,7 +309,8 @@ fun AddBookScreen() {
                 val downloadUrl = uploadCompressedImage(
                     context = context,
                     imageUri = uri,
-                    userId = userId
+                    userId = userId,
+                    folder = "covers"
                 )
                 coverUrl = downloadUrl
                 Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
@@ -333,7 +334,8 @@ fun AddBookScreen() {
                     val downloadUrl = uploadCompressedImage(
                         context = context,
                         imageUri = imageUri.value!!,
-                        userId = userId
+                        userId = userId,
+                        folder = "covers"
                     )
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()

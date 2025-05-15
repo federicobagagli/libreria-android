@@ -64,7 +64,7 @@ fun EditMovieScreen(navController: NavController, backStackEntry: NavBackStackEn
             uploadingCover = true
             coroutineScope.launch {
                 try {
-                    val downloadUrl = uploadCompressedImage(context, it, FirebaseAuth.getInstance().currentUser?.uid ?: "")
+                    val downloadUrl = uploadCompressedImage(context, it, FirebaseAuth.getInstance().currentUser?.uid ?: "", folder = "movies")
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -83,7 +83,7 @@ fun EditMovieScreen(navController: NavController, backStackEntry: NavBackStackEn
             uploadingCover = true
             coroutineScope.launch {
                 try {
-                    val downloadUrl = uploadCompressedImage(context, imageUri.value!!, FirebaseAuth.getInstance().currentUser?.uid ?: "")
+                    val downloadUrl = uploadCompressedImage(context, imageUri.value!!, FirebaseAuth.getInstance().currentUser?.uid ?: "", folder = "movies")
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {

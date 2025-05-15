@@ -276,6 +276,56 @@
     <string name="total_movies_added">Totale film aggiunti: %1$d</string>
 
 
+    <!-- Game -->
+    <string name="add_game">Add Game</string>
+    <string name="edit_game">Edit Game</string>
+    <string name="game_title">Title</string>
+    <string name="game_type">Type</string>
+    <string name="game_type_board">Board Game</string>
+    <string name="game_type_videogame">Video Game</string>
+    <string name="game_type_other">Other</string>
+    <string name="game_platform">Platform</string>
+    <string name="game_publisher">Publisher / Developer</string>
+    <string name="game_release_date">Release Date</string>
+    <string name="game_genre">Genre</string>
+    <string name="game_language">Language</string>
+    <string name="game_description">Description</string>
+    <string name="game_min_players">Minimum Players</string>
+    <string name="game_max_players">Maximum Players</string>
+    <string name="game_duration_minutes">Average Duration (minutes)</string>
+    <string name="game_rating">Rating</string>
+    <string name="game_notes">Notes</string>
+    <string name="game_location">Location</string>
+    <string name="game_cover_url">Cover URL</string>
+    <string name="game_added_date">Added Date</string>
+    <string name="game_not_found">Game not found</string>
+    <string name="view_games">View Games</string>
+    <string name="game_added">🎮 Game successfully added</string>
+    <string name="save_game">Save Game</string>
+    <string name="game_title_label">🎲 Title: %1$s</string>
+    <string name="game_type_label">Type: %1$s</string>
+    <string name="game_platform_label">Platform: %1$s</string>
+    <string name="game_release_date_label">Release Date: %1$s</string>
+    <string name="no_games_found">No games found</string>
+    <string name="export_title_game">Export Games</string>
+    <string name="sort_by_type">Type</string>
+    <string name="sort_by_platform">Platform</string>
+    <string name="game_updated">🎮 Game successfully updated</string>
+    <string name="total_games">Total games: %1$d</string>
+    <string name="last_added_game">Last added: %1$s</string>
+    <string name="videogame_section_title">🎮 Video Games</string>
+    <string name="boardgame_section_title">🎲 Board Games</string>
+    <string name="platform_distribution">Platform distribution</string>
+    <string name="publisher_distribution">Publisher distribution</string>
+    <string name="unknown_platform">Unknown platform</string>
+    <string name="total_games_added">Games added: %1$d</string>
+    <string name="games_added">Games added per month</string>
+    <string name="backup_games_success">✅ Games backup completed</string>
+    <string name="backup_games_error">❌ Error during games backup: %1$s</string>
+    <string name="backup_generate_games">Backup Games</string>
+    <string name="restore_backup_games">Restore Games</string>
+
+
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Settings</string>

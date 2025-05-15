@@ -116,7 +116,7 @@ fun AddMovieScreen(navController: NavController) {
             uploadingCover = true
             coroutineScope.launch {
                 try {
-                    val downloadUrl = uploadCompressedImage(context, it, userId)
+                    val downloadUrl = uploadCompressedImage(context, it, userId, folder = "records")
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
@@ -135,7 +135,7 @@ fun AddMovieScreen(navController: NavController) {
             uploadingCover = true
             coroutineScope.launch {
                 try {
-                    val downloadUrl = uploadCompressedImage(context, imageUri.value!!, userId)
+                    val downloadUrl = uploadCompressedImage(context, imageUri.value!!, userId,folder = "records")
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {

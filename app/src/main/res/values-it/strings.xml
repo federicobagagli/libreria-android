@@ -273,6 +273,55 @@
     <string name="total_movies_added">Total movies added: %1$d</string>
 
 
+    <!-- Game -->
+    <string name="add_game">Aggiungi Gioco</string>
+    <string name="edit_game">Modifica Gioco</string>
+    <string name="game_title">Titolo</string>
+    <string name="game_type">Tipo</string>
+    <string name="game_type_board">Gioco da tavolo</string>
+    <string name="game_type_videogame">Videogioco</string>
+    <string name="game_type_other">Altro</string>
+    <string name="game_platform">Piattaforma</string>
+    <string name="game_publisher">Editore / Sviluppatore</string>
+    <string name="game_release_date">Data di uscita</string>
+    <string name="game_genre">Genere</string>
+    <string name="game_language">Lingua</string>
+    <string name="game_description">Descrizione</string>
+    <string name="game_min_players">Numero minimo di giocatori</string>
+    <string name="game_max_players">Numero massimo di giocatori</string>
+    <string name="game_duration_minutes">Durata media (minuti)</string>
+    <string name="game_rating">Valutazione</string>
+    <string name="game_notes">Note</string>
+    <string name="game_location">Posizione</string>
+    <string name="game_cover_url">URL copertina</string>
+    <string name="game_added_date">Data di aggiunta</string>
+    <string name="game_not_found">Gioco non trovato</string>
+    <string name="view_games">Visualizza Giochi</string>
+    <string name="game_added">🎮 Gioco aggiunto con successo</string>
+    <string name="save_game">Salva Gioco</string>
+    <string name="game_title_label">🎲 Titolo: %1$s</string>
+    <string name="game_type_label">Tipo: %1$s</string>
+    <string name="game_platform_label">Piattaforma: %1$s</string>
+    <string name="game_release_date_label">Data di uscita: %1$s</string>
+    <string name="no_games_found">Nessun gioco trovato</string>
+    <string name="export_title_game">Esporta Giochi</string>
+    <string name="sort_by_type">Tipo</string>
+    <string name="sort_by_platform">Piattaforma</string>
+    <string name="game_updated">🎮 Gioco aggiornato con successo</string>
+    <string name="total_games">Giochi totali: %1$d</string>
+    <string name="last_added_game">Ultimo aggiunto: %1$s</string>
+    <string name="videogame_section_title">🎮 Videogiochi</string>
+    <string name="boardgame_section_title">🎲 Giochi da tavolo</string>
+    <string name="platform_distribution">Distribuzione per piattaforma</string>
+    <string name="publisher_distribution">Distribuzione per editore</string>
+    <string name="unknown_platform">Piattaforma sconosciuta</string>
+    <string name="total_games_added">Giochi aggiunti: %1$d</string>
+    <string name="games_added">Giochi aggiunti per mese</string>
+    <string name="backup_games_success">✅ Backup giochi completato</string>
+    <string name="backup_games_error">❌ Errore durante il backup giochi: %1$s</string>
+    <string name="backup_generate_games">Backup Giochi</string>
+    <string name="restore_backup_games">Ripristina Giochi</string>
+
 
     <!-- Settings -->
     <string name="settings_title">⚙️ Configurazione</string>

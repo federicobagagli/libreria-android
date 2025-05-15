@@ -193,6 +193,63 @@ object BackupUtils {
         }
     }
 
+    suspend fun backupGames(context: Context) {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(context, context.getString(R.string.user_not_authenticated), Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        try {
+            val db = FirebaseFirestore.getInstance()
+            val snapshot = db.collection("games")
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+
+            val games = snapshot.documents.mapNotNull { it.toObject<com.federico.mylibrary.model.Game>() }
+            val jsonString = Json.encodeToString(games)
+            val jsonBytes = jsonString.toByteArray(Charsets.UTF_8)
+
+            val storageRef = FirebaseStorage.getInstance().reference
+                .child("backups/$userId/game_backup.json")
+
+            storageRef.putBytes(jsonBytes).await()
+            Toast.makeText(context, context.getString(R.string.backup_games_success), Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(context, context.getString(R.string.backup_games_error, e.message ?: ""), Toast.LENGTH_LONG).show()
+        }
+    }
+
+    suspend fun restoreGamesBackup(context: Context): Boolean {
+        return try {
+            val user = FirebaseAuth.getInstance().currentUser ?: return false
+            val fileRef = FirebaseStorage.getInstance().reference
+                .child("backups/${user.uid}/game_backup.json")
+
+            val localFile = File(context.cacheDir, "temp_game_backup.json")
+            fileRef.getFile(localFile).await()
+
+            val jsonContent = localFile.readText()
+            val games: List<com.federico.mylibrary.model.Game> = Json.decodeFromString(jsonContent)
+
+            val firestore = FirebaseFirestore.getInstance()
+            val existing = firestore.collection("games")
+                .whereEqualTo("userId", user.uid)
+                .get().await()
+
+            for (doc in existing.documents) doc.reference.delete().await()
+            for (game in games) firestore.collection("games").add(game).await()
+
+            true
+        } catch (e: Exception) {
+            Log.e("BackupUtils", "Restore games failed: ${e.message}", e)
+            false
+        }
+    }
+
+
     suspend fun getBackupTimestamp(context: Context, type: String): Long? {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return null
         return try {

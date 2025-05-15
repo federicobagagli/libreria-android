@@ -39,7 +39,15 @@ fun ExportView(
 ) {
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
-    val headers = remember { BookExportItem.headers(context) }
+    val headers = remember(items) {
+        when (items.firstOrNull()) {
+            is GameExportItem -> GameExportItem.headers(context)
+            is BookExportItem -> BookExportItem.headers(context)
+            is RecordExportItem -> RecordExportItem.headers(context)
+            is MovieExportItem -> MovieExportItem.headers(context)
+            else -> emptyList()
+        }
+    }
 
     val rows = items.map { it.toExportRow() }
     val csvContent = remember(items) { CsvExporter.generateCsvContent(headers, rows) }

@@ -86,7 +86,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     val downloadUrl = uploadCompressedImage(
                         context = context,
                         imageUri = it,
-                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch,
+                        folder = "covers"
                     )
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
@@ -109,7 +110,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     val downloadUrl = uploadCompressedImage(
                         context = context,
                         imageUri = imageUri.value!!,
-                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch
+                        userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@launch,
+                        folder = "covers"
                     )
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()

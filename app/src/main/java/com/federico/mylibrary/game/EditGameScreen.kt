@@ -1,0 +1,260 @@
+package com.federico.mylibrary.game
+
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import com.federico.mylibrary.R
+import com.federico.mylibrary.createTempImageUri
+import com.federico.mylibrary.model.Game
+import com.federico.mylibrary.uploadCompressedImage
+import com.federico.mylibrary.ui.bookFieldModifier
+import com.federico.mylibrary.ui.bookFieldTextStyle
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import java.text.SimpleDateFormat
+import java.util.*
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditGameScreen(navController: NavController, backStackEntry: NavBackStackEntry) {
+    val context = LocalContext.current
+    val gameId = backStackEntry.arguments?.getString("gameId") ?: return
+    val db = FirebaseFirestore.getInstance()
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+    val typeOptions = listOf("board", "videogame", "altro")
+
+    var title by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf(typeOptions[0]) }
+    var platform by remember { mutableStateOf("") }
+    var publisher by remember { mutableStateOf("") }
+    var releaseDate by remember { mutableStateOf("") }
+    var genre by remember { mutableStateOf("") }
+    var language by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var minPlayers by remember { mutableStateOf("") }
+    var maxPlayers by remember { mutableStateOf("") }
+    var durationMinutes by remember { mutableStateOf("") }
+    var rating by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+    var location by remember { mutableStateOf("") }
+    var addedDate by remember { mutableStateOf("") }
+    var coverUrl by remember { mutableStateOf("") }
+
+    var isLoading by remember { mutableStateOf(true) }
+    var uploadingCover by remember { mutableStateOf(false) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+    var expandedType by remember { mutableStateOf(false) }
+    val imageUri = remember { mutableStateOf<Uri?>(null) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            uploadingCover = true
+            coroutineScope.launch {
+                try {
+                    coverUrl = uploadCompressedImage(context, it, userId, folder = "games")
+                    Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+                } finally {
+                    uploadingCover = false
+                }
+            }
+        }
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && imageUri.value != null) {
+            uploadingCover = true
+            coroutineScope.launch {
+                try {
+                    coverUrl = uploadCompressedImage(context, imageUri.value!!, userId, folder = "games")
+                    Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+                } finally {
+                    uploadingCover = false
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(gameId) {
+        val doc = db.collection("games").document(gameId).get().await()
+        val game = doc.toObject(Game::class.java)
+        game?.let {
+            title = it.title
+            type = it.type
+            platform = it.platform
+            publisher = it.publisher
+            releaseDate = it.releaseDate
+            genre = it.genre
+            language = it.language
+            description = it.description
+            minPlayers = it.minPlayers.takeIf { p -> p > 0 }?.toString() ?: ""
+            maxPlayers = it.maxPlayers.takeIf { p -> p > 0 }?.toString() ?: ""
+            durationMinutes = it.durationMinutes.takeIf { d -> d > 0 }?.toString() ?: ""
+            rating = it.rating
+            notes = it.notes
+            location = it.location
+            addedDate = it.addedDate
+            coverUrl = it.coverUrl
+        }
+        isLoading = false
+    }
+
+    val missingTitle = stringResource(R.string.missing_title)
+    val gameUpdated = stringResource(R.string.game_updated)
+    val errorPrefix = stringResource(R.string.error_prefix)
+
+    if (isLoading) {
+        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+    } else {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Surface(shadowElevation = 4.dp) {
+                Button(
+                    onClick = {
+                        if (title.isBlank()) {
+                            Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
+                            return@Button
+                        }
+
+                        val updateMap = mapOf(
+                            "title" to title,
+                            "type" to type,
+                            "platform" to platform,
+                            "publisher" to publisher,
+                            "releaseDate" to releaseDate,
+                            "genre" to genre,
+                            "language" to language,
+                            "description" to description,
+                            "minPlayers" to (minPlayers.toIntOrNull() ?: 0),
+                            "maxPlayers" to (maxPlayers.toIntOrNull() ?: 0),
+                            "durationMinutes" to (durationMinutes.toIntOrNull() ?: 0),
+                            "rating" to rating,
+                            "notes" to notes,
+                            "location" to location,
+                            "addedDate" to addedDate,
+                            "coverUrl" to coverUrl
+                        )
+
+                        db.collection("games").document(gameId)
+                            .update(updateMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(context, gameUpdated, Toast.LENGTH_SHORT).show()
+                                navController.popBackStack()
+                            }
+                            .addOnFailureListener {
+                                Toast.makeText(context, "$errorPrefix ${it.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    Text(stringResource(R.string.save_game))
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                @Composable
+                fun inputField(value: String, onChange: (String) -> Unit, label: Int) {
+                    OutlinedTextField(
+                        value = value,
+                        onValueChange = onChange,
+                        label = { Text(stringResource(label), fontSize = 14.sp) },
+                        textStyle = bookFieldTextStyle,
+                        modifier = bookFieldModifier
+                    )
+                }
+
+                inputField(title, { title = it }, R.string.game_title)
+
+                ExposedDropdownMenuBox(expanded = expandedType, onExpandedChange = { expandedType = !expandedType }) {
+                    OutlinedTextField(
+                        readOnly = true,
+                        value = type,
+                        onValueChange = {},
+                        label = { Text(stringResource(R.string.game_type), fontSize = 14.sp) },
+                        textStyle = bookFieldTextStyle,
+                        modifier = bookFieldModifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(expanded = expandedType, onDismissRequest = { expandedType = false }) {
+                        typeOptions.forEach {
+                            DropdownMenuItem(
+                                text = { Text(it, fontSize = 14.sp) },
+                                onClick = {
+                                    type = it
+                                    expandedType = false
+                                }
+                            )
+                        }
+                    }
+                }
+
+                if (type == "videogame") {
+                    inputField(platform, { platform = it }, R.string.game_platform)
+                }
+
+                inputField(publisher, { publisher = it }, R.string.game_publisher)
+                inputField(releaseDate, { releaseDate = it }, R.string.game_release_date)
+                inputField(genre, { genre = it }, R.string.game_genre)
+                inputField(language, { language = it }, R.string.game_language)
+                inputField(description, { description = it }, R.string.game_description)
+                inputField(minPlayers, { minPlayers = it.filter { c -> c.isDigit() } }, R.string.game_min_players)
+                inputField(maxPlayers, { maxPlayers = it.filter { c -> c.isDigit() } }, R.string.game_max_players)
+                inputField(durationMinutes, { durationMinutes = it.filter { c -> c.isDigit() } }, R.string.game_duration_minutes)
+                inputField(rating, { rating = it.filter { c -> c.isDigit() } }, R.string.game_rating)
+                inputField(notes, { notes = it }, R.string.game_notes)
+                inputField(location, { location = it }, R.string.game_location)
+                inputField(coverUrl, { coverUrl = it }, R.string.game_cover_url)
+                inputField(addedDate, {}, R.string.game_added_date)
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(onClick = {
+                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }) {
+                        Text(stringResource(R.string.select_from_gallery))
+                    }
+                    Button(onClick = {
+                        imageUri.value = createTempImageUri(context)
+                        imageUri.value?.let { cameraLauncher.launch(it) }
+                    }) {
+                        Text(stringResource(R.string.take_photo))
+                    }
+                }
+
+                if (uploadingCover) {
+                    CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                }
+            }
+        }
+    }
+}
