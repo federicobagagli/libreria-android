@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 
 fun isStrongPassword(password: String): Boolean {
     val lengthOk = password.length >= 8
@@ -27,6 +28,20 @@ fun isStrongPassword(password: String): Boolean {
     val special = password.any { !it.isLetterOrDigit() }
 
     return lengthOk && upper && lower && digit && special
+}
+
+fun ensureUserDocumentExists(uid: String) {
+    val userDoc = FirebaseFirestore.getInstance().collection("users").document(uid)
+    userDoc.get().addOnSuccessListener { doc ->
+        if (!doc.exists()) {
+            userDoc.set(
+                mapOf(
+                    "isPremium" to false,
+                    "isDeveloper" to false
+                )
+            )
+        }
+    }
 }
 
 
@@ -54,6 +69,10 @@ fun LoginScreen(auth: FirebaseAuth) {
                     val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
                     auth.signInWithCredential(firebaseCredential)
                         .addOnSuccessListener {
+                            val user = auth.currentUser
+                            if (user != null) {
+                                ensureUserDocumentExists(user.uid)
+                            }
                             Toast.makeText(context, context.getString(R.string.login_success), Toast.LENGTH_SHORT).show()
                             activity.recreate()
                         }
@@ -72,6 +91,7 @@ fun LoginScreen(auth: FirebaseAuth) {
         return
     }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -88,7 +108,8 @@ fun LoginScreen(auth: FirebaseAuth) {
                             .setFilterByAuthorizedAccounts(false)
                             .build()
                     )
-                    .setAutoSelectEnabled(true)
+                    //.setAutoSelectEnabled(true)
+                    .setAutoSelectEnabled(false)
                     .build()
 
                 oneTapClient.beginSignIn(signInRequest)
@@ -145,6 +166,7 @@ fun LoginScreen(auth: FirebaseAuth) {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val user = auth.currentUser
+                            user?.let { ensureUserDocumentExists(it.uid) }
                             if (user != null && !user.isEmailVerified) {
                                 user.sendEmailVerification()
                                 Toast.makeText(
@@ -183,6 +205,7 @@ fun LoginScreen(auth: FirebaseAuth) {
                     .addOnCompleteListener { registerTask ->
                         if (registerTask.isSuccessful) {
                             val user = auth.currentUser
+                            user?.let { ensureUserDocumentExists(it.uid) }
                             user?.sendEmailVerification()
                             Toast.makeText(
                                 context,
@@ -215,6 +238,8 @@ fun LoginScreen(auth: FirebaseAuth) {
             Text(text = stringResource(R.string.password_reset_title))
         }
     }
+
+
 
     if (showWeakPasswordDialog) {
         AlertDialog(

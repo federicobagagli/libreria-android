@@ -369,6 +369,10 @@
     <string name="confirm_deletion_title">Confirm deletion</string>
     <string name="confirm_delete_all_message">Are you sure you want to DELETE the ENTIRE collection? This action is irreversible.</string>
     <string name="deletion_complete">Collection successfully deleted</string>
-
+    <string name="premium_required_for_theme">Theme selection is available only for premium users.</string>
+    <string name="unlock_premium">Unlock Premium</string>
+    <string name="premium_required_title">Premium Feature</string>
+    <string name="premium_required_message">This feature is only available to premium users. Visit your profile to upgrade your account.</string>
+    <string name="theme_selection_title">Theme selection</string>
 
 </resources>

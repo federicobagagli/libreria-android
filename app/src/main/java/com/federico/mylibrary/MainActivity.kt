@@ -71,16 +71,20 @@ import com.federico.mylibrary.record.RecordBarChartsScreen
 import com.federico.mylibrary.record.RecordPieChartsScreen
 import com.federico.mylibrary.viewmodel.GameFilterViewModel
 import com.federico.mylibrary.viewmodel.MovieFilterViewModel
+import com.federico.mylibrary.viewmodel.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        Log.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
         setContent {
             val context = applicationContext
             val selectedThemeStyle by ThemePreferences.themeStyleFlow(context).collectAsState(initial = AppThemeStyle.SYSTEM)
 
 
             val coroutineScope = rememberCoroutineScope()
+
 
             LibraryAppTheme(themeStyle = selectedThemeStyle) {
                 val auth = FirebaseAuth.getInstance()
@@ -122,7 +126,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
     val recordFilterViewModel: RecordFilterViewModel = viewModel()
     val movieFilterViewModel: MovieFilterViewModel = viewModel()
     val gameFilterViewModel: GameFilterViewModel = viewModel()
-
+    val userViewModel: UserViewModel = viewModel()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -164,7 +168,8 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
                 SettingsScreen(
                     navController = navController,
                     selectedTheme = selectedTheme,
-                    onThemeSelected = onThemeSelected
+                    onThemeSelected = onThemeSelected,
+                    userViewModel = userViewModel
                 )
             }
             composable("library_room") { LibraryRoomScreen(navController) }

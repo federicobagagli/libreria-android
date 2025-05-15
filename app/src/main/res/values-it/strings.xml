@@ -365,6 +365,10 @@
     <string name="confirm_deletion_title">Conferma eliminazione</string>
     <string name="confirm_delete_all_message">Vuoi davvero eliminare TUTTA la collezione? Questa azione è irreversibile.</string>
     <string name="deletion_complete">Collezione eliminata con successo</string>
-
+    <string name="premium_required_for_theme">La selezione del tema è disponibile solo per utenti premium.</string>
+    <string name="unlock_premium">Sblocca Premium</string>
+    <string name="premium_required_title">Funzionalità Premium</string>
+    <string name="premium_required_message">Questa funzione è disponibile solo per utenti premium. Visita il tuo profilo per aggiornare l account.</string>
+    <string name="theme_selection_title">Tema</string>
 
 </resources>
