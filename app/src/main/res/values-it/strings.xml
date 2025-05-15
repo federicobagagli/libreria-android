@@ -361,5 +361,10 @@
     <string name="confirm_restore_title">Conferma ripristino</string>
     <string name="confirm_restore_message">Questa operazione sostituirà la tua libreria attuale con la versione del backup. Continuare?</string>
     <string name="last_backup_time">Ultimo backup: %1$s</string>
+    <string name="delete_entire_collection">🗑️ Elimina tutta la collezione</string>
+    <string name="confirm_deletion_title">Conferma eliminazione</string>
+    <string name="confirm_delete_all_message">Vuoi davvero eliminare TUTTA la collezione? Questa azione è irreversibile.</string>
+    <string name="deletion_complete">Collezione eliminata con successo</string>
+
 
 </resources>

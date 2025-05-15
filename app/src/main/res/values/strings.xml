@@ -365,6 +365,10 @@
     <string name="confirm_restore_title">Confirm restore</string>
     <string name="confirm_restore_message">This will replace your current library with the backup version. Continue?</string>
     <string name="last_backup_time">Last backup: %1$s</string>
+    <string name="delete_entire_collection">🗑️ Delete entire collection</string>
+    <string name="confirm_deletion_title">Confirm deletion</string>
+    <string name="confirm_delete_all_message">Are you sure you want to DELETE the ENTIRE collection? This action is irreversible.</string>
+    <string name="deletion_complete">Collection successfully deleted</string>
 
 
 </resources>
