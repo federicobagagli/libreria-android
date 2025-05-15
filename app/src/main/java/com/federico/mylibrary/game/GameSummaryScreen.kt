@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 @Composable
 fun GameSummaryScreen(navController: NavController) {
@@ -26,8 +26,16 @@ fun GameSummaryScreen(navController: NavController) {
     val context = LocalContext.current
 
     var totalGames by remember { mutableStateOf(0) }
-    var mostCommonGenre by remember { mutableStateOf<String?>(null) }
-    var lastAddedGame by remember { mutableStateOf<String?>(null) }
+
+    var totalBoardGames by remember { mutableStateOf(0) }
+    var mostCommonBoardGenre by remember { mutableStateOf<String?>(null) }
+    var lastBoardGame by remember { mutableStateOf<String?>(null) }
+
+    var totalVideoGames by remember { mutableStateOf(0) }
+    var mostCommonVideoGenre by remember { mutableStateOf<String?>(null) }
+    var lastVideoGame by remember { mutableStateOf<String?>(null) }
+
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     LaunchedEffect(userId) {
         if (userId != null) {
@@ -36,25 +44,35 @@ fun GameSummaryScreen(navController: NavController) {
                 .get()
                 .await()
 
-            totalGames = snapshot.size()
+            val all = snapshot.documents.mapNotNull { it.data }
 
-            val genres = snapshot.documents.mapNotNull {
-                it.getString("genre")?.trim()?.takeIf { g -> g.isNotEmpty() }?.lowercase()
-            }
-            mostCommonGenre = genres.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
+            totalGames = all.size
 
-            val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val boardGames = all.filter { it["type"] == "board" }
+            val videoGames = all.filter { it["type"] == "videogame" }
 
-            lastAddedGame = snapshot.documents
-                .mapNotNull { doc ->
-                    val dateStr = doc.getString("addedDate") ?: return@mapNotNull null
-                    val title = doc.getString("title") ?: return@mapNotNull null
-                    runCatching {
-                        sdf.parse(dateStr) to title
-                    }.getOrNull()
-                }
-                .maxByOrNull { it.first }
-                ?.second
+            totalBoardGames = boardGames.size
+            totalVideoGames = videoGames.size
+
+            mostCommonBoardGenre = boardGames.mapNotNull {
+                it["genre"]?.toString()?.trim()?.takeIf { g -> g.isNotEmpty() }
+            }.groupingBy { it.lowercase() }.eachCount().maxByOrNull { it.value }?.key
+
+            mostCommonVideoGenre = videoGames.mapNotNull {
+                it["genre"]?.toString()?.trim()?.takeIf { g -> g.isNotEmpty() }
+            }.groupingBy { it.lowercase() }.eachCount().maxByOrNull { it.value }?.key
+
+            lastBoardGame = boardGames.mapNotNull {
+                val date = it["addedDate"]?.toString()
+                val title = it["title"]?.toString()
+                runCatching { sdf.parse(date) to title }.getOrNull()
+            }.maxByOrNull { it.first }?.second
+
+            lastVideoGame = videoGames.mapNotNull {
+                val date = it["addedDate"]?.toString()
+                val title = it["title"]?.toString()
+                runCatching { sdf.parse(date) to title }.getOrNull()
+            }.maxByOrNull { it.first }?.second
         }
     }
 
@@ -70,13 +88,42 @@ fun GameSummaryScreen(navController: NavController) {
     ) {
         Text(stringResource(R.string.summary), style = MaterialTheme.typography.headlineMedium)
 
+        // Riepilogo totale
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(text = stringResource(R.string.total_games, totalGames))
-                mostCommonGenre?.let {
+            }
+        }
+
+        // Card: Videogiochi
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("🎮 " + stringResource(R.string.game_type_videogame), style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(R.string.total_games, totalVideoGames))
+                mostCommonVideoGenre?.let {
                     Text(text = stringResource(R.string.most_common_genre, it))
                 }
-                lastAddedGame?.let {
+                lastVideoGame?.let {
+                    Text(text = stringResource(R.string.last_added_game, it))
+                }
+            }
+        }
+
+        // Card: Giochi da tavolo
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("🎲 " + stringResource(R.string.game_type_board), style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(R.string.total_games, totalBoardGames))
+                mostCommonBoardGenre?.let {
+                    Text(text = stringResource(R.string.most_common_genre, it))
+                }
+                lastBoardGame?.let {
                     Text(text = stringResource(R.string.last_added_game, it))
                 }
             }

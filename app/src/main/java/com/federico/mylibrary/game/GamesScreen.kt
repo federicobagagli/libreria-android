@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,13 @@ fun GamesScreen(
             if (sortDirection == "desc") sorted.reversed() else sorted
         }
     }
+
+    val typeLabels = mapOf(
+        "board" to stringResource(R.string.game_type_board),
+        "videogame" to stringResource(R.string.game_type_videogame),
+        "altro" to stringResource(R.string.game_type_other)
+    )
+
 
     LaunchedEffect(userId, filters) {
         if (userId != null) {
@@ -178,11 +186,20 @@ fun GamesScreen(
                 modifier = Modifier.weight(1f)
             ) {
                 items(games) { (id, game) ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    val (cardColor, iconLabel) = when (game.type) {
+                        "videogame" -> MaterialTheme.colorScheme.surfaceVariant to "🎮"
+                        "board" -> MaterialTheme.colorScheme.tertiaryContainer to "🎲"
+                        else -> MaterialTheme.colorScheme.secondaryContainer to "🧩"
+                    }
+                    Card(modifier = Modifier.fillMaxWidth() , colors = CardDefaults.cardColors(containerColor = cardColor)) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(stringResource(R.string.game_title_label, game.title), style = MaterialTheme.typography.titleMedium)
-                            Text(stringResource(R.string.game_type_label, game.type))
-                            Text(stringResource(R.string.game_platform_label, game.platform))
+                            Text(stringResource(R.string.game_type_label, typeLabels[game.type] ?: game.type))
+                            if (game.type == "videogame") {
+                                Text(stringResource(R.string.game_platform_label, game.platform))
+                            } else if (game.type == "board") {
+                                Text(stringResource(R.string.game_publisher) + ": ${game.publisher}")
+                            }
                             Text(stringResource(R.string.game_release_date_label, game.releaseDate))
 
                             Row(

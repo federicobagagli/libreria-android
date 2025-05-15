@@ -38,7 +38,13 @@ fun EditGameScreen(navController: NavController, backStackEntry: NavBackStackEnt
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-    val typeOptions = listOf("board", "videogame", "altro")
+    val typeOptions = listOf(
+        stringResource(R.string.game_type_board),
+        stringResource(R.string.game_type_videogame),
+        stringResource(R.string.game_type_other)
+    )
+    val typeKeys = listOf("board", "videogame", "altro")
+
 
     var title by remember { mutableStateOf("") }
     var type by remember { mutableStateOf(typeOptions[0]) }
@@ -197,21 +203,23 @@ fun EditGameScreen(navController: NavController, backStackEntry: NavBackStackEnt
 
                 inputField(title, { title = it }, R.string.game_title)
 
+                val selectedIndex = typeKeys.indexOf(type).coerceAtLeast(0)
+
                 ExposedDropdownMenuBox(expanded = expandedType, onExpandedChange = { expandedType = !expandedType }) {
                     OutlinedTextField(
                         readOnly = true,
-                        value = type,
+                        value = typeOptions[selectedIndex],
                         onValueChange = {},
-                        label = { Text(stringResource(R.string.game_type), fontSize = 14.sp) },
-                        textStyle = bookFieldTextStyle,
-                        modifier = bookFieldModifier.menuAnchor()
+                        label = { Text(stringResource(R.string.game_type)) },
+                        modifier = Modifier.fillMaxWidth()
                     )
+
                     ExposedDropdownMenu(expanded = expandedType, onDismissRequest = { expandedType = false }) {
-                        typeOptions.forEach {
+                        typeOptions.forEachIndexed { index, label ->
                             DropdownMenuItem(
-                                text = { Text(it, fontSize = 14.sp) },
+                                text = { Text(label) },
                                 onClick = {
-                                    type = it
+                                    type = typeKeys[index]
                                     expandedType = false
                                 }
                             )
