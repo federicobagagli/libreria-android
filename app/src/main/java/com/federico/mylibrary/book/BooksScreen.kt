@@ -20,17 +20,22 @@ import com.federico.mylibrary.export.BookExportItem
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.model.Book
 import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
+import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
+import com.federico.mylibrary.util.PremiumBlocker
+
 
 @Composable
 fun BooksScreen(
     navController: NavController,
     exportViewModel: ExportViewModel,
-    filterViewModel: LibraryFilterViewModel
+    filterViewModel: LibraryFilterViewModel,
+    userViewModel: UserViewModel
 ) {
+    val isPremium by userViewModel.isPremium.collectAsState()
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid
     val filters by filterViewModel.filterState.collectAsState()
@@ -61,7 +66,7 @@ fun BooksScreen(
                 .get()
                 .await()
 
-            booksRaw  = snapshot.documents.mapNotNull {
+            booksRaw = snapshot.documents.mapNotNull {
                 val book = it.toObject<Book>()
                 if (book != null) it.id to book else null
             }.filter { (_, book) ->
@@ -106,41 +111,47 @@ fun BooksScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Button(
-                    onClick = {
-                        exportViewModel.setExportData(
-                            items = books.map { (_, book) ->
-                                BookExportItem(
-                                    title = book.title,
-                                    author = book.author,
-                                    publisher = book.publisher,
-                                    genre = book.genre,
-                                    language = book.language,
-                                    description = book.description,
-                                    pageCount = book.pageCount,
-                                    format = book.format,
-                                    readingStatus = book.readingStatus,
-                                    addedDate = book.addedDate,
-                                    rating = book.rating,
-                                    notes = book.notes,
-                                    coverUrl = book.coverUrl,
-                                    publishDate = book.publishDate,
-                                    location = book.location
-                                )
-                            },
-                            fileName = "library_export.csv"
-                        )
-                        navController.navigate("exportView")
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("📤 " + stringResource(R.string.export_title_book))
+                PremiumBlocker(isPremium = isPremium, modifier = Modifier.weight(1f)) {
+                    Button(
+                        onClick = {
+                            exportViewModel.setExportData(
+                                items = books.map { (_, book) ->
+                                    BookExportItem(
+                                        title = book.title,
+                                        author = book.author,
+                                        publisher = book.publisher,
+                                        genre = book.genre,
+                                        language = book.language,
+                                        description = book.description,
+                                        pageCount = book.pageCount,
+                                        format = book.format,
+                                        readingStatus = book.readingStatus,
+                                        addedDate = book.addedDate,
+                                        rating = book.rating,
+                                        notes = book.notes,
+                                        coverUrl = book.coverUrl,
+                                        publishDate = book.publishDate,
+                                        location = book.location
+                                    )
+                                },
+                                fileName = "library_export.csv"
+                            )
+                            navController.navigate("exportView")
+                        },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("📤 " + stringResource(R.string.export_title_book))
+                    }
                 }
 
                 Button(
                     onClick = {
                         filterViewModel.clearFilters()
-                        Toast.makeText(context, context.getString(R.string.filters_cleared), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.filters_cleared),
+                            Toast.LENGTH_SHORT
+                        ).show()
                         navController.navigate("view_library") {
                             popUpTo("books") { inclusive = true }
                         }
@@ -158,40 +169,63 @@ fun BooksScreen(
                     Text(stringResource(R.string.sort_button))
                 }
 
-                DropdownMenu(expanded = showFieldMenu, onDismissRequest = { showFieldMenu = false }) {
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_title)) }, onClick = {
-                        sortField = "title"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_author)) }, onClick = {
-                        sortField = "author"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_added_date)) }, onClick = {
-                        sortField = "addedDate"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_rating)) }, onClick = {
-                        sortField = "rating"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_genre)) }, onClick = {
-                        sortField = "genre"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_publisher)) }, onClick = {
-                        sortField = "publisher"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_publish_date)) }, onClick = {
-                        sortField = "publishDate"; showFieldMenu = false; showDirectionMenu = true
-                    })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_by_location)) }, onClick = {
-                        sortField = "location"; showFieldMenu = false; showDirectionMenu = true
-                    })
+                DropdownMenu(
+                    expanded = showFieldMenu,
+                    onDismissRequest = { showFieldMenu = false }) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_title)) },
+                        onClick = {
+                            sortField = "title"; showFieldMenu = false; showDirectionMenu = true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_author)) },
+                        onClick = {
+                            sortField = "author"; showFieldMenu = false; showDirectionMenu = true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_added_date)) },
+                        onClick = {
+                            sortField = "addedDate"; showFieldMenu = false; showDirectionMenu = true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_rating)) },
+                        onClick = {
+                            sortField = "rating"; showFieldMenu = false; showDirectionMenu = true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_genre)) },
+                        onClick = {
+                            sortField = "genre"; showFieldMenu = false; showDirectionMenu = true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_publisher)) },
+                        onClick = {
+                            sortField = "publisher"; showFieldMenu = false; showDirectionMenu = true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_publish_date)) },
+                        onClick = {
+                            sortField = "publishDate"; showFieldMenu = false; showDirectionMenu =
+                            true
+                        })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_by_location)) },
+                        onClick = {
+                            sortField = "location"; showFieldMenu = false; showDirectionMenu = true
+                        })
                 }
 
-                DropdownMenu(expanded = showDirectionMenu, onDismissRequest = { showDirectionMenu = false }) {
+                DropdownMenu(
+                    expanded = showDirectionMenu,
+                    onDismissRequest = { showDirectionMenu = false }) {
                     DropdownMenuItem(text = { Text(stringResource(R.string.sort_asc)) }, onClick = {
                         sortDirection = "asc"; showDirectionMenu = false
                     })
-                    DropdownMenuItem(text = { Text(stringResource(R.string.sort_desc)) }, onClick = {
-                        sortDirection = "desc"; showDirectionMenu = false
-                    })
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.sort_desc)) },
+                        onClick = {
+                            sortDirection = "desc"; showDirectionMenu = false
+                        })
                 }
             }
 
@@ -247,7 +281,7 @@ fun BooksScreen(
                     FirebaseFirestore.getInstance().collection("books").document(bookId)
                         .delete()
                         .addOnSuccessListener {
-                            booksRaw  = booksRaw.filterNot { it.first == bookId }
+                            booksRaw = booksRaw.filterNot { it.first == bookId }
                         }
                     bookToDelete = null
                 }) {
@@ -264,6 +298,7 @@ fun BooksScreen(
         )
     }
 }
+
 fun bookSortKey(book: Book, field: String): Comparable<*> {
     return when (field) {
         "title" -> book.title.lowercase()

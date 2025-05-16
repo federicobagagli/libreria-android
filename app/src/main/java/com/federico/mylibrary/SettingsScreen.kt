@@ -41,7 +41,13 @@ fun SettingsScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Button(
-            onClick = { navController.navigate("backup") },
+            onClick = {
+                if (isPremium) {
+                    navController.navigate("backup")
+                } else {
+                    showUpgradeDialog = true
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.backup_section_title))
