@@ -55,6 +55,8 @@ fun LoginScreen(auth: FirebaseAuth) {
     var password by remember { mutableStateOf("") }
     var showReset by remember { mutableStateOf(false) }
     var showWeakPasswordDialog by remember { mutableStateOf(false) }
+    val loginEnabled = email.isNotBlank() && password.isNotBlank()
+
 
     val oneTapClient = remember { Identity.getSignInClient(context) }
 
@@ -188,10 +190,12 @@ fun LoginScreen(auth: FirebaseAuth) {
                         }
                     }
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = loginEnabled
         ) {
             Text(stringResource(R.string.login_button))
         }
+
 
         Spacer(modifier = Modifier.height(12.dp))
 
