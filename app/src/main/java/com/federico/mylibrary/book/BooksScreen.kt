@@ -111,38 +111,38 @@ fun BooksScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                PremiumBlocker(isPremium = isPremium, modifier = Modifier.weight(1f)) {
-                    Button(
-                        onClick = {
-                            exportViewModel.setExportData(
-                                items = books.map { (_, book) ->
-                                    BookExportItem(
-                                        title = book.title,
-                                        author = book.author,
-                                        publisher = book.publisher,
-                                        genre = book.genre,
-                                        language = book.language,
-                                        description = book.description,
-                                        pageCount = book.pageCount,
-                                        format = book.format,
-                                        readingStatus = book.readingStatus,
-                                        addedDate = book.addedDate,
-                                        rating = book.rating,
-                                        notes = book.notes,
-                                        coverUrl = book.coverUrl,
-                                        publishDate = book.publishDate,
-                                        location = book.location
-                                    )
-                                },
-                                fileName = "library_export.csv"
-                            )
-                            navController.navigate("exportView")
-                        },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("📤 " + stringResource(R.string.export_title_book))
+                PremiumBlocker(
+                    isPremium = isPremium,
+                    modifier = Modifier.weight(1f),
+                    onClickAllowed = {
+                        exportViewModel.setExportData(
+                            items = books.map { (_, book) ->
+                                BookExportItem(
+                                    title = book.title,
+                                    author = book.author,
+                                    publisher = book.publisher,
+                                    genre = book.genre,
+                                    language = book.language,
+                                    description = book.description,
+                                    pageCount = book.pageCount,
+                                    format = book.format,
+                                    readingStatus = book.readingStatus,
+                                    addedDate = book.addedDate,
+                                    rating = book.rating,
+                                    notes = book.notes,
+                                    coverUrl = book.coverUrl,
+                                    publishDate = book.publishDate,
+                                    location = book.location
+                                )
+                            },
+                            fileName = "library_export.csv"
+                        )
+                        navController.navigate("exportView")
                     }
+                ) {
+                    Text("📤 " + stringResource(R.string.export_title_book))
                 }
+
 
                 Button(
                     onClick = {
