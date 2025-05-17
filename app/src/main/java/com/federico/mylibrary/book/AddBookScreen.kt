@@ -1,6 +1,8 @@
 package com.federico.mylibrary.book
 
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -42,6 +44,10 @@ import com.federico.mylibrary.createTempImageUri
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.mlkit.vision.common.InputImage
 import com.federico.mylibrary.uploadCompressedImage
+import android.os.Build
+import androidx.core.content.ContextCompat
+import com.federico.mylibrary.createMediaStoreImageUri
+import com.federico.mylibrary.util.logCheckpoint
 
 @Serializable
 data class BookInfo(
@@ -117,6 +123,13 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddBookScreen() {
+
+    //test debug
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var errorStackTrace by remember { mutableStateOf("") }
+    //fine test debug
+
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     var uploadingCover by remember { mutableStateOf(false) }
     var showIsbnHelpDialog by remember { mutableStateOf(false) }
@@ -317,9 +330,41 @@ fun AddBookScreen() {
             } catch (e: Exception) {
                 Log.e("PhotoPicker", "Errore upload: ${e.message}", e)
                 Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+
+
+
+
+                val sw = java.io.StringWriter()
+                e.printStackTrace(java.io.PrintWriter(sw))
+                errorStackTrace = sw.toString()
+                showErrorDialog = true
+                Log.e("DEBUG_DIALOG", "Errore stacktrace", e)
+
+
             } finally {
                 uploadingCover = false
             }
+        }
+    }
+
+    val imagePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val galleryPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.READ_MEDIA_IMAGES] == true
+        if (granted) {
+            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -341,6 +386,16 @@ fun AddBookScreen() {
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
+
+
+                    val sw = java.io.StringWriter()
+                    e.printStackTrace(java.io.PrintWriter(sw))
+                    errorStackTrace = sw.toString()
+                    showErrorDialog = true
+                    Log.e("DEBUG_DIALOG", "Errore stacktrace", e)
+
+
+
                 } finally {
                     uploadingCover = false
                 }
@@ -349,7 +404,6 @@ fun AddBookScreen() {
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-
         // 🔼 Bottoni fissi in alto
         Surface(shadowElevation = 4.dp) {
             Column(modifier = Modifier
@@ -578,14 +632,70 @@ fun AddBookScreen() {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
-                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    logCheckpoint(context, "📸 bottone galleria premuto")
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            imagePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                        } else {
+                            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                    } catch (e: Exception) {
+                        logCheckpoint(context, "❌ errore galleria", e)
+                        val sw = java.io.StringWriter()
+                        e.printStackTrace(java.io.PrintWriter(sw))
+                        errorStackTrace = sw.toString()
+                        showErrorDialog = true
+                        Log.e("GALLERY_ERROR", "Errore lancio galleria", e)
+                    }
                 }) {
                     Text(stringResource(R.string.select_from_gallery))
                 }
 
                 Button(onClick = {
-                    imageUri.value = createTempImageUri(context)
-                    imageUri.value?.let { cameraLauncher.launch(it) }
+                    logCheckpoint(context, "📸 bottone fotocamera premuto")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        val permission = Manifest.permission.CAMERA
+                        val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+                        if (!granted) {
+                            // Richiedi il permesso in modo esplicito
+                            permissionLauncher.launch(permission)
+                            return@Button
+                        }
+                    }
+                    try {
+                        val uri = createTempImageUri(context)
+                        /*
+                        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            createMediaStoreImageUri(context)
+                        } else {
+                            createTempImageUri(context)
+                        }
+
+                         */
+                        imageUri.value = uri
+                        Toast.makeText(context, "📸 URI: $uri", Toast.LENGTH_SHORT).show()
+                        Log.d("DEBUG_URI", "Uri generato: $uri")
+                        Toast.makeText(context, "Uri: $uri", Toast.LENGTH_SHORT).show()
+
+
+// PATCH: concedi temporaneamente i permessi di scrittura
+                        context.grantUriPermission(
+                            "com.android.camera", // oppure "*" per concedere a tutte
+                            uri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+
+
+                        cameraLauncher.launch(uri)
+                    } catch (e: Exception) {
+                        logCheckpoint(context, "❌ errore fotocamera", e)
+                        val sw = java.io.StringWriter()
+                        e.printStackTrace(java.io.PrintWriter(sw))
+                        errorStackTrace = sw.toString()
+                        showErrorDialog = true
+                        Log.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
+                    }
                 }) {
                     Text(stringResource(R.string.take_photo))
                 }
@@ -593,6 +703,24 @@ fun AddBookScreen() {
 
             if (uploadingCover) {
                 CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+            }
+            if (showErrorDialog) {
+                AlertDialog(
+                    onDismissRequest = { showErrorDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = { showErrorDialog = false }) {
+                            Text(stringResource(R.string.ok))
+                        }
+                    },
+                    title = { Text("Errore tecnico") },
+                    text = {
+                        Box(modifier = Modifier
+                            .heightIn(min = 100.dp, max = 400.dp)
+                            .verticalScroll(rememberScrollState())) {
+                            Text(errorStackTrace, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                )
             }
 
 

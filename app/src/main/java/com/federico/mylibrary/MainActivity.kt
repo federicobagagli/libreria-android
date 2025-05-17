@@ -3,6 +3,7 @@
 package com.federico.mylibrary
 
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -31,6 +32,7 @@ import com.federico.mylibrary.book.LibraryRoomScreen
 import com.federico.mylibrary.book.LibrarySummaryScreen
 import com.federico.mylibrary.book.ViewLibraryScreen
 import com.federico.mylibrary.datastore.ThemePreferences
+import com.federico.mylibrary.debug.CrashScreen
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.ExportViewScreen
 import com.federico.mylibrary.game.AddGameScreen
@@ -182,7 +184,8 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
                 BooksScreen(
                     navController = navController,
                     exportViewModel = exportViewModel,
-                    filterViewModel = libraryFilterViewModel
+                    filterViewModel = libraryFilterViewModel,
+                    userViewModel = userViewModel
                 )
             }
             composable("details_book/{bookId}") { backStackEntry ->

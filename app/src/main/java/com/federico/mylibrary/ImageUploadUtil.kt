@@ -80,12 +80,23 @@ suspend fun uploadCompressedImage(
 
 
 fun createTempImageUri(context: Context): Uri {
-    val file = File(context.cacheDir, "temp_photo.jpg").apply {
-        if (!exists()) createNewFile()
-    }
+    val file = File(context.getExternalFilesDir(null), "camera_temp_${System.currentTimeMillis()}.jpg")
     return FileProvider.getUriForFile(
         context,
         "${context.packageName}.fileprovider",
         file
     )
+}
+
+fun createMediaStoreImageUri(context: Context): Uri? {
+    val contentValues = android.content.ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, "cover_${System.currentTimeMillis()}.jpg")
+        put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MyLibrary")
+        put(MediaStore.Images.Media.IS_PENDING, 1)
+    }
+
+    val contentResolver = context.contentResolver
+    val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    return uri
 }
