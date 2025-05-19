@@ -15,6 +15,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.federico.mylibrary.R
 import com.federico.mylibrary.model.Game
+import com.federico.mylibrary.util.Logger
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -30,7 +31,7 @@ fun DetailsGameScreen(navController: NavController, backStackEntry: NavBackStack
     LaunchedEffect(gameId) {
         val doc = db.collection("games").document(gameId).get().await()
         game = doc.toObject(Game::class.java)
-        Log.d("COVER_URL", "URL = ${game?.coverUrl}")
+        Logger.d("COVER_URL", "URL = ${game?.coverUrl}")
         isLoading = false
     }
 

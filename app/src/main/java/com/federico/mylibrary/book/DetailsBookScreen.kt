@@ -17,6 +17,7 @@ import com.federico.mylibrary.model.Book
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import coil.compose.AsyncImage
+import com.federico.mylibrary.util.Logger
 
 @Composable
 fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStackEntry) {
@@ -30,7 +31,7 @@ fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStack
     LaunchedEffect(bookId) {
         val doc = db.collection("books").document(bookId).get().await()
         book = doc.toObject(Book::class.java)
-        Log.d("COVER_URL", "URL = ${book?.coverUrl}")
+        Logger.d("COVER_URL", "URL = ${book?.coverUrl}")
         isLoading = false
     }
 

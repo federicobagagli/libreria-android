@@ -21,6 +21,7 @@ import com.federico.mylibrary.R
 import com.federico.mylibrary.uploadCompressedImage
 import com.federico.mylibrary.createTempImageUri
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -80,6 +81,8 @@ fun AddRecordScreen(navController: NavController) {
                         Toast.LENGTH_SHORT
                     ).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in AddRecordScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(
                         context,
                         context.getString(R.string.upload_failed, e.message ?: ""),
@@ -108,6 +111,8 @@ fun AddRecordScreen(navController: NavController) {
                         Toast.LENGTH_SHORT
                     ).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in AddRecordScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(
                         context,
                         context.getString(R.string.upload_failed, e.message ?: ""),

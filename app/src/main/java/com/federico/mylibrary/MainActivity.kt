@@ -76,13 +76,14 @@ import com.federico.mylibrary.viewmodel.MovieFilterViewModel
 import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.federico.mylibrary.book.IsbnScannerScreen
+import com.federico.mylibrary.util.Logger
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
         val currentUser = FirebaseAuth.getInstance().currentUser
-        Log.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
+        Logger.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
         setContent {
             val context = applicationContext
             val selectedThemeStyle by ThemePreferences.themeStyleFlow(context).collectAsState(initial = AppThemeStyle.SYSTEM)
@@ -295,15 +296,15 @@ fun BottomNavigationBar(navController: NavHostController, currentDestination: an
                 selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                 onClick = {
                     if (item.route == "back") {
-                        Log.d("BottomNav", "Back button clicked")
+                        Logger.d("BottomNav", "Back button clicked")
                         val popped = navController.popBackStack()
                         if (!popped) {
-                            Log.d("BottomNav", "Nothing to pop, navigating to living_room")
+                            Logger.d("BottomNav", "Nothing to pop, navigating to living_room")
                             navController.navigate("living_room") {
                                 popUpTo(0) { inclusive = true }
                             }
                         } else {
-                            Log.d("BottomNav", "Navigated back successfully")
+                            Logger.d("BottomNav", "Navigated back successfully")
                         }
                     } else {
                         navController.navigate(item.route)

@@ -38,6 +38,7 @@ import java.util.Locale
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
+import com.federico.mylibrary.util.Logger
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,6 +103,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in EditBookScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false
@@ -147,6 +150,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in EditBookScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false
@@ -407,8 +412,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                         } catch (e: Exception) {
                             FirebaseCrashlytics.getInstance().recordException(e)
                             val sw = java.io.StringWriter()
-                            e.printStackTrace(java.io.PrintWriter(sw))
-                            Log.e("GALLERY_ERROR", "EditBook Errore lancio galleria", e)
+                            Logger.e("GALLERY_ERROR", "EditBook Errore lancio galleria", e)
                         }
                     }) {
                         Text(stringResource(R.string.select_from_gallery))
@@ -440,8 +444,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                             FirebaseCrashlytics.getInstance().recordException(e)
                             FirebaseCrashlytics.getInstance().log("EditBook crash in addBook con fotocamera")
                             val sw = java.io.StringWriter()
-                            e.printStackTrace(java.io.PrintWriter(sw))
-                            Log.e("CAMERA_ERROR", "EditBook Errore durante il lancio fotocamera", e)
+                            Logger.e("CAMERA_ERROR", "EditBook Errore durante il lancio fotocamera", e)
                             FirebaseCrashlytics.getInstance().recordException(e)
                         }
                     }) {

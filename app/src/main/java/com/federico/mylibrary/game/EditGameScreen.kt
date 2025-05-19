@@ -24,6 +24,7 @@ import com.federico.mylibrary.uploadCompressedImage
 import com.federico.mylibrary.ui.bookFieldModifier
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -81,6 +82,8 @@ fun EditGameScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     coverUrl = uploadCompressedImage(context, it, userId, folder = "games")
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in EditGameScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false
@@ -99,6 +102,8 @@ fun EditGameScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     coverUrl = uploadCompressedImage(context, imageUri.value!!, userId, folder = "games")
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in EditGameScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false

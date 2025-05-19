@@ -94,7 +94,7 @@ suspend fun searchMoviesFromTmdb(title: String): List<MovieInfoLite> {
             )
         }
     } catch (e: Exception) {
-        Log.e("TMDB_SEARCH", "Errore durante la ricerca TMDb: ${e.message}", e)
+        Logger.e("TMDB_SEARCH", "Errore durante la ricerca TMDb: ${e.message}", e)
         emptyList()
     } finally {
         client.close()
@@ -135,7 +135,7 @@ suspend fun fetchMovieDetailsFromTmdb(id: Int): MovieInfo? {
             language = language
         )
     } catch (e: Exception) {
-        Log.e("TMDB_DETAILS", "Errore durante fetch dettagli TMDb: ${e.message}", e)
+        Logger.e("TMDB_DETAILS", "Errore durante fetch dettagli TMDb: ${e.message}", e)
         null
     } finally {
         client.close()

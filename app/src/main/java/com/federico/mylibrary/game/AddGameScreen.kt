@@ -24,6 +24,7 @@ import com.federico.mylibrary.uploadCompressedImage
 import com.federico.mylibrary.ui.bookFieldModifier
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -80,6 +81,8 @@ fun AddGameScreen() {
                 coverUrl = downloadUrl
                 Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().log("crash in AddGameScreen")
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
             } finally {
                 uploadingCover = false
@@ -98,6 +101,8 @@ fun AddGameScreen() {
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in AddGameScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false

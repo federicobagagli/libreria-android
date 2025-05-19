@@ -13,14 +13,14 @@ fun logCheckpoint(context: Context, tag: String, throwable: Throwable? = null) {
     val stack = throwable?.stackTraceToString().orEmpty()
 
     // ✅ Log locale (visibile in Logcat)
-    Log.d("LOG_CHECKPOINT", "📍 [$tag] - user=$userId")
-    if (stack.isNotBlank()) Log.d("LOG_CHECKPOINT", stack)
+    Logger.d("LOG_CHECKPOINT", "📍 [$tag] - user=$userId")
+    if (stack.isNotBlank()) Logger.d("LOG_CHECKPOINT", stack)
 
     // ✅ Toast locale per debugging visivo (opzionale)
     Toast.makeText(context, "📍 $tag", Toast.LENGTH_SHORT).show()
 
     if (userId == null) {
-        Log.w("LOG_CHECKPOINT", "❌ Impossibile salvare log: utente non autenticato")
+        Logger.w("LOG_CHECKPOINT", "❌ Impossibile salvare log: utente non autenticato")
         return
     }
 
@@ -38,9 +38,9 @@ fun logCheckpoint(context: Context, tag: String, throwable: Throwable? = null) {
         .collection("log")
         .add(entry)
         .addOnSuccessListener {
-            Log.d("LOG_CHECKPOINT", "✅ Log salvato su Firestore: $tag")
+            Logger.d("LOG_CHECKPOINT", "✅ Log salvato su Firestore: $tag")
         }
         .addOnFailureListener {
-            Log.e("LOG_CHECKPOINT", "❌ Fallito salvataggio log: ${it.message}")
+            Logger.e("LOG_CHECKPOINT", "❌ Fallito salvataggio log: ${it.message}")
         }
 }

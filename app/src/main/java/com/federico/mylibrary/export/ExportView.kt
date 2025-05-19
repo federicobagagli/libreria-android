@@ -30,6 +30,7 @@ import androidx.compose.ui.text.AnnotatedString
 import android.content.ContentValues
 import android.provider.MediaStore
 import android.os.Build
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.io.OutputStream
 
 @Composable
@@ -126,7 +127,8 @@ fun exportToCsvFile(context: Context, content: String, fileName: String): File? 
         }
         file
     } catch (e: Exception) {
-        e.printStackTrace()
+        FirebaseCrashlytics.getInstance().log("crash in exportToCsvFile")
+        FirebaseCrashlytics.getInstance().recordException(e)
         null
     }
 }

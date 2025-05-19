@@ -2,6 +2,7 @@
 agp = "8.10.0"
 charts = "1.0.1"
 firebaseAuthKtx = "23.2.0"
+firebaseBom = "32.7.2"
 firebaseFirestoreKtx = "25.1.4"
 kotlin = "2.0.21"
 coreKtx = "1.10.1"
@@ -16,6 +17,7 @@ composeBom = "2024.09.00"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 charts = { module = "com.github.tehras:charts", version.ref = "charts" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

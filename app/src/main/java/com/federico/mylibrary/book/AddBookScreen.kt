@@ -50,6 +50,7 @@ import com.federico.mylibrary.createMediaStoreImageUri
 import com.federico.mylibrary.util.logCheckpoint
 import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavHostController
+import com.federico.mylibrary.util.Logger
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Serializable
@@ -84,7 +85,7 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
                 parameters.append("key", apiKey)
             }
         }.body()
-        Log.d("GoogleBooksAPI", "Response JSON: $response")
+        Logger.d("GoogleBooksAPI", "Response JSON: $response")
         val items = response["items"]?.jsonArray ?: return null
         val volumeInfo = items[0].jsonObject["volumeInfo"]?.jsonObject ?: return null
 
@@ -220,11 +221,11 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
             val image = InputImage.fromBitmap(bitmap, 0)
 
             Toast.makeText(context, context.getString(R.string.processing_image), Toast.LENGTH_SHORT).show()
-            Log.d("ScanISBN", "Elaborazione immagine per barcode...")
+            Logger.d("ScanISBN", "Elaborazione immagine per barcode...")
 
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    Log.d("ScanISBN", "Barcode trovati: ${barcodes.size}")
+                    Logger.d("ScanISBN", "Barcode trovati: ${barcodes.size}")
 
                     val isbnBarcode = barcodes.firstOrNull {
                         Toast.makeText(context, "Rilevato: ${it.rawValue}", Toast.LENGTH_SHORT)
@@ -236,7 +237,7 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
 
                     if (isbn != null) {
                         Toast.makeText(context, context.getString(R.string.isbn_found, isbn), Toast.LENGTH_SHORT).show()
-                        Log.d("ScanISBN", "ISBN valido: $isbn")
+                        Logger.d("ScanISBN", "ISBN valido: $isbn")
 
                         coroutineScope.launch {
                             val book =
@@ -261,7 +262,7 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                                     context.getString(R.string.text_recognized),
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                Log.d(
+                                Logger.d(
                                     "ScanISBN",
                                     "Libro trovato: ${book.title} - ${book.authors.joinToString(", ") { it.name }}"
                                 )
@@ -271,12 +272,12 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                                     context.getString(R.string.no_book_found),
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                Log.d("ScanISBN", "Nessun libro trovato via Google Books API")
+                                Logger.d("ScanISBN", "Nessun libro trovato via Google Books API")
                             }
                         }
                     } else {
                         showIsbnHelpDialog = true
-                        Log.d("ScanISBN", "Nessun ISBN EAN-13 valido trovato.")
+                        Logger.d("ScanISBN", "Nessun ISBN EAN-13 valido trovato.")
                     }
                 }
                 .addOnFailureListener {
@@ -285,11 +286,11 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                         "${context.getString(R.string.error_prefix)} ${it.message}",
                         Toast.LENGTH_SHORT
                     ).show()
-                    Log.e("ScanISBN", "Errore scansione barcode: ${it.message}")
+                    Logger.e("ScanISBN", "Errore scansione barcode: ${it.message}")
                 }
         } else {
             Toast.makeText(context, context.getString(R.string.no_image_captured), Toast.LENGTH_SHORT).show()
-            Log.d("ScanISBN", "Bitmap nullo ricevuto dal TakePicturePreview.")
+            Logger.d("ScanISBN", "Bitmap nullo ricevuto dal TakePicturePreview.")
         }
     }
     val scrollState = rememberScrollState()
@@ -328,11 +329,11 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri == null) {
-            Log.d("PhotoPicker", "Nessuna immagine selezionata")
+            Logger.d("PhotoPicker", "Nessuna immagine selezionata")
             return@rememberLauncherForActivityResult
         }
 
-        Log.d("PhotoPicker", "URI selezionato: $uri")
+        Logger.d("PhotoPicker", "URI selezionato: $uri")
         uploadingCover = true
         coroutineScope.launch {
             try {
@@ -345,17 +346,16 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                 coverUrl = downloadUrl
                 Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Log.e("PhotoPicker", "Errore upload: ${e.message}", e)
+                FirebaseCrashlytics.getInstance().log("crash in addBook con fotocamera")
+                FirebaseCrashlytics.getInstance().recordException(e)
+                Logger.e("PhotoPicker", "Errore upload: ${e.message}", e)
                 Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
 
 
-
-
                 val sw = java.io.StringWriter()
-                e.printStackTrace(java.io.PrintWriter(sw))
                 errorStackTrace = sw.toString()
                 showErrorDialog = true
-                Log.e("DEBUG_DIALOG", "Errore stacktrace", e)
+                Logger.e("DEBUG_DIALOG", "Errore stacktrace", e)
 
 
             } finally {
@@ -402,14 +402,15 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in AddBookScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
 
 
                     val sw = java.io.StringWriter()
-                    e.printStackTrace(java.io.PrintWriter(sw))
                     errorStackTrace = sw.toString()
                     showErrorDialog = true
-                    Log.e("DEBUG_DIALOG", "Errore stacktrace", e)
+                    Logger.e("DEBUG_DIALOG", "Errore stacktrace", e)
 
 
 
@@ -696,12 +697,13 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                                 photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                             }
                         } catch (e: Exception) {
-                            logCheckpoint(context, "❌ errore galleria", e)
+                            //logCheckpoint(context, "❌ errore galleria", e)
+                            FirebaseCrashlytics.getInstance().log("crash in AddBookScreen")
+                            FirebaseCrashlytics.getInstance().recordException(e)
                             val sw = java.io.StringWriter()
-                            e.printStackTrace(java.io.PrintWriter(sw))
                             errorStackTrace = sw.toString()
                             showErrorDialog = true
-                            Log.e("GALLERY_ERROR", "Errore lancio galleria", e)
+                            Logger.e("GALLERY_ERROR", "Errore lancio galleria", e)
                         }
                     }
                 },
@@ -736,7 +738,7 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                              */
                             imageUri.value = uri
                             Toast.makeText(context, "📸 URI: $uri", Toast.LENGTH_SHORT).show()
-                            Log.d("DEBUG_URI", "Uri generato: $uri")
+                            Logger.d("DEBUG_URI", "Uri generato: $uri")
                             Toast.makeText(context, "Uri: $uri", Toast.LENGTH_SHORT).show()
 
 
@@ -754,10 +756,9 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                             FirebaseCrashlytics.getInstance().recordException(e)
                             logCheckpoint(context, "❌ errore fotocamera", e)
                             val sw = java.io.StringWriter()
-                            e.printStackTrace(java.io.PrintWriter(sw))
                             errorStackTrace = sw.toString()
                             showErrorDialog = true
-                            Log.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
+                            Logger.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
                         }
                     }
                 }, modifier = Modifier.testTag("takePhotoButton")

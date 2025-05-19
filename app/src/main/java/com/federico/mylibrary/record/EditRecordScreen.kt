@@ -27,6 +27,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import androidx.compose.ui.text.input.KeyboardType
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,6 +80,8 @@ fun EditRecordScreen(navController: NavController, backStackEntry: NavBackStackE
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in EditRecordScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploading = false
@@ -98,6 +101,8 @@ fun EditRecordScreen(navController: NavController, backStackEntry: NavBackStackE
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in EditRecordScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploading = false

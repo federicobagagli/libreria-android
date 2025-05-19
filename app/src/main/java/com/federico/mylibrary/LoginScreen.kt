@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 
 fun isStrongPassword(password: String): Boolean {
@@ -83,6 +84,8 @@ fun LoginScreen(auth: FirebaseAuth) {
                         }
                 }
             } catch (e: Exception) {
+                FirebaseCrashlytics.getInstance().log("Login crash")
+                FirebaseCrashlytics.getInstance().recordException(e)
                 Toast.makeText(context, context.getString(R.string.login_failed, e.message ?: ""), Toast.LENGTH_SHORT).show()
             }
         }
@@ -122,6 +125,8 @@ fun LoginScreen(auth: FirebaseAuth) {
                                 IntentSenderRequest.Builder(intentSender).build()
                             )
                         } catch (e: IntentSender.SendIntentException) {
+                            FirebaseCrashlytics.getInstance().log("crash in googleLoginLauncher")
+                            FirebaseCrashlytics.getInstance().recordException(e)
                             Toast.makeText(context, context.getString(R.string.google_intent_error, e.message ?: ""), Toast.LENGTH_SHORT).show()
                         }
                     }

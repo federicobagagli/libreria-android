@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.federico.mylibrary.ui.ThemeSelector
 import com.federico.mylibrary.ui.theme.AppThemeStyle
+import com.federico.mylibrary.util.Logger
 import com.federico.mylibrary.util.deleteUserAndData
 import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -110,20 +111,20 @@ fun SettingsScreen(
 
                             docRef.update("isPremium", newValue)
                                 .addOnSuccessListener {
-                                    Log.d("TOGGLE_PREMIUM", "✅ isPremium aggiornato a $newValue")
+                                    Logger.d("TOGGLE_PREMIUM", "✅ isPremium aggiornato a $newValue")
                                     Toast.makeText(context,
                                         "isPremium aggiornato a $newValue",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
                                 .addOnFailureListener {
-                                    Log.e("TOGGLE_PREMIUM", "❌ Errore update: ${it.message}")
+                                    Logger.e("TOGGLE_PREMIUM", "❌ Errore update: ${it.message}")
                                 }
                         } else {
-                            Log.e("TOGGLE_PREMIUM", "❌ Documento utente non trovato.")
+                            Logger.e("TOGGLE_PREMIUM", "❌ Documento utente non trovato.")
                         }
                     }.addOnFailureListener {
-                        Log.e("TOGGLE_PREMIUM", "❌ Errore lettura documento: ${it.message}")
+                        Logger.e("TOGGLE_PREMIUM", "❌ Errore lettura documento: ${it.message}")
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

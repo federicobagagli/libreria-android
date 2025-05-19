@@ -59,7 +59,7 @@ android {
         }
         getByName("release") {
             isMinifyEnabled = false
-            isDebuggable = true
+            isDebuggable = true //per produzione serve false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -82,6 +82,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.0")
     implementation("androidx.camera:camera-view:1.3.0")
     implementation("com.google.firebase:firebase-crashlytics-ktx:18.6.1")
+    implementation(platform(libs.firebase.bom))
 
     // ✅ JUnit base
     androidTestImplementation("junit:junit:4.13.2")

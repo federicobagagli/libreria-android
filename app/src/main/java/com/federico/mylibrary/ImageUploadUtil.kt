@@ -15,6 +15,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import androidx.core.graphics.scale
+import com.federico.mylibrary.util.Logger
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import java.io.File
 
 suspend fun uploadCompressedImage(
@@ -37,9 +39,13 @@ suspend fun uploadCompressedImage(
                 Intent.FLAG_GRANT_READ_URI_PERMISSION
             )
         } catch (e: SecurityException) {
-            Log.w("ImageUpload", "Persistable permission not granted: ${e.message}")
+            FirebaseCrashlytics.getInstance().log("crash in uploadCompressedImage")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.w("ImageUpload", "Persistable permission not granted: ${e.message}")
         } catch (e: Exception) {
-            Log.e("ImageUpload", "Unexpected URI error: ${e.message}")
+            FirebaseCrashlytics.getInstance().log("crash in uploadCompressedImage")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("ImageUpload", "Unexpected URI error: ${e.message}")
         }
     }
 
@@ -47,19 +53,23 @@ suspend fun uploadCompressedImage(
         try {
             val original = if (Build.VERSION.SDK_INT >= 28) {
                 val source = ImageDecoder.createSource(context.contentResolver, imageUri)
-                Log.d("ImageUpload", "ImageDecoder source OK")
+                Logger.d("ImageUpload", "ImageDecoder source OK")
                 ImageDecoder.decodeBitmap(source)
             } else {
-                Log.d("ImageUpload", "Using MediaStore")
+                Logger.d("ImageUpload", "Using MediaStore")
                 MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
             }
-            Log.d("ImageUpload", "Bitmap decoded, resizing...")
+            Logger.d("ImageUpload", "Bitmap decoded, resizing...")
             original.scale(maxWidth, maxHeight)
         } catch (e: SecurityException) {
-            Log.e("ImageUpload", "SecurityException: ${e.message}", e)
+            FirebaseCrashlytics.getInstance().log("crash in uploadCompressedImage")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("ImageUpload", "SecurityException: ${e.message}", e)
             throw e
         } catch (e: Exception) {
-            Log.e("ImageUpload", "Bitmap error: ${e.message}", e)
+            FirebaseCrashlytics.getInstance().log("crash in uploadCompressedImage")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("ImageUpload", "Bitmap error: ${e.message}", e)
             throw e
         }
     }
@@ -71,10 +81,10 @@ suspend fun uploadCompressedImage(
     val filename = "$folder/$userId/${System.currentTimeMillis()}.jpg"
     val storageRef = FirebaseStorage.getInstance().reference.child(filename)
 
-    Log.d("ImageUpload", "Uploading image to Firebase Storage...")
+    Logger.d("ImageUpload", "Uploading image to Firebase Storage...")
     storageRef.putBytes(data).await()
     val downloadUrl = storageRef.downloadUrl.await().toString()
-    Log.d("ImageUpload", "Upload complete. URL: $downloadUrl")
+    Logger.d("ImageUpload", "Upload complete. URL: $downloadUrl")
     return downloadUrl
 }
 

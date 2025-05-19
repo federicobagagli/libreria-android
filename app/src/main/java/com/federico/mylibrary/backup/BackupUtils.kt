@@ -7,7 +7,9 @@ import com.federico.mylibrary.R
 import com.federico.mylibrary.model.Book
 import com.federico.mylibrary.model.Record
 import com.federico.mylibrary.model.Movie
+import com.federico.mylibrary.util.Logger
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.storage.FirebaseStorage
@@ -47,7 +49,9 @@ object BackupUtils {
             Toast.makeText(context, context.getString(R.string.backup_library_success), Toast.LENGTH_SHORT).show()
 
         } catch (e: Exception) {
-            e.printStackTrace()
+            FirebaseCrashlytics.getInstance().log("crash in BackupUtils")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("BackupUtils", "Errore durante il backup", e)
             Toast.makeText(context, context.getString(R.string.backup_library_error, e.message ?: ""), Toast.LENGTH_LONG).show()
         }
     }
@@ -74,7 +78,9 @@ object BackupUtils {
 
             true
         } catch (e: Exception) {
-            Log.e("BackupUtils", "Restore library failed: ${e.message}", e)
+            FirebaseCrashlytics.getInstance().log("crash in restoreLibraryBackup")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("BackupUtils", "Restore library failed: ${e.message}", e)
             false
         }
     }
@@ -104,7 +110,8 @@ object BackupUtils {
             storageRef.putBytes(jsonBytes).await()
             Toast.makeText(context, context.getString(R.string.backup_records_success), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            e.printStackTrace()
+            FirebaseCrashlytics.getInstance().log("crash in backupRecords")
+            FirebaseCrashlytics.getInstance().recordException(e)
             Toast.makeText(context, context.getString(R.string.backup_records_error, e.message ?: ""), Toast.LENGTH_LONG).show()
         }
     }
@@ -131,7 +138,9 @@ object BackupUtils {
 
             true
         } catch (e: Exception) {
-            Log.e("BackupUtils", "Restore records failed: ${e.message}", e)
+            FirebaseCrashlytics.getInstance().log("crash in restoreRecordBackup")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("BackupUtils", "Restore records failed: ${e.message}", e)
             false
         }
     }
@@ -161,7 +170,8 @@ object BackupUtils {
             storageRef.putBytes(jsonBytes).await()
             Toast.makeText(context, context.getString(R.string.backup_movies_success), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            e.printStackTrace()
+            FirebaseCrashlytics.getInstance().log("crash in backupMovies")
+            FirebaseCrashlytics.getInstance().recordException(e)
             Toast.makeText(context, context.getString(R.string.backup_movies_error, e.message ?: ""), Toast.LENGTH_LONG).show()
         }
     }
@@ -188,7 +198,9 @@ object BackupUtils {
 
             true
         } catch (e: Exception) {
-            Log.e("BackupUtils", "Restore movies failed: ${e.message}", e)
+            FirebaseCrashlytics.getInstance().log("crash in restoreMovieBackup")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("BackupUtils", "Restore movies failed: ${e.message}", e)
             false
         }
     }
@@ -217,7 +229,8 @@ object BackupUtils {
             storageRef.putBytes(jsonBytes).await()
             Toast.makeText(context, context.getString(R.string.backup_games_success), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            e.printStackTrace()
+            FirebaseCrashlytics.getInstance().log("crash in backupGames")
+            FirebaseCrashlytics.getInstance().recordException(e)
             Toast.makeText(context, context.getString(R.string.backup_games_error, e.message ?: ""), Toast.LENGTH_LONG).show()
         }
     }
@@ -244,7 +257,9 @@ object BackupUtils {
 
             true
         } catch (e: Exception) {
-            Log.e("BackupUtils", "Restore games failed: ${e.message}", e)
+            FirebaseCrashlytics.getInstance().log("crash in restoreGamesBackup")
+            FirebaseCrashlytics.getInstance().recordException(e)
+            Logger.e("BackupUtils", "Restore games failed: ${e.message}", e)
             false
         }
     }
@@ -257,6 +272,8 @@ object BackupUtils {
                 .child("backups/$userId/${type}_backup.json")
             ref.metadata.await().updatedTimeMillis
         } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().log("crash in getBackupTimestamp")
+            FirebaseCrashlytics.getInstance().recordException(e)
             null
         }
     }

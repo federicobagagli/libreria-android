@@ -26,6 +26,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.federico.mylibrary.R
+import com.federico.mylibrary.util.Logger
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -104,7 +105,7 @@ fun IsbnScannerScreen(
                             )
                         } catch (e: Exception) {
                             errorMessage = e.message
-                            Log.e("CameraX", "Errore binding camera", e)
+                            Logger.e("CameraX", "Errore binding camera", e)
                         }
 
                     }, ContextCompat.getMainExecutor(ctx))
@@ -159,7 +160,7 @@ private fun processImageProxy(
                 val code = barcodes.firstOrNull { it.rawValue?.length == 13 }
                 code?.rawValue?.let(onIsbnDetected)
             }
-            .addOnFailureListener { Log.e("Scanner", "Errore scanner", it) }
+            .addOnFailureListener { Logger.e("Scanner", "Errore scanner", it) }
             .addOnCompleteListener { imageProxy.close() }
     } else {
         imageProxy.close()

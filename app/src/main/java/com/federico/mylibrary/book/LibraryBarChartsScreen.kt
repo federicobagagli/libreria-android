@@ -50,7 +50,6 @@ fun LibraryBarChartsScreen(navController: NavController) {
     }
 
 
-    println("Totale aggiunti: $totalAdded, letti: $totalRead")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,7 +70,7 @@ fun LibraryBarChartsScreen(navController: NavController) {
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalArrangement = Arrangement.spacedBy(2.dp) // Spaziatura minima
             ) {
-                println("Totale aggiunti: $totalAdded, letti: $totalRead")
+
                 Text(
                     text = stringResource(R.string.total_books_added, totalAdded),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

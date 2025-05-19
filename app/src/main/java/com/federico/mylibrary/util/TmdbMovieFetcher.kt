@@ -2,6 +2,7 @@ package com.federico.mylibrary
 
 import android.util.Log
 import com.federico.mylibrary.BuildConfig
+import com.federico.mylibrary.util.Logger
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
@@ -102,7 +103,7 @@ suspend fun fetchMovieInfoFromTmdb(title: String): MovieInfo? {
             language = language
         )
     } catch (e: Exception) {
-        Log.e("TMDB_FETCH", "Errore durante il fetch da TMDb: ${e.message}", e)
+        Logger.e("TMDB_FETCH", "Errore durante il fetch da TMDb: ${e.message}", e)
         null
     } finally {
         client.close()

@@ -36,6 +36,7 @@ import com.federico.mylibrary.util.MovieInfoLite
 import com.federico.mylibrary.util.TmdbMoviePickerDialog
 import com.federico.mylibrary.util.searchMoviesFromTmdb
 import com.federico.mylibrary.util.fetchMovieDetailsFromTmdb
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -120,6 +121,8 @@ fun AddMovieScreen(navController: NavController) {
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in AddMovieScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false
@@ -139,6 +142,8 @@ fun AddMovieScreen(navController: NavController) {
                     coverUrl = downloadUrl
                     Toast.makeText(context, context.getString(R.string.cover_uploaded), Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().log("crash in AddMovieScreen")
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     Toast.makeText(context, context.getString(R.string.upload_failed, e.message ?: ""), Toast.LENGTH_LONG).show()
                 } finally {
                     uploadingCover = false
