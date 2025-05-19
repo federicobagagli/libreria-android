@@ -77,7 +77,10 @@ android {
 }
 
 dependencies {
-
+    implementation("com.google.guava:guava:31.1-android")
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
+    implementation("androidx.camera:camera-view:1.3.0")
     implementation("com.google.firebase:firebase-crashlytics-ktx:18.6.1")
 
     // ✅ JUnit base

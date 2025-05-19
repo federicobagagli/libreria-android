@@ -75,6 +75,7 @@ import com.federico.mylibrary.viewmodel.GameFilterViewModel
 import com.federico.mylibrary.viewmodel.MovieFilterViewModel
 import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.federico.mylibrary.book.IsbnScannerScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -166,7 +167,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             }
             composable("living_room") { LivingRoomScreen(navController) }
             composable("view_library") { ViewLibraryScreen(navController, libraryFilterViewModel) }
-            composable("add") { AddBookScreen() }
+            composable("add") { AddBookScreen(navController) }
             composable("backup") { BackupScreen(navController = navController) }
             composable("settings") {
                 SettingsScreen(
@@ -259,6 +260,22 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("game_advanced_summary") { GameAdvancedSummaryScreen(navController) }
             composable("game_pie_charts") { GamePieChartsScreen(navController) }
             composable("game_bar_charts") { GameBarChartsScreen(navController) }
+
+            composable("scan_isbn_live") {
+                IsbnScannerScreen(
+                    navController = navController,
+                    onIsbnDetected = { isbn ->
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set("scannedIsbn", isbn)
+                        navController.popBackStack()
+                    },
+                    onCancel = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
         }
     }
 }

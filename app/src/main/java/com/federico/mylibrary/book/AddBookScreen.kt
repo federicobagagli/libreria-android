@@ -49,6 +49,7 @@ import androidx.core.content.ContextCompat
 import com.federico.mylibrary.createMediaStoreImageUri
 import com.federico.mylibrary.util.logCheckpoint
 import androidx.compose.ui.platform.testTag
+import androidx.navigation.NavHostController
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Serializable
@@ -122,11 +123,21 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
     }
 }
 
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
-                  overrideCameraPicker: (() -> Unit)? = null ,
+fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -> Unit)? = null,
+                  overrideCameraPicker: (() -> Unit)? = null,
                   userIdOverride: String? = null) {
+
+    val context = LocalContext.current
+
+    val scannedIsbn = navController
+        .currentBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("scannedIsbn")
 
     //test debug
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -154,7 +165,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
     var pendingBookData by remember { mutableStateOf<Map<String, Any>?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
-    val context = LocalContext.current
+
 
     val userId = userIdOverride ?: FirebaseAuth.getInstance().currentUser?.uid ?: return
     //val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -409,6 +420,33 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
         }
     }
 
+    LaunchedEffect(scannedIsbn) {
+        scannedIsbn?.let {
+            navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scannedIsbn")
+
+            val book = fetchBookInfoFromGoogleBooks(it, BuildConfig.GOOGLE_BOOKS_API_KEY)
+            if (book != null) {
+                title = book.title
+                author = book.authors.joinToString(", ") { a -> a.name }
+                genre = book.genre
+                publishDate = book.publishDate
+                publisher = book.publisher
+                language = book.language
+                description = book.description
+                pageCount = if (book.pageCount > 0) book.pageCount.toString() else ""
+                rating = if (book.averageRating > 0.0) book.averageRating.toInt().toString() else ""
+                coverUrl = book.coverUrl
+                location = book.location
+
+                Toast.makeText(context, context.getString(R.string.text_recognized), Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, context.getString(R.string.no_book_found), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+
     Column(modifier = Modifier.fillMaxSize()) {
         // 🔼 Bottoni fissi in alto
         Surface(shadowElevation = 4.dp) {
@@ -419,6 +457,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    /*
                     Button(
                         onClick = {
                             if (cameraPermissionGranted) barcodeScannerLauncher.launch(null)
@@ -429,6 +468,16 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
                     ) {
                         Text(stringResource(R.string.scan_isbn), color = Color.White)
                     }
+
+                     */
+                    Button(
+                        onClick = {
+                            navController.navigate("scan_isbn_live")
+                        },modifier = Modifier.weight(1f),
+                          colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF81C784))
+                    )  {
+                            Text(stringResource(R.string.scan_isbn), color = Color.White)
+                        }
 
                     Button(
                         onClick = {
@@ -701,6 +750,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
 
                             cameraLauncher.launch(uri)
                         } catch (e: Exception) {
+                            FirebaseCrashlytics.getInstance().log("crash in addBook con fotocamera")
                             FirebaseCrashlytics.getInstance().recordException(e)
                             logCheckpoint(context, "❌ errore fotocamera", e)
                             val sw = java.io.StringWriter()
@@ -727,7 +777,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
                             Text(stringResource(R.string.ok))
                         }
                     },
-                    title = { Text("Errore tecnico") },
+                    title = { Text("Tecnical error") },
                     text = {
                         Box(modifier = Modifier
                             .heightIn(min = 100.dp, max = 400.dp)
