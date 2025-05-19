@@ -95,6 +95,10 @@ fun RecordsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val smallButtonModifier = Modifier
+                .weight(1f)
+                .heightIn(min = 36.dp)
+            val smallTextStyle = MaterialTheme.typography.labelSmall
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -135,6 +139,16 @@ fun RecordsScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("📤 " + stringResource(R.string.export_title_record))
+                }
+
+                Button(
+                    onClick = {
+                        navController.navigate("view_records")
+                    },
+                    modifier = smallButtonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text(stringResource(R.string.filter),style = smallTextStyle) // oppure "🔍 Filtra" se vuoi aggiungere un'icona
                 }
 
                 Button(

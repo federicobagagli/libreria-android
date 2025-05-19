@@ -37,7 +37,7 @@ fun MovieRoomScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("view_movies") },
+            onClick = { navController.navigate("movies") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_movies), fontSize = 18.sp)

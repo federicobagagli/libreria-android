@@ -37,7 +37,7 @@ fun RecordRoomScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("view_records") },
+            onClick = { navController.navigate("records") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_records), fontSize = 18.sp)

@@ -21,6 +21,7 @@ import com.federico.mylibrary.R
 import com.federico.mylibrary.export.BookExportItem
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.model.Book
+import com.federico.mylibrary.ui.ImageDialog
 import com.federico.mylibrary.viewmodel.LibraryFilterViewModel
 import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -329,25 +330,10 @@ fun BooksScreen(
             text = { Text("\"${book.title}\"") }
         )
     }
-    if (expandedCoverUrl != null) {
-        AlertDialog(
-            onDismissRequest = { expandedCoverUrl = null },
-            confirmButton = {
-                TextButton(onClick = { expandedCoverUrl = null }) {
-                    Text(stringResource(R.string.close))
-                }
-            },
-            text = {
-                AsyncImage(
-                    model = expandedCoverUrl,
-                    contentDescription = stringResource(R.string.book_cover_url),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(2f / 3f)
-                )
-            }
-        )
-    }
+    ImageDialog(
+        imageUrl = expandedCoverUrl,
+        onDismiss = { expandedCoverUrl = null }
+    )
 
 }
 

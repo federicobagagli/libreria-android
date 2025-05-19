@@ -1,6 +1,7 @@
 package com.federico.mylibrary.game
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,10 +17,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.federico.mylibrary.R
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.export.GameExportItem
 import com.federico.mylibrary.model.Game
+import com.federico.mylibrary.ui.ImageDialog
 import com.federico.mylibrary.viewmodel.GameFilterViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -45,6 +48,7 @@ fun GamesScreen(
     var sortDirection by remember { mutableStateOf("asc") }
     var showFieldMenu by remember { mutableStateOf(false) }
     var showDirectionMenu by remember { mutableStateOf(false) }
+    var expandedCoverUrl by remember { mutableStateOf<String?>(null) }
 
     val games by remember(sortField, sortDirection, gamesRaw) {
         derivedStateOf {
@@ -110,6 +114,10 @@ fun GamesScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val smallButtonModifier = Modifier
+                .weight(1f)
+                .heightIn(min = 36.dp)
+            val smallTextStyle = MaterialTheme.typography.labelSmall
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -127,6 +135,16 @@ fun GamesScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("📤 " + stringResource(R.string.export_title_game))
+                }
+
+                Button(
+                    onClick = {
+                        navController.navigate("view_games")
+                    },
+                    modifier = smallButtonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text(stringResource(R.string.filter),style = smallTextStyle) // oppure "🔍 Filtra" se vuoi aggiungere un'icona
                 }
 
                 Button(
@@ -201,6 +219,17 @@ fun GamesScreen(
                                 Text(stringResource(R.string.game_publisher) + ": ${game.publisher}")
                             }
                             Text(stringResource(R.string.game_release_date_label, game.releaseDate))
+                            if (game.coverUrl.isNotBlank()) {
+                                val imageUrl = game.coverUrl.replace("http://", "https://")
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = stringResource(R.string.book_cover_url),
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clickable { expandedCoverUrl = imageUrl }
+                                )
+                            }
+
 
                             Row(
                                 modifier = Modifier.padding(top = 8.dp),
@@ -255,6 +284,10 @@ fun GamesScreen(
             text = { Text("\"${game.title}\"") }
         )
     }
+    ImageDialog(
+        imageUrl = expandedCoverUrl,
+        onDismiss = { expandedCoverUrl = null }
+    )
 }
 
 fun gameSortKey(game: Game, field: String): Comparable<*> {

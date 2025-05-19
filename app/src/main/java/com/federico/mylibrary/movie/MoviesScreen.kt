@@ -3,6 +3,7 @@
 package com.federico.mylibrary.movie
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.federico.mylibrary.R
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.model.Movie
@@ -26,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.tasks.await
 import com.federico.mylibrary.export.MovieExportItem
+import com.federico.mylibrary.ui.ImageDialog
 
 @Composable
 fun MoviesScreen(
@@ -45,6 +48,7 @@ fun MoviesScreen(
     var sortDirection by remember { mutableStateOf("asc") }
     var showFieldMenu by remember { mutableStateOf(false) }
     var showDirectionMenu by remember { mutableStateOf(false) }
+    var expandedCoverUrl by remember { mutableStateOf<String?>(null) }
 
     val movies by remember(sortField, sortDirection, moviesRaw) {
         derivedStateOf {
@@ -100,6 +104,10 @@ fun MoviesScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            val smallButtonModifier = Modifier
+                .weight(1f)
+                .heightIn(min = 36.dp)
+            val smallTextStyle = MaterialTheme.typography.labelSmall
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -131,6 +139,16 @@ fun MoviesScreen(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("📤 " + stringResource(R.string.export_title_movie))
+                }
+
+                Button(
+                    onClick = {
+                        navController.navigate("view_movies")
+                    },
+                    modifier = smallButtonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text(stringResource(R.string.filter),style = smallTextStyle) // oppure "🔍 Filtra" se vuoi aggiungere un'icona
                 }
 
                 Button(
@@ -184,6 +202,16 @@ fun MoviesScreen(
                             Text(stringResource(R.string.movie_director_label, movie.director))
                             Text(stringResource(R.string.movie_genre_label, movie.genre))
                             Text(stringResource(R.string.movie_publish_date_label, movie.publishDate))
+                            if (movie.coverUrl.isNotBlank()) {
+                                val imageUrl = movie.coverUrl.replace("http://", "https://")
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = stringResource(R.string.book_cover_url),
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clickable { expandedCoverUrl = imageUrl }
+                                )
+                            }
 
                             Row(
                                 modifier = Modifier.padding(top = 8.dp),
@@ -238,6 +266,10 @@ fun MoviesScreen(
             text = { Text(movie.title) }
         )
     }
+    ImageDialog(
+        imageUrl = expandedCoverUrl,
+        onDismiss = { expandedCoverUrl = null }
+    )
 }
 
 fun movieSortKey(movie: Movie, field: String): Comparable<*> {

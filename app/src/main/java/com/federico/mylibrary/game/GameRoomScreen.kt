@@ -37,7 +37,7 @@ fun GameRoomScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("view_games") },
+            onClick = { navController.navigate("games") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_games), fontSize = 18.sp)
