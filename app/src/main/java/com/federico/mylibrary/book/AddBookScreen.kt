@@ -48,6 +48,8 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import com.federico.mylibrary.createMediaStoreImageUri
 import com.federico.mylibrary.util.logCheckpoint
+import androidx.compose.ui.platform.testTag
+
 
 @Serializable
 data class BookInfo(
@@ -122,7 +124,9 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddBookScreen() {
+fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
+                  overrideCameraPicker: (() -> Unit)? = null ,
+                  userIdOverride: String? = null) {
 
     //test debug
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -151,7 +155,9 @@ fun AddBookScreen() {
     val coroutineScope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+    val userId = userIdOverride ?: FirebaseAuth.getInstance().currentUser?.uid ?: return
+    //val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
     var title by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
@@ -632,71 +638,77 @@ fun AddBookScreen() {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
-                    logCheckpoint(context, "📸 bottone galleria premuto")
-                    try {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            imagePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-                        } else {
-                            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    overrideGalleryPicker?.invoke() ?: run {
+                        logCheckpoint(context, "📸 bottone galleria premuto")
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                imagePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                            } else {
+                                photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            }
+                        } catch (e: Exception) {
+                            logCheckpoint(context, "❌ errore galleria", e)
+                            val sw = java.io.StringWriter()
+                            e.printStackTrace(java.io.PrintWriter(sw))
+                            errorStackTrace = sw.toString()
+                            showErrorDialog = true
+                            Log.e("GALLERY_ERROR", "Errore lancio galleria", e)
                         }
-                    } catch (e: Exception) {
-                        logCheckpoint(context, "❌ errore galleria", e)
-                        val sw = java.io.StringWriter()
-                        e.printStackTrace(java.io.PrintWriter(sw))
-                        errorStackTrace = sw.toString()
-                        showErrorDialog = true
-                        Log.e("GALLERY_ERROR", "Errore lancio galleria", e)
                     }
-                }) {
+                },
+                    modifier = Modifier.testTag("galleryButton")) {
                     Text(stringResource(R.string.select_from_gallery))
                 }
 
                 Button(onClick = {
-                    logCheckpoint(context, "📸 bottone fotocamera premuto")
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val permission = Manifest.permission.CAMERA
-                        val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+                    overrideCameraPicker?.invoke() ?: run {
+                        logCheckpoint(context, "📸 bottone fotocamera premuto")
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            val permission = Manifest.permission.CAMERA
+                            val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
-                        if (!granted) {
-                            // Richiedi il permesso in modo esplicito
-                            permissionLauncher.launch(permission)
-                            return@Button
+                            if (!granted) {
+                                // Richiedi il permesso in modo esplicito
+                                permissionLauncher.launch(permission)
+                                return@Button
+                            }
                         }
-                    }
-                    try {
-                        val uri = createTempImageUri(context)
-                        /*
-                        val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            createMediaStoreImageUri(context)
-                        } else {
-                            createTempImageUri(context)
-                        }
+                        try {
+                            val uri = createTempImageUri(context)
+                            /*
+                            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                createMediaStoreImageUri(context)
+                            } else {
+                                createTempImageUri(context)
+                            }
 
-                         */
-                        imageUri.value = uri
-                        Toast.makeText(context, "📸 URI: $uri", Toast.LENGTH_SHORT).show()
-                        Log.d("DEBUG_URI", "Uri generato: $uri")
-                        Toast.makeText(context, "Uri: $uri", Toast.LENGTH_SHORT).show()
+                             */
+                            imageUri.value = uri
+                            Toast.makeText(context, "📸 URI: $uri", Toast.LENGTH_SHORT).show()
+                            Log.d("DEBUG_URI", "Uri generato: $uri")
+                            Toast.makeText(context, "Uri: $uri", Toast.LENGTH_SHORT).show()
 
 
 // PATCH: concedi temporaneamente i permessi di scrittura
-                        context.grantUriPermission(
-                            "com.android.camera", // oppure "*" per concedere a tutte
-                            uri,
-                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                        )
+                            context.grantUriPermission(
+                                "com.android.camera", // oppure "*" per concedere a tutte
+                                uri,
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
 
 
-                        cameraLauncher.launch(uri)
-                    } catch (e: Exception) {
-                        logCheckpoint(context, "❌ errore fotocamera", e)
-                        val sw = java.io.StringWriter()
-                        e.printStackTrace(java.io.PrintWriter(sw))
-                        errorStackTrace = sw.toString()
-                        showErrorDialog = true
-                        Log.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
+                            cameraLauncher.launch(uri)
+                        } catch (e: Exception) {
+                            logCheckpoint(context, "❌ errore fotocamera", e)
+                            val sw = java.io.StringWriter()
+                            e.printStackTrace(java.io.PrintWriter(sw))
+                            errorStackTrace = sw.toString()
+                            showErrorDialog = true
+                            Log.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
+                        }
                     }
-                }) {
+                }, modifier = Modifier.testTag("takePhotoButton")
+                ) {
                     Text(stringResource(R.string.take_photo))
                 }
             }

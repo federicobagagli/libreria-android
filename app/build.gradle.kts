@@ -66,12 +66,31 @@ android {
             buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
         }
     }
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+    }
 
 
 
 }
 
 dependencies {
+
+    // ✅ JUnit base
+    androidTestImplementation("junit:junit:4.13.2")
+
+    // ✅ AndroidX JUnit + Espresso + Runner
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+
+    // ✅ Compose UI Test
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // ✅ Orchestrator
+    androidTestUtil("androidx.test:orchestrator:1.4.2")
+
     implementation("com.google.android.gms:play-services-auth:21.0.0")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
@@ -80,10 +99,10 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:1.5.1") // o più recente
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-    implementation("io.ktor:ktor-client-core:2.3.0")
-    implementation("io.ktor:ktor-client-cio:2.3.0")
+    implementation("io.ktor:ktor-client-core:2.3.7")
+    implementation("io.ktor:ktor-client-cio:2.3.7")
     implementation("io.ktor:ktor-client-okhttp:2.3.0")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.0")
+    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.0")
     implementation("com.google.mlkit:barcode-scanning:17.2.0")
     implementation("com.google.mlkit:text-recognition:16.0.0")

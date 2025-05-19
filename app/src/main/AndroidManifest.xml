@@ -39,6 +39,12 @@
         </activity>
 
 
+
+        <activity
+            android:name="com.federico.mylibrary.test.TestActivity"
+            android:exported="true"
+            tools:ignore="MissingIntentFilter" />
+
     </application>
 
 
