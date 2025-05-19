@@ -45,6 +45,8 @@
     <string name="google_login_failed">Google login failed: %1$s</string>
     <string name="google_intent_error">IntentSender error: %1$s</string>
     <string name="or_login_with">or log in with</string>
+    <string name="filter">Filter</string>
+    <string name="close">Close</string>
 
 
 

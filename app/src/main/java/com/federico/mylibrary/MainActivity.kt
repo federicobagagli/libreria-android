@@ -132,22 +132,21 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
     val movieFilterViewModel: MovieFilterViewModel = viewModel()
     val gameFilterViewModel: GameFilterViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
+    val hideTopBarRoutes = listOf("books", "view_library", "records", "view_records")
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = when (currentDestination?.route) {
-                            "living_room" -> stringResource(R.string.salotto_title)
-                            "view_library" -> ""//stringResource(R.string.view_library_title)
-                            "books" -> ""//stringResource(R.string.screen_books)
-                            "add" -> stringResource(R.string.screen_add)
-                            "settings" -> stringResource(R.string.screen_settings)
-                            else -> ""//stringResource(R.string.app_name)
-                        }
-                    )
-                }
-            )
+            if (currentDestination?.route !in hideTopBarRoutes) {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = when (currentDestination?.route) {
+                                "living_room" -> stringResource(R.string.salotto_title)
+                                else -> ""
+                            }
+                        )
+                    }
+                )
+            }
         },
         bottomBar = {
             BottomNavigationBar(navController, currentDestination)

@@ -38,7 +38,7 @@ fun LibraryRoomScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("view_library") },
+            onClick = { navController.navigate("books?showAll=true") },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_books), fontSize = 18.sp)

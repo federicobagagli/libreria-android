@@ -1,6 +1,7 @@
 package com.federico.mylibrary.book
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.federico.mylibrary.R
 import com.federico.mylibrary.export.BookExportItem
 import com.federico.mylibrary.export.ExportViewModel
@@ -41,9 +43,13 @@ fun BooksScreen(
     val filters by filterViewModel.filterState.collectAsState()
     val context = LocalContext.current
 
+    val showAll = navController.currentBackStackEntry?.arguments?.getString("showAll") == "true"
+
     var booksRaw by remember { mutableStateOf<List<Pair<String, Book>>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var bookToDelete by remember { mutableStateOf<Pair<String, Book>?>(null) }
+    var expandedCoverUrl by remember { mutableStateOf<String?>(null) }
+
     // 🔽 Stato per ordinamento
     var sortField by remember { mutableStateOf("title") }
     var sortDirection by remember { mutableStateOf("asc") }
@@ -108,12 +114,18 @@ fun BooksScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                val smallButtonModifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 36.dp)
+                val smallTextStyle = MaterialTheme.typography.labelSmall
                 PremiumBlocker(
                     isPremium = isPremium,
-                    modifier = Modifier.weight(1f),
+                    modifier = smallButtonModifier,
                     onClickAllowed = {
                         exportViewModel.setExportData(
                             items = books.map { (_, book) ->
@@ -140,9 +152,18 @@ fun BooksScreen(
                         navController.navigate("exportView")
                     }
                 ) {
-                    Text("📤 " + stringResource(R.string.export_title_book))
+                    Text("📤 " + stringResource(R.string.export_title_book),style = smallTextStyle)
                 }
 
+                Button(
+                    onClick = {
+                        navController.navigate("view_library")
+                    },
+                    modifier = smallButtonModifier,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text(stringResource(R.string.filter),style = smallTextStyle) // oppure "🔍 Filtra" se vuoi aggiungere un'icona
+                }
 
                 Button(
                     onClick = {
@@ -156,15 +177,15 @@ fun BooksScreen(
                             popUpTo("books") { inclusive = true }
                         }
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = smallButtonModifier,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
-                    Text("🔄 " + stringResource(R.string.clear_filters))
+                    Text("🔄 " + stringResource(R.string.clear_filters),style = smallTextStyle)
                 }
 
                 Button(
                     onClick = { showFieldMenu = true },
-                    modifier = Modifier.weight(1f)
+                    modifier = smallButtonModifier
                 ) {
                     Text(stringResource(R.string.sort_button))
                 }
@@ -243,6 +264,17 @@ fun BooksScreen(
                             Text(stringResource(R.string.book_author_label, book.author))
                             Text(stringResource(R.string.book_genre_label, book.genre))
                             Text(stringResource(R.string.book_publish_date_label, book.publishDate))
+                            if (book.coverUrl.isNotBlank()) {
+                                val imageUrl = book.coverUrl.replace("http://", "https://")
+                                AsyncImage(
+                                    model = imageUrl,
+                                    contentDescription = stringResource(R.string.book_cover_url),
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clickable { expandedCoverUrl = imageUrl }
+                                )
+                            }
+
 
                             Row(
                                 modifier = Modifier.padding(top = 8.dp),
@@ -297,6 +329,26 @@ fun BooksScreen(
             text = { Text("\"${book.title}\"") }
         )
     }
+    if (expandedCoverUrl != null) {
+        AlertDialog(
+            onDismissRequest = { expandedCoverUrl = null },
+            confirmButton = {
+                TextButton(onClick = { expandedCoverUrl = null }) {
+                    Text(stringResource(R.string.close))
+                }
+            },
+            text = {
+                AsyncImage(
+                    model = expandedCoverUrl,
+                    contentDescription = stringResource(R.string.book_cover_url),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(2f / 3f)
+                )
+            }
+        )
+    }
+
 }
 
 fun bookSortKey(book: Book, field: String): Comparable<*> {
@@ -311,3 +363,4 @@ fun bookSortKey(book: Book, field: String): Comparable<*> {
         else -> book.title.lowercase()
     }
 }
+

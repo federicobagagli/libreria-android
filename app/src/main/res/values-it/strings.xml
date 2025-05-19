@@ -44,6 +44,8 @@
     <string name="google_login_failed">Errore login Google: %1$s</string>
     <string name="google_intent_error">Errore IntentSender: %1$s</string>
     <string name="or_login_with">oppure accedi con</string>
+    <string name="filter">Filtra</string>
+    <string name="close">Chiudi</string>
 
 
 
