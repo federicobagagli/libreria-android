@@ -74,10 +74,12 @@ import com.federico.mylibrary.record.RecordPieChartsScreen
 import com.federico.mylibrary.viewmodel.GameFilterViewModel
 import com.federico.mylibrary.viewmodel.MovieFilterViewModel
 import com.federico.mylibrary.viewmodel.UserViewModel
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
         val currentUser = FirebaseAuth.getInstance().currentUser
         Log.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
         setContent {

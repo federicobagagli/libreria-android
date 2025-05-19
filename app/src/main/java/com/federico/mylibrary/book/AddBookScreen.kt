@@ -49,7 +49,7 @@ import androidx.core.content.ContextCompat
 import com.federico.mylibrary.createMediaStoreImageUri
 import com.federico.mylibrary.util.logCheckpoint
 import androidx.compose.ui.platform.testTag
-
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 @Serializable
 data class BookInfo(
@@ -662,6 +662,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
 
                 Button(onClick = {
                     overrideCameraPicker?.invoke() ?: run {
+                        FirebaseCrashlytics.getInstance().log("📸 bottone fotocamera premuto")
                         logCheckpoint(context, "📸 bottone fotocamera premuto")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             val permission = Manifest.permission.CAMERA
@@ -675,6 +676,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
                         }
                         try {
                             val uri = createTempImageUri(context)
+                            FirebaseCrashlytics.getInstance().log("📸 URI generato: $uri")
                             /*
                             val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 createMediaStoreImageUri(context)
@@ -699,6 +701,7 @@ fun AddBookScreen(overrideGalleryPicker: (() -> Unit)? = null,
 
                             cameraLauncher.launch(uri)
                         } catch (e: Exception) {
+                            FirebaseCrashlytics.getInstance().recordException(e)
                             logCheckpoint(context, "❌ errore fotocamera", e)
                             val sw = java.io.StringWriter()
                             e.printStackTrace(java.io.PrintWriter(sw))

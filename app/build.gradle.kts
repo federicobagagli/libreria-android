@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.firebase.crashlytics")
 }
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
@@ -58,6 +59,7 @@ android {
         }
         getByName("release") {
             isMinifyEnabled = false
+            isDebuggable = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -75,6 +77,8 @@ android {
 }
 
 dependencies {
+
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.6.1")
 
     // ✅ JUnit base
     androidTestImplementation("junit:junit:4.13.2")

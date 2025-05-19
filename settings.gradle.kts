@@ -1,12 +1,6 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google() // ✅ Qui basta che sia presente **senza filtri** per funzionare
         mavenCentral()
         gradlePluginPortal()
     }
