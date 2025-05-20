@@ -32,11 +32,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.ui.platform.testTag
 import androidx.core.content.ContextCompat
+import com.federico.mylibrary.ui.LimitReachedDialog
 import com.federico.mylibrary.util.Logger
+import com.federico.mylibrary.util.checkLimitReached
 import com.federico.mylibrary.util.logCheckpoint
+import com.federico.mylibrary.viewmodel.UserViewModel
 
 @Composable
-fun AddRecordScreen(navController: NavController, overrideGalleryPicker: (() -> Unit)? = null,
+fun AddRecordScreen(navController: NavController,
+                    userViewModel: UserViewModel,
+                    overrideGalleryPicker: (() -> Unit)? = null,
                     overrideCameraPicker: (() -> Unit)? = null,
                     userIdOverride: String? = null) {
     val context = LocalContext.current
@@ -72,6 +77,18 @@ fun AddRecordScreen(navController: NavController, overrideGalleryPicker: (() -> 
     var coverUrl by remember { mutableStateOf("") }
     var addedDate = currentDate
     var location by remember { mutableStateOf("") }
+
+    val isPremium by userViewModel.isPremium.collectAsState()
+    var isLimitReached by remember { mutableStateOf(false) }
+    var showLimitDialog by remember { mutableStateOf(false) }
+    //per limitare numero inserimenti per i non-premium
+    LaunchedEffect(Unit) {
+        if (!isPremium) {
+            checkLimitReached(userId, "records", userViewModel.maxItemsNonPremium) { reached ->
+                isLimitReached = reached
+            }
+        }
+    }
 
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -221,7 +238,12 @@ fun AddRecordScreen(navController: NavController, overrideGalleryPicker: (() -> 
     Scaffold(
         topBar = {
             Button(
-                onClick = { saveRecord() },
+                onClick = {
+                    if (isLimitReached) {
+                        showLimitDialog = true
+                        return@Button
+                    }
+                    saveRecord() },
                 enabled = title.isNotBlank(),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -467,4 +489,12 @@ fun AddRecordScreen(navController: NavController, overrideGalleryPicker: (() -> 
 
         }
     }
+    LimitReachedDialog(
+        show = showLimitDialog,
+        onDismiss = { showLimitDialog = false },
+        onGoPremium = {
+            showLimitDialog = false
+            navController.navigate("go_premium")
+        }
+    )
 }

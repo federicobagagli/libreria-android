@@ -207,7 +207,7 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
     //per limitare numero inserimenti per i non-premium
     LaunchedEffect(Unit) {
         if (!isPremium) {
-            checkLimitReached(userId, "books", 2) { reached ->
+            checkLimitReached(userId, "books", userViewModel.maxItemsNonPremium) { reached ->
                 isLimitReached = reached
             }
         }
@@ -889,7 +889,7 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
         onDismiss = { showLimitDialog = false },
         onGoPremium = {
             showLimitDialog = false
-            navController.navigate("go_premium") // esempio, da creare
+            navController.navigate("go_premium")
         }
     )
 }

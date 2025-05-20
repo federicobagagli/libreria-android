@@ -76,6 +76,7 @@ import com.federico.mylibrary.viewmodel.MovieFilterViewModel
 import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.federico.mylibrary.book.IsbnScannerScreen
+import com.federico.mylibrary.ui.GoPremiumScreen
 import com.federico.mylibrary.util.Logger
 import com.google.android.gms.ads.MobileAds
 
@@ -206,7 +207,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             }
             composable("record_room") { RecordRoomScreen(navController,
                 userViewModel = userViewModel) }
-            composable("add_record") { AddRecordScreen(navController) }
+            composable("add_record") { AddRecordScreen(navController,userViewModel = userViewModel) }
             composable("view_records") { ViewRecordsScreen(navController, recordFilterViewModel) }
             composable("records") {
                 RecordsScreen(
@@ -226,7 +227,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             //Movies
             composable("movie_room") { MovieRoomScreen(navController,
                 userViewModel = userViewModel) }
-            composable("add_movie") { AddMovieScreen(navController) }
+            composable("add_movie") { AddMovieScreen(navController,userViewModel = userViewModel) }
             composable("view_movies") { ViewMoviesScreen(navController, movieFilterViewModel) }
             composable("movies") {
                 MoviesScreen(
@@ -249,7 +250,7 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             //Games
             composable("game_room") { GameRoomScreen(navController,
                 userViewModel = userViewModel) }
-            composable("add_game") { AddGameScreen() }
+            composable("add_game") { AddGameScreen(navController,userViewModel = userViewModel) }
             composable("view_games") { ViewGamesScreen(navController, gameFilterViewModel) }
             composable("games") {
                 GamesScreen(
@@ -282,6 +283,9 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
                         navController.popBackStack()
                     }
                 )
+            }
+            composable("go_premium") {
+                GoPremiumScreen(navController)
             }
 
         }

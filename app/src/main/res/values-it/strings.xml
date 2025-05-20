@@ -48,7 +48,13 @@
     <string name="close">Chiudi</string>
     <string name="limit_reached_title">Limite raggiunto</string>
     <string name="limit_reached_message">Hai raggiunto il limite massimo di 20 elementi per gli utenti gratuiti. Passa a Premium per continuare.</string>
+    <string name="premium_title">Diventa Premium</string>
+    <string name="premium_description">Sblocca tutte le funzionalità dell app:</string>
+    <string name="premium_no_limits">Nessun limite di inserimenti</string>
+    <string name="premium_backup">Accesso al backup e ripristino</string>
+    <string name="premium_theme">Selezione del tema</string>
     <string name="go_premium">Diventa Premium</string>
+    <string name="premium_share">Esportazione e condivisione della collezione</string>
 
 
 

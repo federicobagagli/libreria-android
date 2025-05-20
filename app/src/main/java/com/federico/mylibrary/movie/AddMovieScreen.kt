@@ -37,18 +37,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.testTag
 import androidx.core.content.ContextCompat
 import com.federico.mylibrary.fetchMovieInfoFromTmdb
+import com.federico.mylibrary.ui.LimitReachedDialog
 import com.federico.mylibrary.util.Logger
 import com.federico.mylibrary.util.MovieInfoLite
 import com.federico.mylibrary.util.TmdbMoviePickerDialog
+import com.federico.mylibrary.util.checkLimitReached
 import com.federico.mylibrary.util.searchMoviesFromTmdb
 import com.federico.mylibrary.util.fetchMovieDetailsFromTmdb
 import com.federico.mylibrary.util.logCheckpoint
+import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMovieScreen(navController: NavController, overrideGalleryPicker: (() -> Unit)? = null,
+fun AddMovieScreen(navController: NavController,
+                   userViewModel: UserViewModel,
+                   overrideGalleryPicker: (() -> Unit)? = null,
                    overrideCameraPicker: (() -> Unit)? = null,
                    userIdOverride: String? = null) {
     val context = LocalContext.current
@@ -76,6 +81,18 @@ fun AddMovieScreen(navController: NavController, overrideGalleryPicker: (() -> U
     var notes by remember { mutableStateOf("") }
     var coverUrl by remember { mutableStateOf("") }
     var location by remember { mutableStateOf("") }
+
+    val isPremium by userViewModel.isPremium.collectAsState()
+    var isLimitReached by remember { mutableStateOf(false) }
+    var showLimitDialog by remember { mutableStateOf(false) }
+    //per limitare numero inserimenti per i non-premium
+    LaunchedEffect(Unit) {
+        if (!isPremium) {
+            checkLimitReached(userId, "movies", userViewModel.maxItemsNonPremium) { reached ->
+                isLimitReached = reached
+            }
+        }
+    }
 
     val formatOptions = listOf(
         stringResource(R.string.format_dvd),
@@ -187,6 +204,10 @@ fun AddMovieScreen(navController: NavController, overrideGalleryPicker: (() -> U
                 .padding(8.dp)) {
                 Button(
                     onClick = {
+                        if (isLimitReached) {
+                            showLimitDialog = true
+                            return@Button
+                        }
                         if (title.isBlank()) {
                             Toast.makeText(context, context.getString(R.string.missing_title), Toast.LENGTH_SHORT).show()
                             return@Button
@@ -430,4 +451,12 @@ fun AddMovieScreen(navController: NavController, overrideGalleryPicker: (() -> U
 
             }
     }
+    LimitReachedDialog(
+        show = showLimitDialog,
+        onDismiss = { showLimitDialog = false },
+        onGoPremium = {
+            showLimitDialog = false
+            navController.navigate("go_premium")
+        }
+    )
 }

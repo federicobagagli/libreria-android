@@ -50,6 +50,12 @@
     <string name="limit_reached_title">Limit Reached</string>
     <string name="limit_reached_message">You have reached the limit of 20 items for free users. Upgrade to Premium to continue.</string>
     <string name="go_premium">Go Premium</string>
+    <string name="premium_title">Go Premium</string>
+    <string name="premium_description">Unlock all the features of the app:</string>
+    <string name="premium_no_limits">No insertion limits</string>
+    <string name="premium_backup">Access to backup and restore</string>
+    <string name="premium_theme">Theme selection</string>
+    <string name="premium_share">Export and share your collection</string>
 
 
 

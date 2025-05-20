@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.federico.mylibrary.ui.GoPremiumButton
 import com.federico.mylibrary.ui.ThemeSelector
 import com.federico.mylibrary.ui.theme.AppThemeStyle
 import com.federico.mylibrary.util.Logger
@@ -94,6 +95,15 @@ fun SettingsScreen(
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
                 Text(stringResource(R.string.delete_account_title), color = Color.White)
+            }
+
+            if (!isPremium) {
+                GoPremiumButton(
+                    navController = navController,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                )
             }
         }
 

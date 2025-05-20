@@ -22,16 +22,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
 import com.federico.mylibrary.R
 import com.federico.mylibrary.createTempImageUri
 import com.federico.mylibrary.model.Game
+import com.federico.mylibrary.ui.LimitReachedDialog
 import com.federico.mylibrary.uploadCompressedImage
 import com.federico.mylibrary.ui.bookFieldModifier
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.federico.mylibrary.ui.movieFieldModifier
 import com.federico.mylibrary.ui.movieFieldTextStyle
 import com.federico.mylibrary.util.Logger
+import com.federico.mylibrary.util.checkLimitReached
 import com.federico.mylibrary.util.logCheckpoint
+import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
@@ -41,9 +45,11 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddGameScreen( overrideGalleryPicker: (() -> Unit)? = null,
-                    overrideCameraPicker: (() -> Unit)? = null,
-                    userIdOverride: String? = null) {
+fun AddGameScreen(navController: NavHostController,
+                  userViewModel: UserViewModel,
+                  overrideGalleryPicker: (() -> Unit)? = null,
+                  overrideCameraPicker: (() -> Unit)? = null,
+                  userIdOverride: String? = null) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
@@ -76,6 +82,18 @@ fun AddGameScreen( overrideGalleryPicker: (() -> Unit)? = null,
         stringResource(R.string.game_type_other)
     )
     val typeKeys = listOf("board", "videogame", "altro")
+
+    val isPremium by userViewModel.isPremium.collectAsState()
+    var isLimitReached by remember { mutableStateOf(false) }
+    var showLimitDialog by remember { mutableStateOf(false) }
+    //per limitare numero inserimenti per i non-premium
+    LaunchedEffect(Unit) {
+        if (!isPremium) {
+            checkLimitReached(userId, "games", userViewModel.maxItemsNonPremium) { reached ->
+                isLimitReached = reached
+            }
+        }
+    }
 
     var expandedType by remember { mutableStateOf(false) }
 
@@ -206,6 +224,10 @@ fun AddGameScreen( overrideGalleryPicker: (() -> Unit)? = null,
             ) {
                 Button(
                     onClick = {
+                        if (isLimitReached) {
+                            showLimitDialog = true
+                            return@Button
+                        }
                         if (title.isBlank()) {
                             Toast.makeText(context, context.getString(R.string.missing_title), Toast.LENGTH_SHORT).show()
                             return@Button
@@ -382,4 +404,12 @@ fun AddGameScreen( overrideGalleryPicker: (() -> Unit)? = null,
 
         }
     }
+    LimitReachedDialog(
+        show = showLimitDialog,
+        onDismiss = { showLimitDialog = false },
+        onGoPremium = {
+            showLimitDialog = false
+            navController.navigate("go_premium")
+        }
+    )
 }

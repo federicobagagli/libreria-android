@@ -20,6 +20,8 @@ class UserViewModel : ViewModel() {
     private val _isDeveloper = MutableStateFlow(false)
     val isDeveloper: StateFlow<Boolean> = _isDeveloper
 
+    val maxItemsNonPremium = 2
+
     init {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
