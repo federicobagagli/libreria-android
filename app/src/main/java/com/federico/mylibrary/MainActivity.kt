@@ -77,10 +77,12 @@ import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.federico.mylibrary.book.IsbnScannerScreen
 import com.federico.mylibrary.util.Logger
+import com.google.android.gms.ads.MobileAds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this) {}
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
         val currentUser = FirebaseAuth.getInstance().currentUser
         Logger.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
@@ -165,9 +167,10 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("edit_book/{bookId}") { backStackEntry ->
                 EditBookScreen(navController, backStackEntry)
             }
-            composable("living_room") { LivingRoomScreen(navController) }
+            composable("living_room") { LivingRoomScreen(navController,
+                userViewModel = userViewModel) }
             composable("view_library") { ViewLibraryScreen(navController, libraryFilterViewModel) }
-            composable("add") { AddBookScreen(navController) }
+            composable("add") { AddBookScreen(navController,userViewModel = userViewModel) }
             composable("backup") { BackupScreen(navController = navController) }
             composable("settings") {
                 SettingsScreen(
@@ -177,7 +180,9 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
                     userViewModel = userViewModel
                 )
             }
-            composable("library_room") { LibraryRoomScreen(navController) }
+            composable("library_room") {
+                LibraryRoomScreen(navController,
+                                    userViewModel = userViewModel) }
             composable("library_summary") { LibrarySummaryScreen(navController) }
             composable("exportView") { ExportViewScreen(navController = navController, exportViewModel = exportViewModel) }
             composable("library_advanced_summary") { LibraryAdvancedSummaryScreen(navController) }
@@ -199,7 +204,8 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("edit_record/{recordId}") { backStackEntry ->
                 EditRecordScreen(navController, backStackEntry)
             }
-            composable("record_room") { RecordRoomScreen(navController) }
+            composable("record_room") { RecordRoomScreen(navController,
+                userViewModel = userViewModel) }
             composable("add_record") { AddRecordScreen(navController) }
             composable("view_records") { ViewRecordsScreen(navController, recordFilterViewModel) }
             composable("records") {
@@ -218,7 +224,8 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("record_bar_charts") { RecordBarChartsScreen(navController) }
 
             //Movies
-            composable("movie_room") { MovieRoomScreen(navController) }
+            composable("movie_room") { MovieRoomScreen(navController,
+                userViewModel = userViewModel) }
             composable("add_movie") { AddMovieScreen(navController) }
             composable("view_movies") { ViewMoviesScreen(navController, movieFilterViewModel) }
             composable("movies") {
@@ -240,7 +247,8 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
             composable("movie_bar_charts") { MovieBarChartsScreen(navController) }
 
             //Games
-            composable("game_room") { GameRoomScreen(navController) }
+            composable("game_room") { GameRoomScreen(navController,
+                userViewModel = userViewModel) }
             composable("add_game") { AddGameScreen() }
             composable("view_games") { ViewGamesScreen(navController, gameFilterViewModel) }
             composable("games") {

@@ -3,6 +3,7 @@ package com.federico.mylibrary.book
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,12 +18,29 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.federico.mylibrary.R
 import com.federico.mylibrary.util.ConfirmDeleteAllDialog
+import com.federico.mylibrary.viewmodel.UserViewModel
+import com.federico.mylibrary.ads.AdBannerView
+import android.app.Activity
+import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
-fun LibraryRoomScreen(navController: NavController) {
+fun LibraryRoomScreen(
+    navController: NavController,
+    userViewModel: UserViewModel
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    val isPremium by userViewModel.isPremium.collectAsState()
+    if (!isPremium) {
+        AdBannerView(modifier = Modifier.fillMaxWidth())
+    }
+
+    LaunchedEffect(Unit) {
+        userViewModel.loadInterstitialAd(context)
+    }
 
     Column(
         modifier = Modifier
@@ -38,7 +56,12 @@ fun LibraryRoomScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("books?showAll=true") },
+            onClick = {
+                if (!isPremium) {
+                    userViewModel.maybeShowInterstitial(context)
+                }
+                navController.navigate("books?showAll=true")
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_books), fontSize = 18.sp)
@@ -65,7 +88,10 @@ fun LibraryRoomScreen(navController: NavController) {
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.delete_entire_collection), color = MaterialTheme.colorScheme.onError)
+            Text(
+                stringResource(R.string.delete_entire_collection),
+                color = MaterialTheme.colorScheme.onError
+            )
         }
     }
 

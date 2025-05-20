@@ -46,6 +46,9 @@
     <string name="or_login_with">oppure accedi con</string>
     <string name="filter">Filtra</string>
     <string name="close">Chiudi</string>
+    <string name="limit_reached_title">Limite raggiunto</string>
+    <string name="limit_reached_message">Hai raggiunto il limite massimo di 20 elementi per gli utenti gratuiti. Passa a Premium per continuare.</string>
+    <string name="go_premium">Diventa Premium</string>
 
 
 

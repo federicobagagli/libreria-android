@@ -49,10 +49,13 @@ import androidx.core.content.ContextCompat
 import com.federico.mylibrary.util.logCheckpoint
 import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavHostController
+import com.federico.mylibrary.ui.LimitReachedDialog
 import com.federico.mylibrary.ui.movieFieldModifier
 import com.federico.mylibrary.ui.movieFieldTextStyle
 import com.federico.mylibrary.util.Logger
+import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.federico.mylibrary.util.checkLimitReached
 
 @Serializable
 data class BookInfo(
@@ -130,7 +133,7 @@ suspend fun fetchBookInfoFromGoogleBooks(isbn: String, apiKey: String): BookInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -> Unit)? = null,
+fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel, overrideGalleryPicker: (() -> Unit)? = null,
                   overrideCameraPicker: (() -> Unit)? = null,
                   userIdOverride: String? = null) {
 
@@ -197,6 +200,19 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
     val bookAdded = stringResource(R.string.book_added)
     val errorPrefix = stringResource(R.string.error_prefix)
     val missingTitle = stringResource(R.string.missing_title)
+
+    val isPremium by userViewModel.isPremium.collectAsState()
+    var isLimitReached by remember { mutableStateOf(false) }
+    var showLimitDialog by remember { mutableStateOf(false) }
+    //per limitare numero inserimenti per i non-premium
+    LaunchedEffect(Unit) {
+        if (!isPremium) {
+            checkLimitReached(userId, "books", 2) { reached ->
+                isLimitReached = reached
+            }
+        }
+    }
+
 
     var cameraPermissionGranted by remember { mutableStateOf(false) }
 
@@ -513,6 +529,10 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
 
                     Button(
                         onClick = {
+                            if (isLimitReached) {
+                                showLimitDialog = true
+                                return@Button
+                            }
                             if (title.isBlank()) {
                                 Toast.makeText(context, missingTitle, Toast.LENGTH_SHORT).show()
                                 return@Button
@@ -864,4 +884,12 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
             text = { Text(stringResource(R.string.isbn_not_found_dialog_message)) }
         )
     }
+    LimitReachedDialog(
+        show = showLimitDialog,
+        onDismiss = { showLimitDialog = false },
+        onGoPremium = {
+            showLimitDialog = false
+            navController.navigate("go_premium") // esempio, da creare
+        }
+    )
 }

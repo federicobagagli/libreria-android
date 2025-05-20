@@ -47,7 +47,9 @@
     <string name="or_login_with">or log in with</string>
     <string name="filter">Filter</string>
     <string name="close">Close</string>
-
+    <string name="limit_reached_title">Limit Reached</string>
+    <string name="limit_reached_message">You have reached the limit of 20 items for free users. Upgrade to Premium to continue.</string>
+    <string name="go_premium">Go Premium</string>
 
 
 

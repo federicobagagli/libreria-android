@@ -1,5 +1,6 @@
 package com.federico.mylibrary.viewmodel
 
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -47,4 +48,47 @@ class UserViewModel : ViewModel() {
             _isLoaded.value = true
         }
     }
+
+    // --- Gestione Interstitial Ad ---
+    private var interstitialAd: com.google.android.gms.ads.interstitial.InterstitialAd? = null
+    private var adCounter = 0
+
+    fun loadInterstitialAd(context: android.content.Context) {
+        val adRequest = com.google.android.gms.ads.AdRequest.Builder().build()
+        com.google.android.gms.ads.interstitial.InterstitialAd.load(
+            context,
+            "ca-app-pub-3940256099942544/1033173712", // ✅ Test ID
+            adRequest,
+            object : com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback() {
+                override fun onAdLoaded(ad: com.google.android.gms.ads.interstitial.InterstitialAd) {
+                    interstitialAd = ad
+                }
+
+                override fun onAdFailedToLoad(error: com.google.android.gms.ads.LoadAdError) {
+                    interstitialAd = null
+                }
+            }
+        )
+    }
+
+    fun maybeShowInterstitial(context: android.content.Context) {
+        val activity = context as? android.app.Activity ?: return
+        adCounter++
+        if (adCounter % 5 == 0 && interstitialAd != null) {
+            interstitialAd?.fullScreenContentCallback =
+                object : com.google.android.gms.ads.FullScreenContentCallback() {
+                    override fun onAdDismissedFullScreenContent() {
+                        interstitialAd = null
+                        loadInterstitialAd(context)
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(error: com.google.android.gms.ads.AdError) {
+                        interstitialAd = null
+                        loadInterstitialAd(context)
+                    }
+                }
+            interstitialAd?.show(activity)
+        }
+    }
+
 }

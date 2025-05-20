@@ -1,10 +1,12 @@
 package com.federico.mylibrary
 
 import androidx.compose.foundation.Image
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -13,9 +15,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.federico.mylibrary.R
+import com.federico.mylibrary.ads.AdBannerView
+import com.federico.mylibrary.viewmodel.UserViewModel
 
 @Composable
-fun LivingRoomScreen(navController: NavController) {
+fun LivingRoomScreen(navController: NavController, userViewModel: UserViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
         // Immagine di sfondo
         Image(
@@ -31,6 +35,7 @@ fun LivingRoomScreen(navController: NavController) {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background.copy(alpha = 0.6f))
         )
+        val isPremium by userViewModel.isPremium.collectAsState()
 
         // Contenuto principale
         Column(
@@ -39,6 +44,9 @@ fun LivingRoomScreen(navController: NavController) {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            if (!isPremium) {
+                AdBannerView(modifier = Modifier.fillMaxWidth())
+            }
             Button(onClick = { navController.navigate("library_room") }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.library))
             }

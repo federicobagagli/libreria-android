@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.federico.mylibrary.R
+import com.federico.mylibrary.ads.AdBannerView
 import com.federico.mylibrary.export.BookExportItem
 import com.federico.mylibrary.export.ExportViewModel
 import com.federico.mylibrary.model.Book
@@ -251,6 +252,9 @@ fun BooksScreen(
                 }
             }
 
+            if (!isPremium) {
+                AdBannerView(modifier = Modifier.fillMaxWidth())
+            }
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)

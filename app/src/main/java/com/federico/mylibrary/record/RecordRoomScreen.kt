@@ -16,13 +16,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.federico.mylibrary.R
+import com.federico.mylibrary.ads.AdBannerView
 import com.federico.mylibrary.util.ConfirmDeleteAllDialog
+import com.federico.mylibrary.viewmodel.UserViewModel
+import androidx.compose.runtime.collectAsState
 
 @Composable
-fun RecordRoomScreen(navController: NavController) {
+fun RecordRoomScreen(navController: NavController, userViewModel: UserViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showConfirmDialog by remember { mutableStateOf(false) }
+
+    val isPremium by userViewModel.isPremium.collectAsState()
+    if (!isPremium) {
+        AdBannerView(modifier = Modifier.fillMaxWidth())
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +45,12 @@ fun RecordRoomScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("records") },
+            onClick = {
+                if (!isPremium) {
+                    userViewModel.maybeShowInterstitial(context)
+                }
+                navController.navigate("records")
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.view_records), fontSize = 18.sp)
@@ -63,7 +76,10 @@ fun RecordRoomScreen(navController: NavController) {
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.delete_entire_collection), color = MaterialTheme.colorScheme.onError)
+            Text(
+                stringResource(R.string.delete_entire_collection),
+                color = MaterialTheme.colorScheme.onError
+            )
         }
     }
     ConfirmDeleteAllDialog(
