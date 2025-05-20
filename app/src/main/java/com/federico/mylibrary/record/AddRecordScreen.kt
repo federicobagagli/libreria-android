@@ -26,9 +26,19 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.compose.ui.platform.testTag
+import androidx.core.content.ContextCompat
+import com.federico.mylibrary.util.Logger
+import com.federico.mylibrary.util.logCheckpoint
 
 @Composable
-fun AddRecordScreen(navController: NavController) {
+fun AddRecordScreen(navController: NavController, overrideGalleryPicker: (() -> Unit)? = null,
+                    overrideCameraPicker: (() -> Unit)? = null,
+                    userIdOverride: String? = null) {
     val context = LocalContext.current
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -63,8 +73,21 @@ fun AddRecordScreen(navController: NavController) {
     var addedDate = currentDate
     var location by remember { mutableStateOf("") }
 
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    var errorStackTrace by remember { mutableStateOf("") }
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     var uploading by remember { mutableStateOf(false) }
+    var cameraPermissionGranted by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        cameraPermissionGranted = granted
+        if (!granted) {
+            Toast.makeText(context, context.getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -92,6 +115,27 @@ fun AddRecordScreen(navController: NavController) {
                     uploading = false
                 }
             }
+        }
+    }
+
+    val imagePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val galleryPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.READ_MEDIA_IMAGES] == true
+        if (granted) {
+            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -325,29 +369,100 @@ fun AddRecordScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(12.dp))
 
             if (type == stringResource(R.string.album)) {
-                OutlinedTextField(
-                    value = coverUrl,
-                    onValueChange = { coverUrl = it },
-                    label = { Text(stringResource(R.string.cover_url)) },
-                    modifier = Modifier.fillMaxWidth()
-                )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
-                        imageUri.value = createTempImageUri(context)
-                        cameraLauncher.launch(imageUri.value)
-                    }) {
-                        Text(stringResource(R.string.take_cover_photo))
+                        overrideGalleryPicker?.invoke() ?: run {
+                            logCheckpoint(context, "📸 bottone galleria premuto")
+                            try {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    imagePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                                } else {
+                                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                }
+                            } catch (e: Exception) {
+                                //logCheckpoint(context, "❌ errore galleria", e)
+                                FirebaseCrashlytics.getInstance().log("crash in AddBookScreen")
+                                FirebaseCrashlytics.getInstance().recordException(e)
+                                val sw = java.io.StringWriter()
+                                errorStackTrace = sw.toString()
+                                showErrorDialog = true
+                                Logger.e("GALLERY_ERROR", "Errore lancio galleria", e)
+                            }
+                        }
+                    },
+                        modifier = Modifier.testTag("galleryButton")) {
+                        Text(stringResource(R.string.select_from_gallery))
                     }
-                    Button(onClick = {
-                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                    }) {
-                        Text(stringResource(R.string.select_cover_photo))
-                    }
-                }
 
-                if (uploading) {
-                    CircularProgressIndicator(modifier = Modifier.padding(8.dp))
+                    Button(onClick = {
+                        overrideCameraPicker?.invoke() ?: run {
+                            FirebaseCrashlytics.getInstance().log("📸 bottone fotocamera premuto")
+                            logCheckpoint(context, "📸 bottone fotocamera premuto")
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                val permission = Manifest.permission.CAMERA
+                                val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+                                if (!granted) {
+                                    // Richiedi il permesso in modo esplicito
+                                    permissionLauncher.launch(permission)
+                                    return@Button
+                                }
+                            }
+                            try {
+                                val uri = createTempImageUri(context)
+                                FirebaseCrashlytics.getInstance().log("📸 URI generato: $uri")
+                                /*
+                                val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    createMediaStoreImageUri(context)
+                                } else {
+                                    createTempImageUri(context)
+                                }
+
+                                 */
+                                imageUri.value = uri
+                                Logger.d("DEBUG_URI", "Uri generato: $uri")
+
+// PATCH: concedi temporaneamente i permessi di scrittura
+                                context.grantUriPermission(
+                                    "com.android.camera", // oppure "*" per concedere a tutte
+                                    uri,
+                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                )
+
+                                cameraLauncher.launch(uri)
+                            } catch (e: Exception) {
+                                FirebaseCrashlytics.getInstance().log("crash in addBook con fotocamera")
+                                FirebaseCrashlytics.getInstance().recordException(e)
+                                val sw = java.io.StringWriter()
+                                errorStackTrace = sw.toString()
+                                showErrorDialog = true
+                                Logger.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
+                            }
+                        }
+                    }, modifier = Modifier.testTag("takePhotoButton")
+                    ) {
+                        Text(stringResource(R.string.take_photo))
+                    }
                 }
+            }
+
+            if (showErrorDialog) {
+                AlertDialog(
+                    onDismissRequest = { showErrorDialog = false },
+                    confirmButton = {
+                        TextButton(onClick = { showErrorDialog = false }) {
+                            Text(stringResource(R.string.ok))
+                        }
+                    },
+                    title = { Text("Tecnical error") },
+                    text = {
+                        Box(modifier = Modifier
+                            .heightIn(min = 100.dp, max = 400.dp)
+                            .verticalScroll(rememberScrollState())) {
+                            Text(errorStackTrace, style = MaterialTheme.typography.bodySmall)
+                        }
+                    }
+                )
             }
 
         }

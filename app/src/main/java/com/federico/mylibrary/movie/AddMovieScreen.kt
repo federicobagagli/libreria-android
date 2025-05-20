@@ -1,7 +1,10 @@
 package com.federico.mylibrary.movie
 
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -31,17 +34,23 @@ import java.util.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.testTag
+import androidx.core.content.ContextCompat
 import com.federico.mylibrary.fetchMovieInfoFromTmdb
+import com.federico.mylibrary.util.Logger
 import com.federico.mylibrary.util.MovieInfoLite
 import com.federico.mylibrary.util.TmdbMoviePickerDialog
 import com.federico.mylibrary.util.searchMoviesFromTmdb
 import com.federico.mylibrary.util.fetchMovieDetailsFromTmdb
+import com.federico.mylibrary.util.logCheckpoint
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddMovieScreen(navController: NavController) {
+fun AddMovieScreen(navController: NavController, overrideGalleryPicker: (() -> Unit)? = null,
+                   overrideCameraPicker: (() -> Unit)? = null,
+                   userIdOverride: String? = null) {
     val context = LocalContext.current
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -110,6 +119,17 @@ fun AddMovieScreen(navController: NavController) {
         }
     }
 
+    var cameraPermissionGranted by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        cameraPermissionGranted = granted
+        if (!granted) {
+            Toast.makeText(context, context.getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
@@ -130,7 +150,15 @@ fun AddMovieScreen(navController: NavController) {
             }
         }
     }
-
+    val imagePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
@@ -298,15 +326,73 @@ fun AddMovieScreen(navController: NavController) {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {
-                    photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                }) {
+                    overrideGalleryPicker?.invoke() ?: run {
+                        logCheckpoint(context, "📸 bottone galleria premuto")
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                imagePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                            } else {
+                                photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            }
+                        } catch (e: Exception) {
+                            //logCheckpoint(context, "❌ errore galleria", e)
+                            FirebaseCrashlytics.getInstance().log("crash in AddBookScreen")
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                            val sw = java.io.StringWriter()
+                            Logger.e("GALLERY_ERROR", "Errore lancio galleria", e)
+                        }
+                    }
+                },
+                    modifier = Modifier.testTag("galleryButton")) {
                     Text(stringResource(R.string.select_from_gallery))
                 }
 
                 Button(onClick = {
-                    imageUri.value = createTempImageUri(context)
-                    imageUri.value?.let { cameraLauncher.launch(it) }
-                }) {
+                    overrideCameraPicker?.invoke() ?: run {
+                        FirebaseCrashlytics.getInstance().log("📸 bottone fotocamera premuto")
+                        logCheckpoint(context, "📸 bottone fotocamera premuto")
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            val permission = Manifest.permission.CAMERA
+                            val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+                            if (!granted) {
+                                // Richiedi il permesso in modo esplicito
+                                permissionLauncher.launch(permission)
+                                return@Button
+                            }
+                        }
+                        try {
+                            val uri = createTempImageUri(context)
+                            FirebaseCrashlytics.getInstance().log("📸 URI generato: $uri")
+                            /*
+                            val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                createMediaStoreImageUri(context)
+                            } else {
+                                createTempImageUri(context)
+                            }
+
+                             */
+                            imageUri.value = uri
+                            Logger.d("DEBUG_URI", "Uri generato: $uri")
+                            // PATCH: concedi temporaneamente i permessi di scrittura
+                            context.grantUriPermission(
+                                "com.android.camera", // oppure "*" per concedere a tutte
+                                uri,
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+
+
+                            cameraLauncher.launch(uri)
+                        } catch (e: Exception) {
+                            FirebaseCrashlytics.getInstance().log("crash in addBook con fotocamera")
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                            logCheckpoint(context, "❌ errore fotocamera", e)
+                            val sw = java.io.StringWriter()
+                            Logger.e("CAMERA_ERROR", "Errore durante il lancio fotocamera", e)
+                        }
+                    }
+                }, modifier = Modifier.testTag("takePhotoButton")
+                ) {
                     Text(stringResource(R.string.take_photo))
                 }
             }

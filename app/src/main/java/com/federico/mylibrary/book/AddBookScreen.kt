@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -44,9 +45,7 @@ import com.federico.mylibrary.createTempImageUri
 import com.federico.mylibrary.ui.bookFieldTextStyle
 import com.google.mlkit.vision.common.InputImage
 import com.federico.mylibrary.uploadCompressedImage
-import android.os.Build
 import androidx.core.content.ContextCompat
-import com.federico.mylibrary.createMediaStoreImageUri
 import com.federico.mylibrary.util.logCheckpoint
 import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavHostController
@@ -737,12 +736,8 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
 
                              */
                             imageUri.value = uri
-                            Toast.makeText(context, "📸 URI: $uri", Toast.LENGTH_SHORT).show()
                             Logger.d("DEBUG_URI", "Uri generato: $uri")
-                            Toast.makeText(context, "Uri: $uri", Toast.LENGTH_SHORT).show()
-
-
-// PATCH: concedi temporaneamente i permessi di scrittura
+                            // PATCH: concedi temporaneamente i permessi di scrittura
                             context.grantUriPermission(
                                 "com.android.camera", // oppure "*" per concedere a tutte
                                 uri,

@@ -1,5 +1,9 @@
 package com.federico.mylibrary.movie
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -14,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import com.federico.mylibrary.R
@@ -22,6 +27,7 @@ import com.federico.mylibrary.model.Movie
 import com.federico.mylibrary.ui.movieFieldModifier
 import com.federico.mylibrary.ui.movieFieldTextStyle
 import com.federico.mylibrary.uploadCompressedImage
+import com.federico.mylibrary.util.Logger
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.firestore.FirebaseFirestore
@@ -76,6 +82,27 @@ fun EditMovieScreen(navController: NavController, backStackEntry: NavBackStackEn
                     uploadingCover = false
                 }
             }
+        }
+    }
+
+    var cameraPermissionGranted by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        cameraPermissionGranted = granted
+        if (!granted) {
+            Toast.makeText(context, context.getString(R.string.camera_permission_denied), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val imagePermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        } else {
+            Toast.makeText(context, context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -200,14 +227,50 @@ fun EditMovieScreen(navController: NavController, backStackEntry: NavBackStackEn
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(onClick = {
-                        photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                imagePermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+                            } else {
+                                photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            }
+                        } catch (e: Exception) {
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                            val sw = java.io.StringWriter()
+                            Logger.e("GALLERY_ERROR", "EditBook Errore lancio galleria", e)
+                        }
                     }) {
                         Text(stringResource(R.string.select_from_gallery))
                     }
 
                     Button(onClick = {
-                        imageUri.value = createTempImageUri(context)
-                        imageUri.value?.let { cameraLauncher.launch(it) }
+                        try {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                val permission = Manifest.permission.CAMERA
+                                val granted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+
+                                if (!granted) {
+                                    permissionLauncher.launch(permission)
+                                    return@Button
+                                }
+                            }
+
+                            val uri = createTempImageUri(context)
+                            imageUri.value = uri
+
+                            context.grantUriPermission(
+                                "com.android.camera",
+                                uri,
+                                Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            )
+
+                            cameraLauncher.launch(uri)
+                        } catch (e: Exception) {
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                            FirebaseCrashlytics.getInstance().log("EditRecord crash in addBook con fotocamera")
+                            val sw = java.io.StringWriter()
+                            Logger.e("CAMERA_ERROR", "EditRecord Errore durante il lancio fotocamera", e)
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                        }
                     }) {
                         Text(stringResource(R.string.take_photo))
                     }
