@@ -143,6 +143,9 @@ fun LibreriaApp(selectedTheme: AppThemeStyle,
     val movieFilterViewModel: MovieFilterViewModel = viewModel()
     val gameFilterViewModel: GameFilterViewModel = viewModel()
     val userViewModel: UserViewModel = viewModel()
+    LaunchedEffect(userViewModel) {
+        FirebaseAuth.getInstance().currentUser?.uid?.let { userViewModel.startUserListener(it) }
+    }
     val hideTopBarRoutes = listOf("books", "view_library", "records", "view_records")
     Scaffold(
         topBar = {
