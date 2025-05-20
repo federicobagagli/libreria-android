@@ -59,7 +59,8 @@ class UserViewModel : ViewModel() {
         val adRequest = com.google.android.gms.ads.AdRequest.Builder().build()
         com.google.android.gms.ads.interstitial.InterstitialAd.load(
             context,
-            "ca-app-pub-3940256099942544/1033173712", // ✅ Test ID
+            "ca-app-pub-8207353706287420/1627318533",
+            //"ca-app-pub-3940256099942544/1033173712", // ✅ Test ID
             adRequest,
             object : com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: com.google.android.gms.ads.interstitial.InterstitialAd) {

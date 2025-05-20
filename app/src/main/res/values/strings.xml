@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LibraryApp</string>
+    <string name="app_name">My libraries</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login_or_register">Login / Register</string>
