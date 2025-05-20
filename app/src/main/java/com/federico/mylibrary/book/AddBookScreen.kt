@@ -49,6 +49,8 @@ import androidx.core.content.ContextCompat
 import com.federico.mylibrary.util.logCheckpoint
 import androidx.compose.ui.platform.testTag
 import androidx.navigation.NavHostController
+import com.federico.mylibrary.ui.movieFieldModifier
+import com.federico.mylibrary.ui.movieFieldTextStyle
 import com.federico.mylibrary.util.Logger
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 
@@ -420,6 +422,36 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
         }
     }
 
+    val datePickerState = rememberDatePickerState()
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val formatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            publishDate = formatter.format(Date(millis))
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     LaunchedEffect(scannedIsbn) {
         scannedIsbn?.let {
             navController.currentBackStackEntry?.savedStateHandle?.remove<String>("scannedIsbn")
@@ -584,13 +616,21 @@ fun AddBookScreen(navController: NavHostController, overrideGalleryPicker: (() -
                 textStyle = bookFieldTextStyle,
                 modifier = bookFieldModifier
             )
+
             OutlinedTextField(
                 value = publishDate,
-                onValueChange = { publishDate = it },
+                onValueChange = {},
                 label = { Text(stringResource(R.string.publish_date), fontSize = 14.sp) },
                 textStyle = bookFieldTextStyle,
-                modifier = bookFieldModifier
+                modifier = bookFieldModifier,
+                readOnly = true,
+                enabled = false
             )
+
+            Button(onClick = { showDatePicker = true }) {
+                Text(stringResource(R.string.select_date))
+            }
+
             OutlinedTextField(
                 value = description,
                 onValueChange = { description = it },

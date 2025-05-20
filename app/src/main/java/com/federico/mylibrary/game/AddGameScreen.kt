@@ -28,6 +28,8 @@ import com.federico.mylibrary.model.Game
 import com.federico.mylibrary.uploadCompressedImage
 import com.federico.mylibrary.ui.bookFieldModifier
 import com.federico.mylibrary.ui.bookFieldTextStyle
+import com.federico.mylibrary.ui.movieFieldModifier
+import com.federico.mylibrary.ui.movieFieldTextStyle
 import com.federico.mylibrary.util.Logger
 import com.federico.mylibrary.util.logCheckpoint
 import com.google.firebase.auth.FirebaseAuth
@@ -141,6 +143,36 @@ fun AddGameScreen( overrideGalleryPicker: (() -> Unit)? = null,
         }
     }
 
+    val datePickerState = rememberDatePickerState()
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    val formatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            releaseDate = formatter.format(Date(millis))
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     fun saveGame(game: Map<String, Any>) {
         db.collection("games")
             .add(game)
@@ -245,7 +277,21 @@ fun AddGameScreen( overrideGalleryPicker: (() -> Unit)? = null,
             }
 
             OutlinedTextField(publisher, { publisher = it }, label = { Text(stringResource(R.string.game_publisher)) }, modifier = bookFieldModifier)
-            OutlinedTextField(releaseDate, { releaseDate = it }, label = { Text(stringResource(R.string.game_release_date)) }, modifier = bookFieldModifier)
+
+            OutlinedTextField(
+                value = releaseDate,
+                onValueChange = {},
+                label = { Text(stringResource(R.string.game_release_date), fontSize = 14.sp) },
+                textStyle = movieFieldTextStyle,
+                modifier = movieFieldModifier,
+                readOnly = true,
+                enabled = false
+            )
+
+            Button(onClick = { showDatePicker = true }) {
+                Text(stringResource(R.string.select_date))
+            }
+
             OutlinedTextField(genre, { genre = it }, label = { Text(stringResource(R.string.game_genre)) }, modifier = bookFieldModifier)
             OutlinedTextField(language, { language = it }, label = { Text(stringResource(R.string.game_language)) }, modifier = bookFieldModifier)
             OutlinedTextField(description, { description = it }, label = { Text(stringResource(R.string.game_description)) }, modifier = bookFieldModifier)
