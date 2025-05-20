@@ -79,11 +79,18 @@ import com.federico.mylibrary.book.IsbnScannerScreen
 import com.federico.mylibrary.ui.GoPremiumScreen
 import com.federico.mylibrary.util.Logger
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MobileAds.initialize(this) {}
+        val testDeviceIds = listOf("78B6EDB6E9C9C53A0E77B00DAE9BFCF8")
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(testDeviceIds)
+            .build()
+        MobileAds.setRequestConfiguration(configuration)
+
         FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
         val currentUser = FirebaseAuth.getInstance().currentUser
         Logger.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
