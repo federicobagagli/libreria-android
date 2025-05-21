@@ -18,12 +18,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import coil.compose.AsyncImage
 import com.federico.mylibrary.util.Logger
+import com.federico.mylibrary.util.stringResourceByName
 
 @Composable
 fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStackEntry) {
     val bookId = backStackEntry.arguments?.getString("bookId") ?: return
     val db = FirebaseFirestore.getInstance()
     val context = LocalContext.current
+
 
     var book by remember { mutableStateOf<Book?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -54,8 +56,12 @@ fun DetailsBookScreen(navController: NavController, backStackEntry: NavBackStack
                 Text(text = stringResource(R.string.publish_date) + ": " + it.publishDate)
                 Text(text = stringResource(R.string.book_description) + ": " + it.description)
                 Text(text = stringResource(R.string.book_page_count) + ": ${it.pageCount}")
-                Text(text = stringResource(R.string.format) + ": " + it.format)
-                Text(text = stringResource(R.string.reading_status) + ": " + it.readingStatus)
+                val localizedFormat = stringResourceByName("format_${it.format}")
+                Text(text = stringResource(R.string.format) + ": " + localizedFormat)
+
+                val localizedReadingStatus = stringResourceByName("status_${it.readingStatus}")
+                Text(text = stringResource(R.string.reading_status) + ": " + localizedReadingStatus)
+
                 Text(text = stringResource(R.string.book_added_date) + ": " + it.addedDate)
                 Text(text = stringResource(R.string.book_rating) + ": ${it.rating}")
                 Text(text = stringResource(R.string.book_notes) + ": " + it.notes)

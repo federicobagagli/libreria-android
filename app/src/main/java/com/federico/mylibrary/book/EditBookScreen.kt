@@ -39,6 +39,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.federico.mylibrary.util.Logger
+import com.federico.mylibrary.util.stringResourceByName
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,17 +49,16 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
     val bookId = backStackEntry.arguments?.getString("bookId") ?: return
     val db = FirebaseFirestore.getInstance()
 
-    val formatOptions = listOf(
-        stringResource(R.string.format_physical),
-        stringResource(R.string.format_ebook),
-        stringResource(R.string.format_audio)
-    )
 
-    val readingOptions = listOf(
-        stringResource(R.string.status_not_started),
-        stringResource(R.string.status_reading),
-        stringResource(R.string.status_completed)
-    )
+
+    val readingStatusKeys = listOf("not_started", "reading", "completed")
+    val formatKeys = listOf("physical", "ebook", "audio")
+
+    val readingStatusOptions = readingStatusKeys.map { it to stringResourceByName("status_$it") }
+    val formatOptions = formatKeys.map { it to stringResourceByName("format_$it") }
+
+    var selectedReadingKey by remember { mutableStateOf("not_started") }
+    var selectedFormatKey by remember { mutableStateOf("physical") }
 
     var title by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
@@ -68,8 +68,6 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
     var language by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var pageCount by remember { mutableStateOf("") }
-    var selectedFormat by remember { mutableStateOf(formatOptions[0]) }
-    var selectedReadingStatus by remember { mutableStateOf(readingOptions[0]) }
     var addedDate by remember { mutableStateOf("") }
     var rating by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
@@ -172,8 +170,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
             language = book.language
             description = book.description
             pageCount = if (book.pageCount > 0) book.pageCount.toString() else ""
-            selectedFormat = book.format
-            selectedReadingStatus = book.readingStatus
+            selectedFormatKey = book.format
+            selectedReadingKey = book.readingStatus
             addedDate = book.addedDate
             rating = book.rating.takeIf { it.toIntOrNull() != null && it.toInt() > 0 } ?: ""
             notes = book.notes
@@ -215,8 +213,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                                 "publishDate" to publishDate,
                                 "description" to description,
                                 "pageCount" to (pageCount.toIntOrNull() ?: 0),
-                                "format" to selectedFormat,
-                                "readingStatus" to selectedReadingStatus,
+                                "format" to selectedFormatKey,
+                                "readingStatus" to selectedReadingKey,
                                 "addedDate" to addedDate,
                                 "rating" to rating.trim(),
                                 "notes" to notes,
@@ -228,7 +226,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                                 "yyyy-MM-dd",
                                 java.util.Locale.getDefault()
                             ).format(java.util.Date())
-                            if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed)
+                            if (selectedReadingKey.lowercase() == context.getString(R.string.status_completed)
                                     .lowercase()
                             ) {
                                 updateMap["readDate"] = currentDate
@@ -323,7 +321,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     onExpandedChange = { expandedFormat = !expandedFormat }) {
                     OutlinedTextField(
                         readOnly = true,
-                        value = selectedFormat,
+                        value = stringResourceByName("format_$selectedFormatKey"),
                         onValueChange = {},
                         label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
                         textStyle = bookFieldTextStyle,
@@ -332,11 +330,11 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     ExposedDropdownMenu(
                         expanded = expandedFormat,
                         onDismissRequest = { expandedFormat = false }) {
-                        formatOptions.forEach { option ->
+                        formatOptions.forEach { (key, label) ->
                             DropdownMenuItem(
-                                text = { Text(option, fontSize = 14.sp) },
+                                text = { Text(label, fontSize = 14.sp) },
                                 onClick = {
-                                    selectedFormat = option
+                                    selectedFormatKey = key
                                     expandedFormat = false
                                 }
                             )
@@ -349,7 +347,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     onExpandedChange = { expandedReading = !expandedReading }) {
                     OutlinedTextField(
                         readOnly = true,
-                        value = selectedReadingStatus,
+                        value = stringResourceByName("status_$selectedReadingKey"),
                         onValueChange = {},
                         label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
                         textStyle = bookFieldTextStyle,
@@ -358,11 +356,11 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                     ExposedDropdownMenu(
                         expanded = expandedReading,
                         onDismissRequest = { expandedReading = false }) {
-                        readingOptions.forEach { option ->
+                        readingStatusOptions.forEach { (key, label)  ->
                             DropdownMenuItem(
-                                text = { Text(option, fontSize = 14.sp) },
+                                text = { Text(label, fontSize = 14.sp) },
                                 onClick = {
-                                    selectedReadingStatus = option
+                                    selectedReadingKey = key
                                     expandedReading = false
                                 }
                             )
@@ -477,8 +475,8 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                             "publishDate" to publishDate,
                             "description" to description,
                             "pageCount" to (pageCount.toIntOrNull() ?: 0),
-                            "format" to selectedFormat,
-                            "readingStatus" to selectedReadingStatus,
+                            "format" to selectedFormatKey,
+                            "readingStatus" to selectedReadingKey,
                             "addedDate" to addedDate,
                             "rating" to rating.trim(),
                             "notes" to notes,
@@ -487,7 +485,7 @@ fun EditBookScreen(navController: NavController, backStackEntry: NavBackStackEnt
                         )
 
                         // Aggiungi readDate solo se si passa a "completato"
-                        if (selectedReadingStatus.lowercase() == context.getString(R.string.status_completed)
+                        if (selectedReadingKey.lowercase() == context.getString(R.string.status_completed)
                                 .lowercase()
                         ) {
                             updateMap["readDate"] = currentDate

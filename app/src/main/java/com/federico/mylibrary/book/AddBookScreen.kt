@@ -56,6 +56,7 @@ import com.federico.mylibrary.util.Logger
 import com.federico.mylibrary.viewmodel.UserViewModel
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.federico.mylibrary.util.checkLimitReached
+import com.federico.mylibrary.util.stringResourceByName
 
 @Serializable
 data class BookInfo(
@@ -153,18 +154,15 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
     val imageUri = remember { mutableStateOf<Uri?>(null) }
     var uploadingCover by remember { mutableStateOf(false) }
     var showIsbnHelpDialog by remember { mutableStateOf(false) }
-    val formatOptions = listOf(
-        stringResource(R.string.format_physical),
-        stringResource(R.string.format_ebook),
-        stringResource(R.string.format_audio)
-    )
 
+    val readingStatusKeys = listOf("not_started", "reading", "completed")
+    val formatKeys = listOf("physical", "ebook", "audio")
 
-    val readingOptions = listOf(
-        stringResource(R.string.status_not_started),
-        stringResource(R.string.status_reading),
-        stringResource(R.string.status_completed)
-    )
+    val readingStatusOptions = readingStatusKeys.map { it to stringResourceByName("status_$it") }
+    val formatOptions = formatKeys.map { it to stringResourceByName("format_$it") }
+
+    var selectedReadingKey by remember { mutableStateOf("not_started") }
+    var selectedFormatKey by remember { mutableStateOf("physical") }
 
     var showDuplicateDialog by remember { mutableStateOf(false) }
     var pendingBookData by remember { mutableStateOf<Map<String, Any>?>(null) }
@@ -325,8 +323,8 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
                 publishDate = ""
                 description = ""
                 pageCount = ""
-                selectedFormat = formatOptions[0]
-                selectedReadingStatus = readingOptions[0]
+                selectedFormatKey = "physical"
+                selectedReadingKey = "not_started"
                 rating = ""
                 notes = ""
                 coverUrl = ""
@@ -548,8 +546,8 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
                                 "language" to language,
                                 "description" to description,
                                 "pageCount" to (pageCount.toIntOrNull() ?: 0),
-                                "format" to selectedFormat,
-                                "readingStatus" to selectedReadingStatus,
+                                "format" to selectedFormatKey,
+                                "readingStatus" to selectedReadingKey,
                                 "addedDate" to addedDate,
                                 "rating" to rating.trim(),
                                 "notes" to notes,
@@ -669,22 +667,23 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
             ExposedDropdownMenuBox(
                 expanded = expandedFormat,
                 onExpandedChange = { expandedFormat = !expandedFormat }) {
+
                 OutlinedTextField(
                     readOnly = true,
-                    value = selectedFormat,
+                    value = stringResourceByName("format_$selectedFormatKey"),
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.format), fontSize = 14.sp) },
-                    textStyle = bookFieldTextStyle,
-                    modifier = bookFieldModifier.menuAnchor()
+                    label = { Text(stringResource(R.string.format)) },
+                    modifier = Modifier.menuAnchor()
                 )
+
                 ExposedDropdownMenu(
                     expanded = expandedFormat,
                     onDismissRequest = { expandedFormat = false }) {
-                    formatOptions.forEach { option ->
+                    formatOptions.forEach { (key, label) ->
                         DropdownMenuItem(
-                            text = { Text(option, fontSize = 14.sp) },
+                            text = { Text(label) },
                             onClick = {
-                                selectedFormat = option
+                                selectedFormatKey = key
                                 expandedFormat = false
                             }
                         )
@@ -693,31 +692,34 @@ fun AddBookScreen(navController: NavHostController, userViewModel: UserViewModel
             }
 
 
+
             ExposedDropdownMenuBox(
                 expanded = expandedReading,
                 onExpandedChange = { expandedReading = !expandedReading }) {
+
                 OutlinedTextField(
                     readOnly = true,
-                    value = selectedReadingStatus,
+                    value = stringResourceByName("status_$selectedReadingKey"),
                     onValueChange = {},
-                    label = { Text(stringResource(R.string.reading_status), fontSize = 14.sp) },
-                    textStyle = bookFieldTextStyle,
-                    modifier = bookFieldModifier.menuAnchor()
+                    label = { Text(stringResource(R.string.reading_status)) },
+                    modifier = Modifier.menuAnchor()
                 )
+
                 ExposedDropdownMenu(
                     expanded = expandedReading,
                     onDismissRequest = { expandedReading = false }) {
-                    readingOptions.forEach { option ->
+                    readingStatusOptions.forEach { (key, label) ->
                         DropdownMenuItem(
-                            text = { Text(option, fontSize = 14.sp) },
+                            text = { Text(label) },
                             onClick = {
-                                selectedReadingStatus = option
+                                selectedReadingKey = key
                                 expandedReading = false
                             }
                         )
                     }
                 }
             }
+
 
 
             OutlinedTextField(
