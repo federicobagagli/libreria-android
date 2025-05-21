@@ -1,18 +1,43 @@
 package com.federico.mylibrary.ui
 
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.federico.mylibrary.R
+import com.federico.mylibrary.billing.BillingManager
 
 @Composable
 fun GoPremiumScreen(navController: NavController) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val scope = rememberCoroutineScope()
+
+    val billingManager = remember {
+        BillingManager(
+            context = context,
+            onPremiumPurchased = {
+                Toast.makeText(context, context.getString(R.string.upgrade_success), Toast.LENGTH_LONG).show()
+                navController.popBackStack()
+            }
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        billingManager.startConnection(scope)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -40,8 +65,9 @@ fun GoPremiumScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(onClick = {
-            // TODO: integra Google Play Billing o Firestore update
-            // Esempio test: navController.popBackStack()
+            activity?.let {
+                billingManager.launchPurchaseFlow(it)
+            }
         }) {
             Text(stringResource(R.string.go_premium))
         }

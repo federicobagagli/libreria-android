@@ -77,6 +77,7 @@ android {
 }
 
 dependencies {
+    implementation("com.android.billingclient:billing-ktx:6.1.0")
     implementation("com.google.android.gms:play-services-ads:23.0.0")
 
     implementation("com.google.guava:guava:31.1-android")
