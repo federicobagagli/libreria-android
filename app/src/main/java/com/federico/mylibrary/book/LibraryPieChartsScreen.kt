@@ -16,9 +16,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.federico.mylibrary.ui.PieChartSection
 import com.federico.mylibrary.ui.Legend
+import com.federico.mylibrary.util.stringResourceByName
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun LibraryPieChartsScreen(navController: NavController) {
+    val context = LocalContext.current
     val db = FirebaseFirestore.getInstance()
     val userId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -38,11 +41,36 @@ fun LibraryPieChartsScreen(navController: NavController) {
             val genres = snapshot.documents.mapNotNull { it.getString("genre")?.lowercase() }
             genreCounts = genres.groupingBy { it }.eachCount()
 
-            val statuses = snapshot.documents.mapNotNull { it.getString("readingStatus")?.lowercase() }
-            readingStatusCounts = statuses.groupingBy { it }.eachCount()
+            val validReadingKeys = listOf("not_started", "reading", "completed")
+            val statuses = snapshot.documents.mapNotNull {
+                val raw = it.getString("readingStatus")?.lowercase()?.trim()
+                when {
+                    raw in validReadingKeys -> raw
+                    raw == "non iniziato" -> "not_started"
+                    raw == "in lettura" -> "reading"
+                    raw == "completato" -> "completed"
+                    else -> null
+                }
+            }
+            val rawReadingStatusCounts = statuses.groupingBy { it }.eachCount()
+            readingStatusCounts = rawReadingStatusCounts.mapKeys { (key) ->
+                stringResourceByName("status_${key}", context)
+            }
 
-            val formats = snapshot.documents.mapNotNull { it.getString("format")?.lowercase() }
-            formatCounts = formats.groupingBy { it }.eachCount()
+            val validFormatKeys = listOf("physical", "ebook", "audio")
+            val formats = snapshot.documents.mapNotNull {
+                val raw = it.getString("format")?.lowercase()?.trim()
+                when {
+                    raw in validFormatKeys -> raw
+                    raw == "cartaceo" || raw == "fisico" -> "physical"
+                    raw == "audiolibro" -> "audio"
+                    else -> null
+                }
+            }
+            val rawFormatCounts = formats.groupingBy { it }.eachCount()
+            formatCounts = rawFormatCounts.mapKeys { (key) ->
+                stringResourceByName("format_${key}", context)
+            }
 
             val languages = snapshot.documents.mapNotNull { it.getString("language")?.lowercase() }
             languageCounts = languages.groupingBy { it }.eachCount()
