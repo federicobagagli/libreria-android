@@ -24,10 +24,11 @@ android {
         applicationId = "com.federico.mylibrary"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.0.5"
+        versionCode = 14
+        versionName = "1.0.13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("Boolean", "CRASHLYTICS_ENABLED", "true")
     }
 
     compileOptions {
@@ -61,21 +62,31 @@ android {
         getByName("release") {
             isMinifyEnabled = false
             isDebuggable = false //per produzione serve false
+
+            // 🔥 Abilita Crashlytics
+            buildConfigField("Boolean", "CRASHLYTICS_ENABLED", "true")
+            buildConfigField("String", "GOOGLE_BOOKS_API_KEY", "\"$googleBooksApiKey\"")
+            buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "GOOGLE_BOOKS_API_KEY", "\"$googleBooksApiKey\"")
-            buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
+
         }
     }
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
 
 
 }
+
 
 dependencies {
     implementation("com.android.billingclient:billing-ktx:6.1.0")

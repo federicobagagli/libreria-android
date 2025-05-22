@@ -91,9 +91,10 @@ class MainActivity : ComponentActivity() {
             .build()
         MobileAds.setRequestConfiguration(configuration)
 
-        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        Logger.d("FIREBASE_UID", "UID: ${currentUser?.uid}")
+
+
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(BuildConfig.CRASHLYTICS_ENABLED)
+
         setContent {
             val context = applicationContext
             val selectedThemeStyle by ThemePreferences.themeStyleFlow(context).collectAsState(initial = AppThemeStyle.SYSTEM)
