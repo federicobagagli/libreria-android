@@ -1,6 +1,7 @@
 import java.util.Properties
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.application")
+    //alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
@@ -23,8 +24,8 @@ android {
         applicationId = "com.federico.mylibrary"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 6
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,7 +60,7 @@ android {
         }
         getByName("release") {
             isMinifyEnabled = false
-            isDebuggable = true //per produzione serve false
+            isDebuggable = false //per produzione serve false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

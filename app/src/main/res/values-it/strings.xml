@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">La mia collezione</string>
+    <string name="app_name">La mia libreria</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login_or_register">Login / Registrati</string>

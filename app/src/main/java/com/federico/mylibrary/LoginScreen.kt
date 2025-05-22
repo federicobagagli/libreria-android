@@ -2,6 +2,7 @@ package com.federico.mylibrary
 
 import android.app.Activity
 import android.content.IntentSender
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -14,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.federico.mylibrary.util.Logger
 import com.google.firebase.auth.FirebaseAuth
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
@@ -68,6 +70,24 @@ fun LoginScreen(auth: FirebaseAuth) {
             try {
                 val credential = oneTapClient.getSignInCredentialFromIntent(result.data)
                 val idToken = credential.googleIdToken
+
+                /*
+                Logger.d("LOGIN_GOOGLE", "account: ${credential.id}, token: $idToken")
+
+
+                Toast.makeText(context, "Token: ${idToken?.take(12)}...", Toast.LENGTH_LONG).show()
+
+
+                val accountEmail = credential.id
+
+                if (idToken == null) {
+                    Logger.w("GOOGLE_LOGIN", "ID token nullo per account: $accountEmail")
+                    FirebaseCrashlytics.getInstance().log("ID token nullo per account: $accountEmail")
+                    Toast.makeText(context, "Errore: ID token nullo per $accountEmail", Toast.LENGTH_LONG).show()
+                }
+
+                 */
+
                 if (idToken != null) {
                     val firebaseCredential = GoogleAuthProvider.getCredential(idToken, null)
                     auth.signInWithCredential(firebaseCredential)
@@ -109,7 +129,7 @@ fun LoginScreen(auth: FirebaseAuth) {
                     .setGoogleIdTokenRequestOptions(
                         BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                             .setSupported(true)
-                            .setServerClientId("1048852056688-q09i8vblaf6fm9sdopok83vusv3vpino.apps.googleusercontent.com")
+                            .setServerClientId("1048852056688-m9fu881evchm6rautmcd2pithnfr80l4.apps.googleusercontent.com")
                             .setFilterByAuthorizedAccounts(false)
                             .build()
                     )
