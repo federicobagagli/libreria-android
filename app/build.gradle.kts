@@ -24,8 +24,8 @@ android {
         applicationId = "com.federico.mylibrary"
         minSdk = 24
         targetSdk = 35
-        versionCode = 14
-        versionName = "1.0.13"
+        versionCode = 19
+        versionName = "1.0.18"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("Boolean", "CRASHLYTICS_ENABLED", "true")

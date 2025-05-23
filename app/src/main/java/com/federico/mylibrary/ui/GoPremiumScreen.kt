@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.federico.mylibrary.R
 import com.federico.mylibrary.billing.BillingManager
+import com.federico.mylibrary.util.Logger
 
 @Composable
 fun GoPremiumScreen(navController: NavController) {
@@ -65,8 +66,11 @@ fun GoPremiumScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(onClick = {
-            activity?.let {
-                billingManager.launchPurchaseFlow(it)
+            if (activity == null) {
+                Logger.e("GoPremiumScreen", "Activity è null: impossibile avviare il purchase flow.")
+            } else {
+                Logger.d("GoPremiumScreen", "Activity valida, avvio del purchase flow.")
+                billingManager.launchPurchaseFlow(activity)
             }
         }) {
             Text(stringResource(R.string.go_premium))
